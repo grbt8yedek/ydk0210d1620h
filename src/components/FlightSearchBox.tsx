@@ -188,7 +188,7 @@ export default function FlightSearchBox({
             <DateInput
               value={departureDate}
               onChange={setDepartureDate}
-              className="w-full pl-8 md:pl-2 md:pr-8 pr-2 py-2.5 text-base text-gray-700 placeholder-gray-400 focus:outline-none bg-transparent border border-gray-200 rounded-lg cursor-pointer"
+              className="w-full pl-8 md:pl-2 md:pr-8 pr-2 py-2.5 text-base text-gray-700 placeholder-gray-400 focus:outline-none bg-white border border-gray-200 rounded-lg cursor-pointer"
               placeholder="gg.aa.yyyy"
             />
           </div>
@@ -212,7 +212,7 @@ export default function FlightSearchBox({
             <DateInput
               value={returnDate}
               onChange={setReturnDate}
-              className={`w-full pl-8 md:pl-2 md:pr-8 pr-2 py-2.5 text-base text-gray-700 placeholder-gray-400 focus:outline-none bg-transparent border border-gray-200 rounded-lg cursor-pointer ${tripType === 'oneWay' ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-full pl-8 md:pl-2 md:pr-8 pr-2 py-2.5 text-base text-gray-700 placeholder-gray-400 focus:outline-none bg-transparent border border-gray-200 rounded-lg cursor-pointer ${tripType === 'oneWay' ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'bg-white'}`}
               placeholder={tripType === 'oneWay' ? 'Tek Yön' : 'gg.aa.yyyy'}
               disabled={tripType === 'oneWay'}
             />
@@ -226,7 +226,7 @@ export default function FlightSearchBox({
             <button
               type="button"
               onClick={() => setShowPassengerModal(true)}
-              className="w-full pl-8 pr-2 py-2.5 text-base text-gray-700 text-left focus:outline-none bg-transparent border border-gray-200 rounded-lg appearance-none cursor-pointer"
+              className="w-full pl-8 pr-2 py-2.5 text-base text-gray-700 text-left focus:outline-none bg-white border border-gray-200 rounded-lg appearance-none cursor-pointer"
             >
               {adultCount} Yetişkin{childCount > 0 ? `, ${childCount} Çocuk` : ''}{infantCount > 0 ? `, ${infantCount} Bebek` : ''}
             </button>

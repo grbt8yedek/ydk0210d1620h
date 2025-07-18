@@ -113,7 +113,7 @@ export default function FlightSearchForm({
                 <DateInput
                   value={departureDate}
                   onChange={onDepartureDateChange}
-                  className="w-full pl-10 pr-4 h-12 leading-[44px] py-0 text-base text-gray-700 placeholder-gray-400 focus:outline-none bg-transparent border border-gray-300 rounded-xl"
+                  className="w-full pl-10 pr-4 h-12 leading-[44px] py-0 text-base text-gray-700 placeholder-gray-400 focus:outline-none bg-white border border-gray-300 rounded-xl"
                   placeholder="gg.aa.yyyy"
                 />
               </div>
@@ -126,7 +126,7 @@ export default function FlightSearchForm({
                 <DateInput
                   value={returnDate}
                   onChange={onReturnDateChange}
-                  className={`flex-1 bg-transparent border-none outline-none text-[14px] font-semibold placeholder-[#6b7280] p-0 ${tripType === 'oneWay' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`w-full pl-10 pr-4 h-12 leading-[44px] py-0 text-base text-gray-700 placeholder-gray-400 focus:outline-none bg-white border border-gray-300 rounded-xl ${tripType === 'oneWay' ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''}`}
                   placeholder="gg.aa.yyyy"
                   disabled={tripType === 'oneWay'}
                 />
