@@ -54,7 +54,7 @@ export default function BiletIptalPage() {
       // Demo amaçlı sabit token ve id'ler, gerçek API'de dinamik alınacak
       const token = 'DEMO_TOKEN';
       const result = await cancelOrderBiletDukkaniReal(reservation.orderId || 'demo-order-id', token);
-      setCancellationStatus(result);
+      setCancellationStatus({ success: result.success, message: result.success ? 'Bilet başarıyla iptal edildi.' : 'İptal işlemi başarısız.' });
       if(result.success) {
         setReservation(null); // İptal sonrası rezervasyonu temizle
       }

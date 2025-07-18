@@ -1,47 +1,25 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import AccountSidebar from '@/components/AccountSidebar';
-import { PlaneTakeoff, Building, Car, Wifi, Briefcase } from 'lucide-react';
-import { getAirlineCheckInUrl } from '@/utils/airlines';
 import { getOrderRouteTicketsBiletDukkaniDemo, getOrderRouteAirRulesBiletDukkaniReal } from '@/services/flightApi';
-import { useSession, signOut } from 'next-auth/react';
-import { User, Plane, Users, Star, Receipt, Search, Bell, Heart } from 'lucide-react';
-
-type Passenger = {
-  name: string;
-  seat: string;
-  baggage: string;
-  ticketType: string;
-};
-
-type FlightReservation = {
-  id: string;
-  pnr: string;
-  airline: string;
-  from: string;
-  to: string;
-  date: string;
-  time: string;
-  arrivalTime: string;
-  price: string;
-  status: string;
-  passengers: Passenger[];
-  details: {
-    payment: string;
-    rules: string;
-  };
-};
+import { TabType, FlightReservation, HotelReservation, CarReservation } from '@/types/travel';
+import TabSelector from '@/components/travel/TabSelector';
+import FlightCard from '@/components/travel/FlightCard';
+import HotelCard from '@/components/travel/HotelCard';
+import CarCard from '@/components/travel/CarCard';
+import EmptyState from '@/components/travel/EmptyState';
 
 export default function SeyahatlerimPage() {
-  const [activeTab, setActiveTab] = useState('ucak');
-  const [otelReservations, setOtelReservations] = useState([]);
-  const [aracReservations, setAracReservations] = useState([]);
-  const [esimOrders, setEsimOrders] = useState([]);
+  const [activeTab, setActiveTab] = useState<TabType>('ucak');
   const [flightReservations, setFlightReservations] = useState<FlightReservation[]>([]);
   const [loadingFlights, setLoadingFlights] = useState(false);
   const [openDetailId, setOpenDetailId] = useState<string | null>(null);
-  const [hotelReservations, setHotelReservations] = useState([
+  const [airRules, setAirRules] = useState<{ [flightId: string]: any[] }>({});
+  const [airRulesLoading, setAirRulesLoading] = useState<string | null>(null);
+  const [airRulesError, setAirRulesError] = useState<string | null>(null);
+  
+  // Otel rezervasyonları (DEMO veriler)
+  const [hotelReservations, setHotelReservations] = useState<HotelReservation[]>([
     {
       id: 'h1',
       hotelName: 'Grand Hyatt Berlin',
@@ -90,7 +68,9 @@ export default function SeyahatlerimPage() {
     }
   ]);
   const [openHotelDetailId, setOpenHotelDetailId] = useState<string | null>(null);
-  const [carReservations, setCarReservations] = useState([
+  
+  // Araç rezervasyonları (DEMO veriler)
+  const [carReservations, setCarReservations] = useState<CarReservation[]>([
     {
       id: 'c1',
       car: 'Volkswagen Golf',
@@ -116,19 +96,6 @@ export default function SeyahatlerimPage() {
     }
   ]);
   const [openCarDetailId, setOpenCarDetailId] = useState<string | null>(null);
-  const [airRules, setAirRules] = useState<{ [flightId: string]: any[] }>({});
-  const [airRulesLoading, setAirRulesLoading] = useState<string | null>(null);
-  const [airRulesError, setAirRulesError] = useState<string | null>(null);
-
-  // Tarih formatını Türk formatına çeviren fonksiyon
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('tr-TR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
 
   // BiletDukkani demo API'den bilet detaylarını çek
   useEffect(() => {
@@ -175,7 +142,7 @@ export default function SeyahatlerimPage() {
     fetchTickets();
   }, []);
 
-  const handleOpenDetail = async (flight: any) => {
+  const handleOpenDetail = async (flight: FlightReservation) => {
     if (openDetailId === flight.id) {
       setOpenDetailId(null);
       return;
@@ -186,7 +153,7 @@ export default function SeyahatlerimPage() {
     try {
       // Demo amaçlı sabit token ve id'ler, gerçek API'de dinamik alınacak
       const token = 'DEMO_TOKEN';
-      const rules = await getOrderRouteAirRulesBiletDukkaniReal(flight.orderId || 'demo-order-id', flight.routeId || 'demo-route-id', token);
+      const rules = await getOrderRouteAirRulesBiletDukkaniReal(flight.id, flight.id, token);
       setAirRules(prev => ({ ...prev, [flight.id]: rules }));
     } catch (e: any) {
       setAirRulesError('Kural bilgisi alınamadı.');
@@ -195,275 +162,87 @@ export default function SeyahatlerimPage() {
     }
   };
 
-  // Uçak kartları ve kutuları
+  // Uçak içeriği
   const renderUcakContent = () => (
     <div className="bg-white rounded-lg shadow-sm sm:p-6 p-2">
       <h2 className="sm:text-xl text-lg font-bold mb-4 text-gray-700">Uçak Rezervasyonlarım</h2>
       {flightReservations.length === 0 ? (
-        <div className="text-center sm:py-12 py-6 text-gray-500">
-          Henüz hiç bilet satın almadınız.
-        </div>
+        <EmptyState type="flight" />
       ) : (
         <div className="sm:space-y-4 space-y-2">
-          {flightReservations.map(flight => {
-            const checkInUrl = getAirlineCheckInUrl(flight.airline);
-            return (
-              <div key={flight.id} className="border rounded-xl sm:p-4 p-2 bg-gray-50">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <div className="font-bold sm:text-lg text-base">{flight.from} → {flight.to}</div>
-                    <div className="text-sm text-gray-600">{formatDate(flight.date)} • {flight.time}{flight.arrivalTime ? ` - ${flight.arrivalTime}` : ""} • {flight.airline}</div>
-                    <div className="text-xs text-gray-500 mt-1">PNR: {flight.pnr}</div>
-                    <div className="text-xs text-gray-500">Yolcu: {flight.passengers.map(p => p.name).join(', ')}</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-bold sm:text-xl text-base">{flight.price}</div>
-                    <div className="text-xs text-green-600">{flight.status}</div>
-                    <button
-                      onClick={() => handleOpenDetail(flight)}
-                      className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded-lg hover:bg-gray-300"
-                    >
-                      Detay
-                    </button>
-                  </div>
-                </div>
-                {openDetailId === flight.id && (
-                  <div className="mt-2 pt-2 border-t">
-                    <div className="mb-2 text-sm font-semibold text-gray-700">Yolcular</div>
-                    <table className="w-full mb-2 text-xs">
-                      <thead>
-                        <tr className="text-gray-500">
-                          <th className="text-left py-1">Ad Soyad</th>
-                          <th className="text-left py-1">Koltuk</th>
-                          <th className="text-left py-1">Bagaj</th>
-                          <th className="text-left py-1">Bilet Tipi</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {flight.passengers.map((p, i) => (
-                          <tr key={i} className="border-t">
-                            <td className="py-1">{p.name}</td>
-                            <td className="py-1">{p.seat}</td>
-                            <td className="py-1">{p.baggage}</td>
-                            <td className="py-1">{p.ticketType}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <div className="grid grid-cols-2 gap-1 mb-2 text-xs text-gray-700">
-                      <div><b>PNR:</b> {flight.pnr}</div>
-                      <div><b>Havayolu:</b> {flight.airline}</div>
-                      <div><b>Gidiş Tarihi:</b> {formatDate(flight.date)}</div>
-                      <div><b>Gidiş Saati:</b> {flight.time}{flight.arrivalTime ? ` - ${flight.arrivalTime}` : ""}</div>
-                      <div><b>Durum:</b> {flight.status}</div>
-                      <div><b>Fiyat:</b> {flight.price}</div>
-                    </div>
-                    <div className="mb-2 text-xs text-gray-700"><b>Ödeme:</b> {flight.details.payment}</div>
-                    {/* Bilet Kuralları */}
-                    <div className="mb-2 text-xs text-gray-700">
-                      <b>Bilet Kuralları:</b>
-                      {airRulesLoading === flight.id && (
-                        <div className="text-xs text-gray-500 mt-1">Kurallar yükleniyor...</div>
-                      )}
-                      {airRulesError && (
-                        <div className="text-xs text-red-500 mt-1">{airRulesError}</div>
-                      )}
-                      {airRules[flight.id] && airRules[flight.id].length > 0 && (
-                        <ul className="mt-2 bg-green-50 border border-green-200 rounded-lg p-2 text-xs text-gray-700 space-y-1">
-                          {airRules[flight.id].map((rule, idx) => (
-                            <li key={idx}><span className="font-semibold text-green-800">{rule.title}:</span> {rule.detail}</li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                    <div className="mt-2 flex gap-2">
-                      <button
-                        onClick={() => window.open(checkInUrl, '_blank', 'noopener,noreferrer')}
-                        disabled={!checkInUrl}
-                        title={checkInUrl ? 'Online check-in sayfasına git' : 'Bu havayolu için otomatik yönlendirme bulunmuyor.'}
-                        className="text-xs bg-blue-500 text-white px-2 py-1 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                      >
-                        Online Check-in
-                      </button>
-                      <button
-                        disabled
-                        title="Yakında"
-                        className="text-xs bg-gray-100 text-gray-400 px-2 py-1 rounded-lg cursor-not-allowed flex items-center gap-1"
-                      >
-                        <Briefcase size={12} />
-                        Ek Hizmet Ekle
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          {flightReservations.map(flight => (
+            <FlightCard
+              key={flight.id}
+              flight={flight}
+              airRules={airRules}
+              airRulesLoading={airRulesLoading}
+              airRulesError={airRulesError}
+              onOpenDetail={handleOpenDetail}
+              openDetailId={openDetailId}
+            />
+          ))}
         </div>
       )}
     </div>
   );
 
+  // Otel içeriği
   const renderOtelContent = () => (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <h2 className="text-xl font-bold mb-4 text-gray-700">Otel Rezervasyonlarım (DEMO)</h2>
       {hotelReservations.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
-          Henüz otel rezervasyonu yapmadınız.
-        </div>
+        <EmptyState type="hotel" />
       ) : (
         <div className="space-y-4">
           {hotelReservations.map(hotel => (
-            <div key={hotel.id} className="border rounded-xl p-4 bg-gray-50">
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="font-semibold text-lg text-blue-700">{hotel.hotelName}</div>
-                  <div className="text-sm text-gray-500">{hotel.location}</div>
-                  <div className="text-sm text-gray-500">Giriş: {formatDate(hotel.checkIn)} {hotel.checkInTime} <b>• Çıkış:</b> {formatDate(hotel.checkOut)} {hotel.checkOutTime}</div>
-                  <div className="text-sm text-gray-500">Oda: {hotel.roomType}</div>
-                  <div className="text-sm text-gray-500">Konuklar: {hotel.guests.map(g => g.name).join(', ')}</div>
-                </div>
-                <div className="flex flex-col items-end gap-2">
-                  <div className="text-lg font-bold text-gray-800">{hotel.price}</div>
-                  <div className="text-xs text-green-600">{hotel.status}</div>
-                  <button
-                    className="mt-2 px-4 py-1 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600"
-                    onClick={() => setOpenHotelDetailId(openHotelDetailId === hotel.id ? null : hotel.id)}
-                  >
-                    Detay
-                  </button>
-                </div>
-              </div>
-              {openHotelDetailId === hotel.id && (
-                <div className="mt-4 p-4 bg-white rounded-xl border text-left">
-                  <div className="mb-2 text-base font-semibold text-gray-700">Otel Bilgileri</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Otel:</b> {hotel.hotelName}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Adres:</b> {hotel.address}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Telefon:</b> {hotel.phone}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Giriş Tarihi:</b> {formatDate(hotel.checkIn)} {hotel.checkInTime}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Çıkış Tarihi:</b> {formatDate(hotel.checkOut)} {hotel.checkOutTime}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Oda Tipi:</b> {hotel.roomType}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Konuklar:</b> {hotel.guests.map(g => g.name + ' (' + g.type + ')').join(', ')}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Rezervasyon No:</b> {hotel.reservationNo}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Durum:</b> {hotel.status}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Fiyat:</b> {hotel.price}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Ödeme:</b> {hotel.payment}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Kurallar:</b> {hotel.rules}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Ek Hizmetler:</b> {hotel.services.join(', ')}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Notlar:</b> {hotel.notes}</div>
-                </div>
-              )}
-            </div>
+            <HotelCard
+              key={hotel.id}
+              hotel={hotel}
+              openDetailId={openHotelDetailId}
+              onToggleDetail={setOpenHotelDetailId}
+            />
           ))}
         </div>
       )}
     </div>
   );
 
+  // Araç içeriği
   const renderAracContent = () => (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <h2 className="text-xl font-bold mb-4 text-gray-700">Araç Rezervasyonlarım (DEMO)</h2>
       {carReservations.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
-          Henüz araç kiralamadınız.
-        </div>
+        <EmptyState type="car" />
       ) : (
         <div className="space-y-4">
           {carReservations.map(car => (
-            <div key={car.id} className="border rounded-xl p-4 bg-gray-50">
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="font-semibold text-lg text-orange-700">{car.car}</div>
-                  <div className="text-sm text-gray-500">{car.type}</div>
-                  <div className="text-sm text-gray-500">Alış: {car.pickupLocation} ({car.pickupCity}) {formatDate(car.pickupDate)} {car.pickupTime}</div>
-                  <div className="text-sm text-gray-500">Bırakış: {car.dropoffLocation} ({car.dropoffCity}) {formatDate(car.dropoffDate)} {car.dropoffTime}</div>
-                  <div className="text-sm text-gray-500">Kiralayan: {car.renter}</div>
-                </div>
-                <div className="flex flex-col items-end gap-2">
-                  <div className="text-lg font-bold text-gray-800">{car.price}</div>
-                  <div className="text-xs text-green-600">{car.status}</div>
-                  <button
-                    className="mt-2 px-4 py-1 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600"
-                    onClick={() => setOpenCarDetailId(openCarDetailId === car.id ? null : car.id)}
-                  >
-                    Detay
-                  </button>
-                </div>
-              </div>
-              {openCarDetailId === car.id && (
-                <div className="mt-4 p-4 bg-white rounded-xl border text-left">
-                  <div className="mb-2 text-base font-semibold text-gray-700">Araç Bilgileri</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Plaka:</b> {car.plate}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Rezervasyon No:</b> {car.reservationNo}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Durum:</b> {car.status}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Ödeme:</b> {car.payment}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Ek Hizmetler:</b> {car.services.join(', ')}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Kurallar:</b> {car.rules}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Ofis Tel:</b> {car.officePhone}</div>
-                  <div className="mb-2 text-sm text-gray-700"><b>Notlar:</b> {car.notes}</div>
-                </div>
-              )}
-            </div>
+            <CarCard
+              key={car.id}
+              car={car}
+              openDetailId={openCarDetailId}
+              onToggleDetail={setOpenCarDetailId}
+            />
           ))}
         </div>
       )}
     </div>
   );
 
+  // İçerik seçici
   const renderContent = () => {
     switch (activeTab) {
       case 'ucak':
         return renderUcakContent();
-
       case 'otel':
         return renderOtelContent();
-
       case 'arac':
         return renderAracContent();
-
       case 'esim':
-        return (
-          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center">
-                <Wifi className="w-12 h-12 text-gray-400" />
-              </div>
-              <h2 className="text-xl text-gray-700">Henüz E-sim satın almadınız.</h2>
-              <p className="text-gray-500">
-                İşlem yaptıkça, satın aldığınız E-sim'lere buradan ulaşabileceksiniz.
-              </p>
-              <button className="mt-4 px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors">
-                E-sim satın al
-              </button>
-            </div>
-          </div>
-        );
-
+        return <EmptyState type="esim" />;
       default:
-        return (
-          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <div className="flex flex-col items-center gap-4">
-              <h2 className="text-xl text-gray-700">Bu bölüm henüz hazır değil.</h2>
-              <p className="text-gray-500">
-                Çok yakında hizmetinizde olacak.
-              </p>
-            </div>
-          </div>
-        );
+        return <EmptyState type="default" />;
     }
   };
-
-  const menuItems = [
-    { icon: User, label: 'Hesabım', href: '/hesabim' },
-    { icon: Plane, label: 'Seyahatlerim', href: '/hesabim/seyahatlerim' },
-    { icon: Users, label: 'Yolcularım', href: '/hesabim/yolcularim' },
-    { icon: Star, label: 'Puanlarım', href: '/hesabim/puanlarim' },
-    { icon: Receipt, label: 'Fatura Bilgilerim', href: '/hesabim/fatura' },
-    { icon: Search, label: 'Aramalarım', href: '/hesabim/aramalarim' },
-    { icon: Bell, label: 'Fiyat Alarmlarım', href: '/hesabim/alarmlar' },
-    { icon: Heart, label: 'Favorilerim', href: '/hesabim/favoriler' },
-  ];
-  const handleLogout = () => { signOut({ callbackUrl: '/' }); };
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -471,42 +250,8 @@ export default function SeyahatlerimPage() {
         <div className="sm:flex sm:gap-8 flex flex-col gap-2">
           <div className="flex-1 sm:space-y-6 space-y-2">
             {/* Sekmeler */}
-            <div className="bg-white rounded-lg shadow-sm sm:p-6 p-2">
-              <div className="flex sm:gap-8 gap-1 justify-center overflow-x-auto no-scrollbar">
-                <button
-                  onClick={() => setActiveTab('ucak')}
-                  className={`sm:px-6 sm:py-2 px-2 py-1 rounded-lg text-sm font-medium ${
-                    activeTab === 'ucak' ? 'bg-green-50 text-green-500' : 'text-gray-400 hover:bg-gray-50'
-                  }`}
-                >
-                  <span className="sm:text-base text-sm">Uçak</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('otel')}
-                  className={`sm:px-6 sm:py-2 px-2 py-1 rounded-lg text-sm font-medium ${
-                    activeTab === 'otel' ? 'bg-green-50 text-green-500' : 'text-gray-400 hover:bg-gray-50'
-                  }`}
-                >
-                  <span className="sm:text-base text-sm">Otel</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('arac')}
-                  className={`sm:px-6 sm:py-2 px-2 py-1 rounded-lg text-sm font-medium ${
-                    activeTab === 'arac' ? 'bg-green-50 text-green-500' : 'text-gray-400 hover:bg-gray-50'
-                  }`}
-                >
-                  <span className="sm:text-base text-sm">Araç</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('esim')}
-                  className={`sm:px-6 sm:py-2 px-2 py-1 rounded-lg text-sm font-medium ${
-                    activeTab === 'esim' ? 'bg-green-50 text-green-500' : 'text-gray-400 hover:bg-gray-50'
-                  }`}
-                >
-                  <span className="sm:text-base text-sm">E-sim</span>
-                </button>
-              </div>
-            </div>
+            <TabSelector activeTab={activeTab} onTabChange={setActiveTab} />
+            
             {/* İçerik */}
             <div className="sm:block block">
               {renderContent()}

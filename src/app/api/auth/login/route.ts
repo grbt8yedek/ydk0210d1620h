@@ -2,16 +2,8 @@ import { NextResponse } from 'next/server';
 import { validate } from '@/utils/validation';
 import { userSchema } from '@/utils/validation';
 import { logger } from '@/utils/error';
-
-// Geliştirme aşaması için basit kullanıcı listesi
-const DEV_USERS = [
-  {
-    id: '1',
-    email: 'test@gurbet.biz',
-    password: '$2a$10$YourHashedPasswordHere', // bcrypt ile hashlenmiş "test123"
-    name: 'Test Kullanıcı'
-  }
-];
+import bcrypt from 'bcryptjs';
+import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
@@ -21,19 +13,26 @@ export async function POST(request: Request) {
     await validate(userSchema.login, body);
     const { email, password } = body;
 
-    // Geliştirme aşamasında basit kontrol
-    const user = DEV_USERS.find(u => u.email === email);
+    // Veritabanından kullanıcıyı bul
+    const user = await prisma.user.findUnique({
+      where: { email: email }
+    });
     
-    if (user) {
-      // Geliştirme aşamasında basit şifre kontrolü
-      if (password === 'test123') {
+    if (user && user.password) {
+      // Şifreyi karşılaştır
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      
+      if (isPasswordValid) {
         logger.info(`Başarılı giriş: ${email}`);
         return NextResponse.json({
           success: true,
           user: {
             id: user.id,
             email: user.email,
-            name: user.name
+            name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            phone: user.phone
           }
         });
       }

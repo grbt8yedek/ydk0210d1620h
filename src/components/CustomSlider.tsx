@@ -8,8 +8,8 @@ interface CustomSliderProps {
   // Slider özellikleri
   min: number;
   max: number;
-  value: number | [number, number];
-  onChange: (value: number | [number, number]) => void;
+  value: number | number[];
+  onChange: (value: number | number[]) => void;
   
   // Görünüm özellikleri
   range?: boolean;
