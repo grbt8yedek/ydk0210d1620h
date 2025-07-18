@@ -17,35 +17,54 @@ const BAGGAGE_OPTIONS = [
 ];
 
 const FlightDetailsCard = ({ flight }: { flight: any }) => {
+    // MOBİLDE DAHA KÜÇÜK VE SIKI TASARIM (geri alınabilir)
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     if (!flight) return null;
 
     return (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Uçuş Detayları</h2>
-            <div className="flex items-center justify-between border-b pb-4 mb-4">
-                <div className="flex items-center gap-4">
-                    <PlaneTakeoff className="w-6 h-6 text-green-600" />
-                    <div>
-                        <p className="font-semibold">{flight.origin}</p>
-                        <p className="text-sm text-gray-500">{flight.departureTime ? new Date(flight.departureTime).toLocaleDateString('tr-TR') : ''} - {flight.departureTime?.slice(11, 16)}</p>
-                    </div>
+        <div className={`bg-white rounded-lg shadow-md ${isMobile ? 'p-3' : 'p-6'} mb-6`}>
+            <h2 className={`text-xl font-bold text-gray-800 mb-4 ${isMobile ? 'mb-2' : ''}`}>Uçuş Detayları</h2>
+            <div className={`flex items-center justify-between border-b pb-4 mb-4 ${isMobile ? 'pb-2 mb-2' : ''}`}>
+                <div className="flex flex-col items-center flex-1">
+                    <span className="font-bold text-base sm:text-lg">{flight.origin}</span>
+                    {isMobile ? (
+                      <span className="flex flex-col items-center text-gray-500 text-xs mt-1 w-full">
+                        <span className="flex items-center gap-1 justify-center w-full">
+                          <PlaneTakeoff className="w-4 h-4 text-green-600" />
+                          {flight.departureTime ? new Date(flight.departureTime).toLocaleDateString('tr-TR') : ''}
+                        </span>
+                        <span className="block w-full text-center">{flight.departureTime?.slice(11, 16)}</span>
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-gray-500 text-sm">
+                        <PlaneTakeoff className="w-6 h-6 text-green-600" />
+                        {flight.departureTime ? new Date(flight.departureTime).toLocaleDateString('tr-TR') : ''} - {flight.departureTime?.slice(11, 16)}
+                      </span>
+                    )}
                 </div>
-                <div className="text-center">
-                    <p className="text-sm text-gray-500">{flight.duration}</p>
-                    <div className="w-24 border-t border-dashed my-1"></div>
-                    <p className={`text-xs ${flight.direct ? "text-green-500" : "text-orange-500"}`}>{flight.direct ? "Direkt" : "Aktarmalı"}</p>
+                <div className="flex flex-col items-center flex-1 min-w-0">
+                    <span className={`font-semibold ${isMobile ? 'text-xs' : 'text-sm'}`}>{flight.duration}</span>
+                    <span className={`text-green-600 font-semibold ${isMobile ? 'text-xs mt-[-2px]' : 'text-sm'}`}>{flight.direct ? 'Direkt' : 'Aktarmalı'}</span>
                 </div>
-                <div className="flex items-center gap-4 text-right">
-                    <div>
-                        <p className="font-semibold">{flight.destination}</p>
-                        <p className="text-sm text-gray-500">{flight.arrivalTime ? new Date(flight.arrivalTime).toLocaleDateString('tr-TR') : ''} - {flight.arrivalTime?.slice(11, 16)}</p>
-                    </div>
-                    <PlaneLanding className="w-6 h-6 text-green-600" />
+                <div className="flex flex-col items-center flex-1">
+                    <span className="font-bold text-base sm:text-lg">{flight.destination}</span>
+                    {isMobile ? (
+                      <span className="flex flex-col items-center text-gray-500 text-xs mt-1 w-full">
+                        <span className="flex items-center gap-1 justify-center w-full">
+                          {flight.arrivalTime ? new Date(flight.arrivalTime).toLocaleDateString('tr-TR') : ''}
+                          <PlaneLanding className="w-4 h-4 text-green-600" />
+                        </span>
+                        <span className="block w-full text-center">{flight.arrivalTime?.slice(11, 16)}</span>
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-gray-500 text-sm">
+                        {flight.arrivalTime ? new Date(flight.arrivalTime).toLocaleDateString('tr-TR') : ''} - {flight.arrivalTime?.slice(11, 16)}
+                        <PlaneLanding className="w-6 h-6 text-green-600" />
+                      </span>
+                    )}
                 </div>
             </div>
-            <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">{flight.airlineName} - {flight.flightNumber}</span>
-            </div>
+            <div className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'} text-gray-600`}>{flight.airlineName} - {flight.flightNumber}</div>
         </div>
     );
 };
@@ -147,11 +166,11 @@ const PassengerForm = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Adı*</label>
-                        <input type="text" name="firstName" value={passengerData.firstName || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50" placeholder="Adınız" />
+                        <input type="text" name="firstName" value={passengerData.firstName || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50" placeholder="" />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Soyadı*</label>
-                        <input type="text" name="lastName" value={passengerData.lastName || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50" placeholder="Soyadınız" />
+                        <input type="text" name="lastName" value={passengerData.lastName || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50" placeholder="" />
                     </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -202,7 +221,7 @@ const PassengerForm = ({
                                 value={passengerData.identityNumber || ''} 
                                 onChange={handleChange} 
                                 className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 pr-32"
-                                placeholder="TC Kimlik Numaranız"
+                                placeholder=""
                                 disabled={passengerData.isForeigner}
                             />
                             <div className="absolute right-2 flex items-center">
@@ -307,9 +326,7 @@ const ContactForm = ({
                         Uçuş bilgilendirmeleri, fırsat ve kampanyalardan <a href="#" className="font-bold text-gray-800 hover:underline">Rıza Metni</a> kapsamında haberdar olmak istiyorum.
                     </label>
                 </div>
-                <span className="mt-3 inline-block bg-gray-100 text-gray-600 text-xs font-semibold px-2 py-1 rounded-md">
-                    Ücretsiz SMS
-                </span>
+                {/* Ücretsiz SMS etiketi kaldırıldı */}
             </div>
         </div>
     )
@@ -330,8 +347,8 @@ const BaggageSelection = ({ passengers, flight, onBaggageChange, baggageSelectio
                 {passengers.map((passenger, pIndex) => (
                     <div key={`passenger-baggage-${pIndex}`}>
                         {flightLegs.map((leg, lIndex) => (
-                             <div key={`leg-${lIndex}`} className="p-4 border rounded-lg flex items-center justify-between gap-4">
-                                <div className="flex-1">
+                             <div key={`leg-${lIndex}`} className={`p-4 border rounded-lg ${typeof window !== 'undefined' && window.innerWidth < 768 ? 'flex flex-col gap-2 items-start' : 'flex items-center justify-between gap-4'}`}>
+                                <div className="flex-1 w-full">
                                     <p className="font-bold text-gray-800">{`${pIndex + 1}. ${passenger.type || 'Yolcu'}`}</p>
                                     <div className="flex items-center gap-2 mt-1">
                                         <PlaneTakeoff size={16} className="text-orange-500"/>
@@ -339,10 +356,10 @@ const BaggageSelection = ({ passengers, flight, onBaggageChange, baggageSelectio
                                     </div>
                                     <p className="text-xs text-gray-500 mt-1">Bagaj hakkı 1x{leg.flight.baggage || '20kg'}</p>
                                 </div>
-                                <div className="w-48">
+                                <div className="w-48 sm:w-full mt-2 sm:mt-0">
                                      <label className="block text-xs text-gray-500 mb-1">Ek check-in bagajı</label>
                                      <select
-                                        className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 text-sm"
+                                        className={`w-full p-2 border border-gray-300 rounded-lg bg-gray-50 text-sm ${typeof window !== 'undefined' && window.innerWidth < 768 ? 'mt-1' : ''}`}
                                         value={baggageSelections[pIndex]?.[lIndex]?.price ?? 0}
                                         onChange={(e) => {
                                             const selectedOption = BAGGAGE_OPTIONS.find(opt => opt.price === parseInt(e.target.value));

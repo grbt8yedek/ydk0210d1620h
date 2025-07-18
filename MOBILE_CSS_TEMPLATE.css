@@ -11,6 +11,14 @@
 /* Mobil breakpoint'lerde çalış */
 @media (max-width: 768px) {
   /* Mobil özel stiller buraya */
+  .border-green-200 {
+    --tw-border-opacity: 1 !important;
+    border-color: rgb(225, 233, 227) !important;
+  }
+  /* Sadece üst çizgiyi açık gri yap (buton barı üstü) */
+  .border-green-200 {
+    border-top-color: rgb(229, 231, 235) !important;
+  }
 }
 
 @media (max-width: 480px) {

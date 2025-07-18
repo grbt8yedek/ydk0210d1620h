@@ -1,0 +1,18 @@
+
+> grbt8@0.1.0 dev
+> next dev -p 3001
+
+  ▲ Next.js 13.5.6
+  - Local:        http://localhost:3001
+  - Environments: .env
+
+ ✓ Ready in 3.4s
+ ✓ Compiled /src/middleware in 399ms (54 modules)
+ ○ Compiling /page ...
+ ✓ Compiled /page in 5.6s (2580 modules)
+ ✓ Compiled in 2s (1230 modules)
+ ✓ Compiled /not-found in 762ms (1353 modules)
+ ✓ Compiled /api/auth/[...nextauth]/route in 2s (1492 modules)
+ ✓ Compiled (1815 modules)
+ ○ Compiling /hesabim/page ...
+ ✓ Compiled /hesabim/page in 3.5s (3172 modules)

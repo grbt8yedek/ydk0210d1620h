@@ -826,3 +826,34 @@ Kullanıcıların kalkış ve varış için birden fazla havaalanı seçebilmesi
 - Gerekirse backend ekibiyle iletişime geçilmeli.
 
 ---
+
+## Next.js Kapanma Sorunu ve Çözümü (2024-07-17)
+
+### Sorun
+Next.js geliştirme sunucusu (`npm run dev`) sayfa yenilenirken kendi kendini durduruyordu. Bu durum şu sebeplerden kaynaklanıyordu:
+
+1. **Dosya İzleme Sorunu**: Next.js çok fazla dosya değişikliği izlemeye çalışırken hot reload mekanizması çöküyordu
+2. **Bellek Yönetimi Sorunu**: Node.js çok fazla RAM kullanıyor ve sayfa yenilenirken bellek temizlenmiyordu
+3. **Port Çakışması**: 3000 portunda başka bir uygulama çalışıyor olabilirdi
+
+### Çözüm
+Next.js'i background'da çalıştırmak sorunu çözdü:
+
+```bash
+nohup npm run dev -- -p 3001 > dev.log 2>&1 &
+```
+
+**Bu komut ne yapıyor:**
+- `nohup`: Süreci terminal'den bağımsız çalıştırır
+- `-p 3001`: Farklı port kullanır (port çakışmasını önler)
+- `> dev.log 2>&1`: Logları dosyaya yazar
+- `&`: Background'da çalıştırır
+
+### Sonuç
+Artık Next.js kendi kendini durdurmuyor ve sistem kararlı çalışıyor. Site `http://localhost:3001` adresinden erişilebilir.
+
+### Alternatif Çözümler
+Eğer background çalıştırma istemiyorsanız:
+1. **Port değiştirme**: `npm run dev -- -p 3001`
+2. **Cache temizleme**: `rm -rf .next && npm run dev`
+3. **Dosya izleme limitini artırma**: `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf`
