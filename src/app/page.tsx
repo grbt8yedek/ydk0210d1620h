@@ -15,7 +15,6 @@ import FlightSearchForm from '@/components/FlightSearchForm';
 import HeroSection from '@/components/HeroSection';
 import CampaignsSection from '@/components/CampaignsSection';
 import dynamic from 'next/dynamic';
-import 'react-datepicker/dist/react-datepicker.css';
 import { tr } from 'date-fns/locale';
 import { format } from 'date-fns';
 
