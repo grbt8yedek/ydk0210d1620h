@@ -61,13 +61,15 @@ export default function Header() {
                             </button>
                         </div>
                         <div className="flex justify-center items-center -mt-[0.1rem] mb-0">
-                            <Link href="/" className="text-2xl sm:text-3xl font-bold text-white leading-tight"><span>gurbet</span><span className="text-black">biz</span></Link>
+                            <Link href="/" className="text-sm font-normal text-white leading-tight underline hover:text-gray-100 transition-colors">
+                                gurbetbiz.com
+                            </Link>
                         </div>
                     </div>
                     {/* Masaüstü: Eski yapı */}
                     <div className="hidden sm:flex flex-row justify-between items-center py-3.5">
                         <div className="flex items-center gap-2">
-                            <Link href="/" className="text-2xl sm:text-3xl font-bold text-white leading-tight">gurbet<span className="text-black">biz</span></Link>
+                            <Link href="/" className="text-sm font-normal text-white leading-tight underline hover:text-gray-100 transition-colors">gurbetbiz.com</Link>
                             {/* Döviz alanı - Sadece masaüstünde görünür */}
                             {euroRate !== null && (
                                 <span className="sm:ml-6 ml-2 items-center flex-nowrap whitespace-nowrap text-xs sm:text-sm flex">
@@ -79,9 +81,16 @@ export default function Header() {
                         <div className="flex items-center gap-6 mr-4">
                             <LanguageDropdown />
                             {status === 'authenticated' && (
-                                <Link href="/hesabim" className="flex items-center gap-1 text-sm font-medium hover:text-gray-100 transition-colors">
+                                <Link href="/hesabim" className="flex items-center gap-0.5 text-sm font-medium hover:text-gray-100 transition-colors">
                                     <User className="w-5 h-5" />
-                                    <span>Hesabım</span>
+                                    <span>
+                                        {session?.user?.firstName 
+                                            ? session.user.firstName 
+                                            : session?.user?.email 
+                                                ? session.user.email.split('@')[0] 
+                                                : 'Hesabım'
+                                        }
+                                    </span>
                                 </Link>
                             )}
                             {status === 'authenticated' && (
@@ -116,9 +125,16 @@ export default function Header() {
                                 </button>
                             )}
                             {status === 'authenticated' && (
-                                <button onClick={() => { setIsAccountSidebarOpen(true); setIsMenuOpen(false); }} className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg font-semibold text-base">
+                                <button onClick={() => { setIsAccountSidebarOpen(true); setIsMenuOpen(false); }} className="flex items-center gap-0.5 px-4 py-2 bg-green-50 text-green-700 rounded-lg font-semibold text-base">
                                     <User className="w-5 h-5" />
-                                    <span>Hesabım</span>
+                                    <span>
+                                        {session?.user?.firstName 
+                                            ? session.user.firstName 
+                                            : session?.user?.email 
+                                                ? session.user.email.split('@')[0] 
+                                                : 'Hesabım'
+                                        }
+                                    </span>
                                 </button>
                             )}
                             {/* Ana menü linkleri */}

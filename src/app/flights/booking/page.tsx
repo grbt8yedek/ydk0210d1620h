@@ -244,7 +244,45 @@ export default function BookingPage() {
                     });
                     setReservationModalOpen(true);
                 } else {
-                    alert(`Biletleme başarıyla tamamlandı! PNR: ${orderResult.pnr}`);
+                    // Rezervasyonu veritabanına kaydet
+                    try {
+                        const reservationData = {
+                            type: 'flight',
+                            status: orderResult.orderDetails?.status === 'confirmed' ? 'confirmed' : 'pending',
+                            amount: orderResult.orderDetails?.totalPrice || finalTotalPrice,
+                            currency: orderResult.orderDetails?.currency || 'EUR',
+                            biletDukkaniOrderId: orderResult.orderId,
+                            biletDukkaniRouteId: 'demo-route-id',
+                            pnr: orderResult.pnr,
+                            validUntil: orderResult.orderDetails?.validUntil,
+                            passengers: JSON.stringify(passengerDetails),
+                            flightNumber: flight.flightNumber,
+                            origin: flight.from,
+                            destination: flight.to,
+                            departureTime: flight.departureTime,
+                            arrivalTime: flight.arrivalTime,
+                            airline: flight.airline,
+                        };
+
+                        const reservationResponse = await fetch('/api/reservations', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(reservationData)
+                        });
+                        
+                        if (reservationResponse.ok) {
+                            const savedReservation = await reservationResponse.json();
+                            console.log('Rezervasyon veritabanına kaydedildi:', savedReservation);
+                            alert(`Biletleme başarıyla tamamlandı! PNR: ${orderResult.pnr}`);
+                        } else {
+                            const errorData = await reservationResponse.json();
+                            console.error('Rezervasyon kaydetme hatası:', errorData);
+                            alert(`Biletleme başarılı ama rezervasyon kaydedilemedi. PNR: ${orderResult.pnr}`);
+                        }
+                    } catch (dbError) {
+                        console.error('Veritabanı kaydetme hatası:', dbError);
+                        alert(`Biletleme başarılı ama rezervasyon kaydedilemedi. PNR: ${orderResult.pnr}`);
+                    }
                 }
             } catch (orderError) {
                 console.error("Sipariş oluşturma hatası:", orderError);

@@ -97,47 +97,122 @@ export default function SeyahatlerimPage() {
   ]);
   const [openCarDetailId, setOpenCarDetailId] = useState<string | null>(null);
 
-  // BiletDukkani demo API'den bilet detaylarını çek
+  // Rezervasyonları veritabanından çek
   useEffect(() => {
     async function fetchTickets() {
       setLoadingFlights(true);
-      // Burada gerçek API fonksiyonuna kolayca geçiş yapılabilir
-      // const data = await getOrderRouteTicketsBiletDukkaniReal(orderId, routeId, token);
-      const demoOrderIds = [
-        { orderId: 'demo-order-id-12345', routeId: 'demo-route-id-67890' },
-        { orderId: 'demo-order-id-54321', routeId: 'demo-route-id-09876' }
-      ];
-      const results = await Promise.all(
-        demoOrderIds.map(async ({ orderId, routeId }) => {
-          const data = await getOrderRouteTicketsBiletDukkaniDemo(orderId, routeId);
-          return {
-            id: orderId,
-            pnr: data.tickets[0]?.pnr,
-            airline: data.tickets[0]?.flightNumber,
-            from: data.tickets[0]?.origin,
-            to: data.tickets[0]?.destination,
-            date: data.tickets[0]?.departureTime,
-            time: data.tickets[0]?.departureTime ? new Date(data.tickets[0].departureTime).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '',
-            arrivalTime: '',
-            price: data.tickets[0]?.price + ' ' + data.tickets[0]?.currency,
-            status: data.tickets[0]?.status === 'confirmed' ? 'Onaylandı' : data.tickets[0]?.status,
-            passengers: [
-              {
-                name: data.tickets[0]?.passengerName,
-                seat: data.tickets[0]?.seat,
+      try {
+        // Önce veritabanından kullanıcının rezervasyonlarını al
+        const reservationsResponse = await fetch('/api/reservations?type=flight');
+        if (reservationsResponse.ok) {
+          const reservations = await reservationsResponse.json();
+          console.log('Veritabanından gelen rezervasyonlar:', reservations);
+          
+          if (reservations.length > 0) {
+            // Veritabanından gelen rezervasyonları dönüştür
+            const results = reservations.map((reservation: any) => ({
+              id: reservation.id,
+              pnr: reservation.pnr,
+              airline: reservation.airline || 'Turkish Airlines',
+              from: reservation.origin || 'IST',
+              to: reservation.destination || 'AMS',
+              date: reservation.departureTime,
+              time: reservation.departureTime ? new Date(reservation.departureTime).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '',
+              arrivalTime: reservation.arrivalTime ? new Date(reservation.arrivalTime).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '',
+              price: reservation.amount + ' ' + reservation.currency,
+              status: reservation.status === 'confirmed' ? 'Onaylandı' : 'Beklemede',
+              passengers: reservation.passengers ? JSON.parse(reservation.passengers).map((p: any) => ({
+                name: `${p.firstName} ${p.lastName}`,
+                seat: '12A',
                 baggage: '20kg',
                 ticketType: 'Ekonomi',
+              })) : [],
+              details: {
+                payment: 'Kredi Kartı',
+                rules: 'İade edilemez, değiştirilemez.'
               }
-            ],
-            details: {
-              payment: 'Kredi Kartı',
-              rules: 'İade edilemez, değiştirilemez.'
-            }
-          };
-        })
-      );
-      setFlightReservations(results);
-      setLoadingFlights(false);
+            }));
+            setFlightReservations(results);
+          } else {
+            // Eğer rezervasyon yoksa demo verileri göster
+            const demoOrderIds = [
+              { orderId: 'demo-order-id-12345', routeId: 'demo-route-id-67890' },
+              { orderId: 'demo-order-id-54321', routeId: 'demo-route-id-09876' }
+            ];
+            const results = await Promise.all(
+              demoOrderIds.map(async ({ orderId, routeId }) => {
+                const data = await getOrderRouteTicketsBiletDukkaniDemo(orderId, routeId);
+                return {
+                  id: orderId,
+                  pnr: data.tickets[0]?.pnr,
+                  airline: data.tickets[0]?.flightNumber,
+                  from: data.tickets[0]?.origin,
+                  to: data.tickets[0]?.destination,
+                  date: data.tickets[0]?.departureTime,
+                  time: data.tickets[0]?.departureTime ? new Date(data.tickets[0].departureTime).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '',
+                  arrivalTime: '',
+                  price: data.tickets[0]?.price + ' ' + data.tickets[0]?.currency,
+                  status: data.tickets[0]?.status === 'confirmed' ? 'Onaylandı' : data.tickets[0]?.status,
+                  passengers: [
+                    {
+                      name: data.tickets[0]?.passengerName,
+                      seat: data.tickets[0]?.seat,
+                      baggage: '20kg',
+                      ticketType: 'Ekonomi',
+                    }
+                  ],
+                  details: {
+                    payment: 'Kredi Kartı',
+                    rules: 'İade edilemez, değiştirilemez.'
+                  }
+                };
+              })
+            );
+            setFlightReservations(results);
+          }
+        } else {
+          // Eğer API hatası varsa demo verileri göster
+          const demoOrderIds = [
+            { orderId: 'demo-order-id-12345', routeId: 'demo-route-id-67890' },
+            { orderId: 'demo-order-id-54321', routeId: 'demo-route-id-09876' }
+          ];
+          const results = await Promise.all(
+            demoOrderIds.map(async ({ orderId, routeId }) => {
+              const data = await getOrderRouteTicketsBiletDukkaniDemo(orderId, routeId);
+              return {
+                id: orderId,
+                pnr: data.tickets[0]?.pnr,
+                airline: data.tickets[0]?.flightNumber,
+                from: data.tickets[0]?.origin,
+                to: data.tickets[0]?.destination,
+                date: data.tickets[0]?.departureTime,
+                time: data.tickets[0]?.departureTime ? new Date(data.tickets[0].departureTime).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) : '',
+                arrivalTime: '',
+                price: data.tickets[0]?.price + ' ' + data.tickets[0]?.currency,
+                status: data.tickets[0]?.status === 'confirmed' ? 'Onaylandı' : data.tickets[0]?.status,
+                passengers: [
+                  {
+                    name: data.tickets[0]?.passengerName,
+                    seat: data.tickets[0]?.seat,
+                    baggage: '20kg',
+                    ticketType: 'Ekonomi',
+                  }
+                ],
+                details: {
+                  payment: 'Kredi Kartı',
+                  rules: 'İade edilemez, değiştirilemez.'
+                }
+              };
+            })
+          );
+          setFlightReservations(results);
+        }
+      } catch (error) {
+        console.error('Rezervasyonlar yüklenirken hata:', error);
+        setFlightReservations([]);
+      } finally {
+        setLoadingFlights(false);
+      }
     }
     fetchTickets();
   }, []);
@@ -166,7 +241,12 @@ export default function SeyahatlerimPage() {
   const renderUcakContent = () => (
     <div className="bg-white rounded-lg shadow-sm sm:p-6 p-2">
       <h2 className="sm:text-xl text-lg font-bold mb-4 text-gray-700">Uçak Rezervasyonlarım</h2>
-      {flightReservations.length === 0 ? (
+      {loadingFlights ? (
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Rezervasyonlarınız yükleniyor...</p>
+        </div>
+      ) : flightReservations.length === 0 ? (
         <EmptyState type="flight" />
       ) : (
         <div className="sm:space-y-4 space-y-2">

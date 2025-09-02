@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,36 +8,34 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  firstName     String
-  lastName      String
-  email         String    @unique
-  password      String
-  countryCode   String?
-  phone         String?
-  birthDay      String?
-  birthMonth    String?
-  birthYear     String?
-  gender        String?
-  identityNumber String?
-  isForeigner   Boolean   @default(false)
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  lastLoginAt   DateTime?
-  status        String    @default("active")
-  role          String    @default("user") // "admin" veya "user"
-  canDelete     Boolean   @default(true)
-  priceAlerts   PriceAlert[]
+  id              String           @id @default(cuid())
+  firstName       String
+  lastName        String
+  email           String           @unique
+  password        String
+  countryCode     String?
+  phone           String?
+  birthDay        String?
+  birthMonth      String?
+  birthYear       String?
+  gender          String?
+  identityNumber  String?
+  isForeigner     Boolean          @default(false)
+  emailVerified   DateTime?
+  image           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  lastLoginAt     DateTime?
+  status          String           @default("active")
+  role            String           @default("user")
+  canDelete       Boolean          @default(true)
+  accounts        Account[]
+  passengers      Passenger[]
+  payments        Payment[]
+  priceAlerts     PriceAlert[]
+  reservations    Reservation[]
   searchFavorites SearchFavorite[]
-
-  // İlişkiler
-  accounts      Account[]
-  sessions      Session[]
-  reservations  Reservation[]
-  payments      Payment[]
-  passengers    Passenger[]
+  sessions        Session[]
 }
 
 model Account {
@@ -56,8 +51,7 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -79,17 +73,27 @@ model VerificationToken {
 }
 
 model Reservation {
-  id          String   @id @default(cuid())
-  userId      String
-  type        String   // flight, hotel, car, esim
-  status      String   // pending, confirmed, cancelled
-  amount      Float
-  currency    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  user        User     @relation(fields: [userId], references: [id])
-  payment     Payment?
+  id                  String    @id @default(cuid())
+  userId              String
+  type                String
+  status              String
+  amount              Float
+  currency            String
+  biletDukkaniOrderId String?
+  biletDukkaniRouteId String?
+  pnr                 String?
+  validUntil          DateTime?
+  passengers          String?
+  flightNumber        String?
+  origin              String?
+  destination         String?
+  departureTime       DateTime?
+  arrivalTime         DateTime?
+  airline             String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  payment             Payment?
+  user                User      @relation(fields: [userId], references: [id])
 }
 
 model Payment {
@@ -98,55 +102,52 @@ model Payment {
   userId        String
   amount        Float
   currency      String
-  status        String      // pending, completed, failed
-  provider      String      // stripe, paypal, etc.
+  status        String
+  provider      String
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-
-  user          User        @relation(fields: [userId], references: [id])
   reservation   Reservation @relation(fields: [reservationId], references: [id])
+  user          User        @relation(fields: [userId], references: [id])
 }
 
-// Yeni model: Yolcu
 model Passenger {
-  id              String    @id @default(cuid())
-  userId          String
-  firstName       String
-  lastName        String
-  identityNumber  String?
-  isForeigner     Boolean   @default(false)
-  birthDay        String
-  birthMonth      String
-  birthYear       String
-  gender          String
-  countryCode     String?
-  phone           String?
-  hasMilCard      Boolean   @default(false)
-  hasPassport     Boolean   @default(false)
-  passportNumber  String?
-  passportExpiry  DateTime?
-  milCardNumber   String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  status          String    @default("active")
-  isAccountOwner  Boolean   @default(false)
-
-  user            User      @relation(fields: [userId], references: [id])
+  id             String    @id @default(cuid())
+  userId         String
+  firstName      String
+  lastName       String
+  identityNumber String?
+  isForeigner    Boolean   @default(false)
+  birthDay       String
+  birthMonth     String
+  birthYear      String
+  gender         String
+  countryCode    String?
+  phone          String?
+  hasMilCard     Boolean   @default(false)
+  hasPassport    Boolean   @default(false)
+  passportNumber String?
+  passportExpiry DateTime?
+  milCardNumber  String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  status         String    @default("active")
+  isAccountOwner Boolean   @default(false)
+  user           User      @relation(fields: [userId], references: [id])
 
   @@unique([userId, identityNumber])
   @@index([userId])
 }
 
 model PriceAlert {
-  id            String   @id @default(cuid())
-  userId        String
-  origin        String
-  destination   String
-  departureDate DateTime
-  targetPrice   Float?
+  id                String   @id @default(cuid())
+  userId            String
+  origin            String
+  destination       String
+  departureDate     DateTime
+  targetPrice       Float?
+  createdAt         DateTime @default(now())
   lastNotifiedPrice Float?
-  createdAt     DateTime @default(now())
-  user          User     @relation(fields: [userId], references: [id])
+  user              User     @relation(fields: [userId], references: [id])
 }
 
 model SearchFavorite {
@@ -157,4 +158,4 @@ model SearchFavorite {
   departureDate DateTime
   createdAt     DateTime @default(now())
   user          User     @relation(fields: [userId], references: [id])
-} 
+}
