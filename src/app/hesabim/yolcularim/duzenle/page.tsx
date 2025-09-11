@@ -41,7 +41,8 @@ export default function YolcuDuzenlePage() {
           throw new Error('Yolcu bilgileri getirilemedi');
         }
         const data = await response.json();
-        setInitialFormData({
+        
+        const formData = {
           firstName: data.firstName || '',
           lastName: data.lastName || '',
           identityNumber: data.identityNumber || '',
@@ -57,7 +58,9 @@ export default function YolcuDuzenlePage() {
           passportNumber: data.passportNumber || '',
           passportExpiry: data.passportExpiry ? data.passportExpiry.substring(0, 10) : '',
           milCardNumber: data.milCardNumber || ''
-        });
+        };
+        
+        setInitialFormData(formData);
       } catch (error) {
         console.error('Yolcu bilgileri getirme hatası:', error);
         toast.error('Yolcu bilgileri getirilemedi');

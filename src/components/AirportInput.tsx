@@ -117,7 +117,6 @@ export default function AirportInput({
   if (!isMobile) {
     return (
       <div className={`flex flex-col ${className}`}>
-        <label className="text-xs text-gray-500 mb-1 ml-1 font-medium">{label}</label>
         <div className="relative flex-1">
           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           <input
@@ -127,7 +126,8 @@ export default function AirportInput({
             onChange={handleInputChange}
             onFocus={handleFocus}
             placeholder={placeholder}
-            className="w-full pl-10 pr-4 h-12 border border-gray-300 rounded-xl text-base text-gray-700 placeholder-gray-400 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white"
+            className="w-full pl-10 pr-4 h-12 text-base text-gray-700 placeholder-gray-400 focus:ring-0 outline-none bg-transparent border-none"
+            style={{ outline: 'none !important' }}
           />
           {showSuggestions && suggestions.length > 0 && (
             <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg sm:block">
@@ -151,16 +151,17 @@ export default function AirportInput({
   // Mobil versiyonu
   return (
     <div className="w-full relative">
-      <div className="flex items-center bg-white border border-black rounded-lg px-4 h-11">
-        <MapPin className="w-5 h-5 text-green-500 mr-2" />
+      <div className="flex items-center bg-white border border-gray-300 rounded-lg px-4 h-11 focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-200 transition-all duration-200">
+        <MapPin className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" />
         <input
           ref={inputRef}
           type="text"
-          className="flex-1 bg-transparent border-none outline-none text-[14px] font-semibold placeholder-[#6b7280] focus:outline-none focus:ring-0 focus:border-white"
+          className="flex-1 bg-transparent border-none outline-none text-[14px] font-semibold placeholder-[#6b7280] focus:outline-none focus:ring-0 focus:border-none min-w-0 h-full"
           placeholder={placeholder}
           value={value}
           onChange={handleInputChange}
           onFocus={handleFocus}
+          style={{ outline: 'none !important' }}
         />
       </div>
       {/* Mobil havaalanı önerileri */}

@@ -1,4 +1,4 @@
-# GRBT - Gurbet.biz Web Uygulaması
+,ade9# GRBT - Gurbet.biz Web Uygulaması
 
 Modern Next.js tabanlı web uygulaması.
 
@@ -14,7 +14,7 @@ Modern Next.js tabanlı web uygulaması.
 1. PostgreSQL kurulumu
 2. Prisma migration'larının oluşturulması
 3. Kullanıcı verilerinin PostgreSQL'e taşınması
-4. JSON dosya yapısının kaldırılması
+4. JSON dosya yapısının kaldırılmasıbi
 
 ## Geliştirme Ortamı
 

@@ -1,9 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { PlaneLanding, Info } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AirportInput from '@/components/AirportInput';
@@ -13,10 +11,12 @@ import ServiceButtons from '@/components/ServiceButtons';
 import AppBanner from '@/components/AppBanner';
 import FlightSearchForm from '@/components/FlightSearchForm';
 import HeroSection from '@/components/HeroSection';
-import CampaignsSection from '@/components/CampaignsSection';
-import dynamic from 'next/dynamic';
 import { tr } from 'date-fns/locale';
 import { format } from 'date-fns';
+
+const CampaignsSection = dynamic(() => import('@/components/CampaignsSection'), {
+  ssr: false
+});
 
 // Type tanımları
 interface Airport {
@@ -24,8 +24,6 @@ interface Airport {
   name: string;
   city: string;
 }
-
-const DateInput = dynamic(() => import('@/components/DateInput'), { ssr: false });
 
 export default function Home() {
   // Form state'leri
@@ -49,22 +47,10 @@ export default function Home() {
 
   // Mobil öneri listelerini kapatmak için ref'ler - KALDIRILDI, AirportInput component'inde yönetiliyor
 
-  // Gidiş-dönüş için mobilde otomatik dönüş tarihi açma
-  const [autoOpenReturn, setAutoOpenReturn] = useState(false);
-
   // Gidiş tarihi değişince dönüş input'unu aç
   const handleDepartureChange = (date: Date | undefined) => {
     setDepartureDate(date);
-    if (tripType === 'roundTrip' && isMobile()) {
-      setAutoOpenReturn(true);
-    }
   };
-
-  // Yardımcı fonksiyon
-  function isMobile() {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth < 640;
-  }
 
   // Mobil öneri listelerini kapatmak için useEffect - KALDIRILDI, AirportInput component'inde yönetiliyor
 
@@ -113,8 +99,8 @@ export default function Home() {
       // });
       // const data = await response.json();
 
-      // Demo için 2 saniye bekle
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Demo timeout kaldırıldı - sistem daha hızlı
+      // await new Promise(resolve => setTimeout(resolve, 2000));
 
       // URLSearchParams için null değerleri filtrele
       const params = new URLSearchParams();
@@ -165,6 +151,9 @@ export default function Home() {
             childCount={childCount}
             infantCount={infantCount}
             onPassengerModalOpen={() => setShowPassengerModal(true)}
+            onAdultCountChange={setAdultCount}
+            onChildCountChange={setChildCount}
+            onInfantCountChange={setInfantCount}
             isLoading={isLoading}
             onSearch={searchFlights}
             onSwapAirports={swapAirports}
@@ -178,18 +167,6 @@ export default function Home() {
 
           {/* Kampanyalar Bölümü */}
           <CampaignsSection />
-
-          {/* Yolcu Seçimi Modalı - Hem Mobil Hem Masaüstü */}
-          <PassengerSelector
-            isOpen={showPassengerModal}
-            onClose={() => setShowPassengerModal(false)}
-            adultCount={adultCount}
-            childCount={childCount}
-            infantCount={infantCount}
-            onAdultCountChange={setAdultCount}
-            onChildCountChange={setChildCount}
-            onInfantCountChange={setInfantCount}
-          />
         </div>
       </div>
       <Footer />

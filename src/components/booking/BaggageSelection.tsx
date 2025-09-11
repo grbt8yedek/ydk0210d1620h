@@ -31,31 +31,33 @@ export default function BaggageSelection({ passengers, flight, onBaggageChange, 
                 {passengers.map((passenger, pIndex) => (
                     <div key={`passenger-baggage-${pIndex}`}>
                         {flightLegs.map((leg, lIndex) => (
-                             <div key={`leg-${lIndex}`} className={`p-4 border rounded-lg ${typeof window !== 'undefined' && window.innerWidth < 768 ? 'flex flex-col gap-2 items-start' : 'flex items-center justify-between gap-4'}`}>
-                                <div className="flex-1 w-full">
-                                    <p className="font-bold text-gray-800">{`${pIndex + 1}. ${passenger.type || 'Yolcu'}`}</p>
-                                    <div className="flex items-center gap-2 mt-1">
-                                        <PlaneTakeoff size={16} className="text-orange-500"/>
-                                        <p className="text-sm font-semibold">{leg.type} ({leg.flight.origin}-{leg.flight.destination})</p>
+                             <div key={`leg-${lIndex}`} className="p-4 border rounded-lg bg-gray-50">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div className="flex-1">
+                                        <p className="font-bold text-gray-800">{`${pIndex + 1}. ${passenger.type || 'Yolcu'}`}</p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <PlaneTakeoff size={16} className="text-orange-500"/>
+                                            <p className="text-sm font-semibold">{leg.type} ({leg.flight.origin}-{leg.flight.destination})</p>
+                                        </div>
+                                        <p className="text-xs text-gray-500 mt-1">Bagaj hakkı 1x{leg.flight.baggage || '20kg'}</p>
                                     </div>
-                                    <p className="text-xs text-gray-500 mt-1">Bagaj hakkı 1x{leg.flight.baggage || '20kg'}</p>
-                                </div>
-                                <div className="w-48 sm:w-full mt-2 sm:mt-0">
-                                     <label className="block text-xs text-gray-500 mb-1">Ek check-in bagajı</label>
-                                     <select
-                                        className={`w-full p-2 border border-gray-300 rounded-lg bg-gray-50 text-sm ${typeof window !== 'undefined' && window.innerWidth < 768 ? 'mt-1' : ''}`}
-                                        value={baggageSelections[pIndex]?.[lIndex]?.price ?? 0}
-                                        onChange={(e) => {
-                                            const selectedOption = BAGGAGE_OPTIONS.find(opt => opt.price === parseInt(e.target.value));
-                                            onBaggageChange(pIndex, lIndex, selectedOption);
-                                        }}
-                                     >
-                                        {BAGGAGE_OPTIONS.map(opt => (
-                                            <option key={opt.weight} value={opt.price}>
-                                                {opt.label} {opt.price > 0 ? `(+${opt.price} EUR)` : opt.price < 0 ? `(${opt.price} EUR)`: '(Dahil)'}
-                                            </option>
-                                        ))}
-                                     </select>
+                                    <div className="w-full sm:w-48">
+                                         <label className="block text-xs text-gray-500 mb-1">Ek check-in bagajı</label>
+                                         <select
+                                            className="w-full p-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500"
+                                            value={baggageSelections[pIndex]?.[lIndex]?.price ?? 0}
+                                            onChange={(e) => {
+                                                const selectedOption = BAGGAGE_OPTIONS.find(opt => opt.price === parseInt(e.target.value));
+                                                onBaggageChange(pIndex, lIndex, selectedOption);
+                                            }}
+                                         >
+                                            {BAGGAGE_OPTIONS.map(opt => (
+                                                <option key={opt.weight} value={opt.price}>
+                                                    {opt.label} {opt.price > 0 ? `(+${opt.price} EUR)` : opt.price < 0 ? `(${opt.price} EUR)`: '(Dahil)'}
+                                                </option>
+                                            ))}
+                                         </select>
+                                    </div>
                                 </div>
                             </div>
                         ))}

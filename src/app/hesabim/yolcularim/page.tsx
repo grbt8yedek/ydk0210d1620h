@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import AccountSidebar from '@/components/AccountSidebar';
-import { User, Edit, Trash2, Plus, Plane, Users, Star, Receipt, Search, Bell, Heart } from 'lucide-react';
+import { User, Edit, Trash2, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useSession, signOut } from 'next-auth/react';
@@ -24,16 +23,6 @@ export default function YolcularimPage() {
   const [passengers, setPassengers] = useState<Passenger[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  const menuItems = [
-    { icon: User, label: 'Hesabım', href: '/hesabim' },
-    { icon: Plane, label: 'Seyahatlerim', href: '/hesabim/seyahatlerim' },
-    { icon: Users, label: 'Yolcularım', href: '/hesabim/yolcularim' },
-    { icon: Star, label: 'Puanlarım', href: '/hesabim/puanlarim' },
-    { icon: Receipt, label: 'Fatura Bilgilerim', href: '/hesabim/fatura' },
-    { icon: Search, label: 'Aramalarım', href: '/hesabim/aramalarim' },
-    { icon: Bell, label: 'Fiyat Alarmlarım', href: '/hesabim/alarmlar' },
-    { icon: Heart, label: 'Favorilerim', href: '/hesabim/favoriler' },
-  ];
   const handleLogout = () => { signOut({ callbackUrl: '/' }); };
 
   // Yolcu listesini getir
@@ -85,8 +74,21 @@ export default function YolcularimPage() {
   };
 
   const formatDate = (day: string, month: string, year: string) => {
-    const monthAbbr = month.substring(0, 3);
-    return `${day} ${monthAbbr} ${year}`;
+    if (!day || !month || !year) return '-';
+    
+    // Ay değerini sayısal'dan string'e çevir
+    const monthNames = [
+      'Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz',
+      'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'
+    ];
+    
+    const monthIndex = parseInt(month) - 1;
+    const monthAbbr = monthNames[monthIndex] || month;
+    
+    // Gün değerini iki haneli yap
+    const formattedDay = day.padStart(2, '0');
+    
+    return `${formattedDay} ${monthAbbr} ${year}`;
   };
 
   return (

@@ -16,10 +16,8 @@ import PassengerList from '@/components/booking/PassengerList';
 import BaggageSelection from '@/components/booking/BaggageSelection';
 import PriceSummary from '@/components/booking/PriceSummary';
 import ReservationModal from '@/components/booking/ReservationModal';
-
-
-
-
+import ValidationPopup from '@/components/ValidationPopup';
+import Footer from '@/components/Footer';
 
 const initialPassengerState = {
     id: null,
@@ -67,6 +65,9 @@ export default function BookingPage() {
     const [bookingType, setBookingType] = useState<'reserve' | 'book'>('book');
     const [reservationModalOpen, setReservationModalOpen] = useState(false);
     const [reservationInfo, setReservationInfo] = useState<any>(null);
+    const [validationErrors, setValidationErrors] = useState<string[]>([]);
+    const [showValidationPopup, setShowValidationPopup] = useState(false);
+    const [saveTimeouts, setSaveTimeouts] = useState<{ [key: number]: NodeJS.Timeout }>({});
 
     useEffect(() => {
         const fetchSavedPassengers = async () => {
@@ -92,20 +93,30 @@ export default function BookingPage() {
         
         setPassengers({ adults, children, infants });
         const total = adults + children;
-        if (passengerDetails.length !== total) {
-           setPassengerDetails(Array(total).fill(null).map((_, i) => ({ 
-               ...initialPassengerState,
-               type: i < adults ? 'Yetişkin' : 'Çocuk' 
-            })));
-           setBaggageSelections(Array(total).fill(null).map(() => [{ weight: 20, label: '20 kg Bagaj (Standart)', price: 0 }])); // Default baggage for 1 leg
-        }
+        
+        // Passenger details'ı her zaman initialize et
+        const newPassengerDetails: PassengerDetail[] = Array(total).fill(null).map((_, i) => ({ 
+            ...initialPassengerState,
+            type: i < adults ? 'Yetişkin' as const : 'Çocuk' as const,
+            isForeigner: false // Açıkça false olarak set et
+        }));
+        setPassengerDetails(newPassengerDetails);
+        setBaggageSelections(Array(total).fill(null).map(() => [{ weight: 20, label: '20 kg Bagaj (Standart)', price: 0 }]));
 
-        if (flightData) {
+        // Flight data'yı client-side'da parse et
+        if (flightData && typeof window !== 'undefined') {
             try {
-                const decodedFlight = decodeURIComponent(flightData);
-                setFlight(JSON.parse(decodedFlight));
+                // HTML entities'leri decode et
+                const decodedFlight = decodeURIComponent(flightData)
+                    .replace(/&quot;/g, '"')
+                    .replace(/&amp;/g, '&')
+                    .replace(/&lt;/g, '<')
+                    .replace(/&gt;/g, '>');
+                const parsedFlight = JSON.parse(decodedFlight);
+                setFlight(parsedFlight);
             } catch (error) {
                 console.error("Failed to parse flight data", error);
+                console.error("Raw flight data:", flightData);
             }
         }
 
@@ -117,18 +128,68 @@ export default function BookingPage() {
                 setContactPhone(session.user.phone);
             }
         }
-    }, [searchParams, passengerDetails.length, session]);
+    }, [searchParams, session]);
     
     const handlePassengerFormChange = (passengerIndex: number, field: string, value: any) => {
+        console.log('handlePassengerFormChange:', { passengerIndex, field, value }); // Debug log
+        
+        // isForeigner değişikliğini özel olarak handle et
+        if (field === 'isForeigner') {
+            console.log('isForeigner changed to:', value);
+            console.log('Previous passenger state:', passengerDetails[passengerIndex]);
+        }
+        
         const newDetails = [...passengerDetails];
-        newDetails[passengerIndex] = { ...newDetails[passengerIndex], [field]: value };
+        
+        // isForeigner true ise identityNumber'ı temizle
+        if (field === 'isForeigner' && value === true) {
+            newDetails[passengerIndex] = { 
+                ...newDetails[passengerIndex], 
+                [field]: value,
+                identityNumber: '' // TC kimlik numarasını temizle
+            };
+            console.log('Cleared identityNumber for passenger', passengerIndex);
+        } else {
+            newDetails[passengerIndex] = { ...newDetails[passengerIndex], [field]: value };
+        }
+        
         setPassengerDetails(newDetails);
+        
+        // Eğer yolcu kaydetme işaretliyse ve gerekli alanlar doluysa otomatik kaydet
+        if (newDetails[passengerIndex].shouldSave && 
+            newDetails[passengerIndex].firstName && 
+            newDetails[passengerIndex].lastName &&
+            newDetails[passengerIndex].birthDay &&
+            newDetails[passengerIndex].birthMonth &&
+            newDetails[passengerIndex].birthYear &&
+            newDetails[passengerIndex].gender) {
+            
+            // Önceki timeout'u temizle
+            if (saveTimeouts[passengerIndex]) {
+                clearTimeout(saveTimeouts[passengerIndex]);
+            }
+            
+            // Yeni timeout ayarla
+            const timeoutId = setTimeout(() => {
+                savePassengerImmediately(passengerIndex, newDetails[passengerIndex]);
+            }, 1000); // 1 saniye bekle
+            
+            setSaveTimeouts(prev => ({ ...prev, [passengerIndex]: timeoutId }));
+        }
     };
 
     const handleSelectSavedPassenger = (passengerIndex: number, passengerData: any | null) => {
         const newDetails = [...passengerDetails];
         if (passengerData) {
-            newDetails[passengerIndex] = { ...passengerData, shouldSave: false, type: newDetails[passengerIndex].type };
+            // Kayıtlı yolcu seçildiğinde isForeigner değerini doğru şekilde set et
+            newDetails[passengerIndex] = { 
+                ...passengerData, 
+                shouldSave: false, 
+                type: newDetails[passengerIndex].type,
+                isForeigner: Boolean(passengerData.isForeigner) // Boolean'a çevir
+            };
+            console.log('Selected saved passenger:', passengerData);
+            console.log('isForeigner value:', passengerData.isForeigner);
         } else {
             newDetails[passengerIndex] = { ...initialPassengerState, type: newDetails[passengerIndex].type };
         }
@@ -139,6 +200,61 @@ export default function BookingPage() {
         const newDetails = [...passengerDetails];
         newDetails[passengerIndex].shouldSave = checked;
         setPassengerDetails(newDetails);
+        
+        // Eğer kaydetme işaretlendiyse ve yolcu bilgileri doluysa hemen kaydet
+        if (checked && newDetails[passengerIndex].firstName && newDetails[passengerIndex].lastName) {
+            savePassengerImmediately(passengerIndex, newDetails[passengerIndex]);
+        }
+    };
+    
+    const savePassengerImmediately = async (passengerIndex: number, passengerData: any) => {
+        try {
+            const payload = {
+                firstName: passengerData.firstName,
+                lastName: passengerData.lastName,
+                birthDay: passengerData.birthDay,
+                birthMonth: passengerData.birthMonth,
+                birthYear: passengerData.birthYear,
+                gender: passengerData.gender,
+                identityNumber: passengerData.identityNumber,
+                isForeigner: passengerData.isForeigner || false,
+            };
+
+            if (passengerData.id) { // Update existing passenger
+                const response = await fetch(`/api/passengers/${passengerData.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (response.ok) {
+                    const updatedPassenger = await response.json();
+                    const newDetails = [...passengerDetails];
+                    newDetails[passengerIndex] = { ...newDetails[passengerIndex], ...updatedPassenger };
+                    setPassengerDetails(newDetails);
+                    console.log('Yolcu güncellendi:', updatedPassenger);
+                }
+            } else { // Create new passenger
+                const response = await fetch('/api/passengers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (response.ok) {
+                    const newPassenger = await response.json();
+                    const newDetails = [...passengerDetails];
+                    newDetails[passengerIndex] = { ...newDetails[passengerIndex], id: newPassenger.id };
+                    setPassengerDetails(newDetails);
+                    
+                    // Kayıtlı yolcular listesini güncelle
+                    setSavedPassengers(prev => [newPassenger, ...prev]);
+                    console.log('Yeni yolcu eklendi:', newPassenger);
+                }
+            }
+        } catch (error) {
+            console.error('Yolcu kaydetme hatası:', error);
+        }
     };
     
     const handleBaggageChange = async (passengerIndex: number, legIndex: number, baggage: any) => {
@@ -169,7 +285,66 @@ export default function BookingPage() {
         }
     };
 
-    const handleProceedToPayment = async () => {
+        const handleProceedToPayment = async () => {
+        // Form validasyonu
+        const errors = [];
+        
+        // İletişim bilgileri validasyonu
+        if (!contactEmail || !contactEmail.includes('@')) {
+            errors.push('Geçerli bir e-posta adresi giriniz');
+        }
+        
+        if (!contactPhone) {
+            errors.push('Telefon numarası giriniz');
+        }
+        
+        // Yolcu bilgileri validasyonu
+        passengerDetails.forEach((passenger, index) => {
+            console.log(`Passenger ${index + 1} validation:`, { 
+                isForeigner: passenger.isForeigner, 
+                identityNumber: passenger.identityNumber,
+                firstName: passenger.firstName 
+            });
+            
+            if (!passenger.firstName.trim()) {
+                errors.push(`${index + 1}. yolcu için ad giriniz`);
+            }
+            if (!passenger.lastName.trim()) {
+                errors.push(`${index + 1}. yolcu için soyad giriniz`);
+            }
+            if (!passenger.birthDay || !passenger.birthMonth || !passenger.birthYear) {
+                errors.push(`${index + 1}. yolcu için doğum tarihi giriniz`);
+            }
+            if (!passenger.gender) {
+                errors.push(`${index + 1}. yolcu için cinsiyet seçiniz`);
+            }
+            // TC kimlik numarası validasyonu - sadece T.C. vatandaşları için gerekli
+            const isForeigner = Boolean(passenger.isForeigner);
+            const hasIdentityNumber = passenger.identityNumber.trim().length > 0;
+            
+            if (!isForeigner && !hasIdentityNumber) {
+                console.log(`TC validation failed for passenger ${index + 1}:`, {
+                    isForeigner,
+                    hasIdentityNumber,
+                    identityNumber: passenger.identityNumber
+                });
+                errors.push(`${index + 1}. yolcu için TC kimlik numarası giriniz`);
+            }
+        });
+        
+        // Hata varsa göster ve işlemi durdur
+        if (errors.length > 0) {
+            setValidationErrors(errors);
+            setShowValidationPopup(true);
+            return;
+        }
+        
+
+        // Hata yoksa devam et
+        proceedWithPayment();
+    };
+
+    const proceedWithPayment = async () => {
         if (!termsAccepted) {
             alert('Devam etmek için lütfen kullanım koşullarını kabul edin.');
             return;
@@ -289,7 +464,6 @@ export default function BookingPage() {
                 alert('Sipariş oluşturulurken bir hata oluştu.');
             }
             
-            alert('Yolcu bilgileri başarıyla kaydedildi/güncellendi!');
             // TODO: Navigate to the actual payment page
         } catch (error) {
             console.error('Failed to save/update passenger details', error);
@@ -297,7 +471,7 @@ export default function BookingPage() {
         }
     };
 
-    if (!flight || passengerDetails.length === 0) {
+    if (!flight) {
         return (
             <div>
                 <Header />
@@ -384,7 +558,13 @@ export default function BookingPage() {
                     reservationInfo={reservationInfo}
                     onClose={() => setReservationModalOpen(false)}
                 />
+                <ValidationPopup 
+                    isOpen={showValidationPopup}
+                    errors={validationErrors}
+                    onClose={() => setShowValidationPopup(false)}
+                />
             </main>
+            <Footer />
             <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
         </>
     );

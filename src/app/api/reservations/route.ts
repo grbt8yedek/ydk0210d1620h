@@ -69,7 +69,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(reservation);
   } catch (error) {
     console.error('Rezervasyon oluşturma hatası:', error);
-    console.error('Hata detayı:', error.message);
-    return NextResponse.json({ error: 'Rezervasyon oluşturulurken bir hata oluştu.', details: error.message }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    console.error('Hata detayı:', errorMessage);
+    return NextResponse.json({ error: 'Rezervasyon oluşturulurken bir hata oluştu.', details: errorMessage }, { status: 500 });
   }
 }

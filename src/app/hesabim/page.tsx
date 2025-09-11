@@ -7,8 +7,10 @@ import AccountSidebar from '@/components/AccountSidebar';
 import ChangePasswordModal from '@/components/ChangePasswordModal';
 import DeleteAccountModal from '@/components/DeleteAccountModal';
 import { useSession, signOut } from 'next-auth/react';
-import { User, Plane, Users, Star, Receipt, Search, Bell, Heart } from 'lucide-react';
+import { User, Plane, Users, Receipt, Search, Bell, Heart } from 'lucide-react';
 import { User as PrismaUser } from '@prisma/client';
+import SurveyPopup from '@/components/SurveyPopup';
+import Footer from '@/components/Footer';
 
 interface UserData {
   firstName: string;
@@ -49,6 +51,7 @@ export default function HesabimPage() {
     if (status === 'unauthenticated') {
       router.push('/giris');
     } else if (status === 'authenticated' && session.user) {
+      // Session'dan bilgileri al
       const user = session.user as any;
       setUserData({
         firstName: user.firstName || '',
@@ -63,8 +66,37 @@ export default function HesabimPage() {
         identityNumber: user.identityNumber || '',
         isForeigner: user.isForeigner || false,
       });
+      
+      // Eğer session'da eksik bilgiler varsa veritabanından çek
+      if (!user.birthDay || !user.gender || !user.identityNumber) {
+        fetchUserData();
+      }
     }
   }, [session, status, router]);
+
+  const fetchUserData = async () => {
+    try {
+      const response = await fetch('/api/user/profile');
+      if (response.ok) {
+        const userData = await response.json();
+        setUserData({
+          firstName: userData.firstName || '',
+          lastName: userData.lastName || '',
+          email: userData.email || '',
+          phone: userData.phone || '',
+          countryCode: userData.countryCode || '+90',
+          birthDay: userData.birthDay ? parseInt(userData.birthDay, 10) : '',
+          birthMonth: userData.birthMonth ? parseInt(userData.birthMonth, 10) : '',
+          birthYear: userData.birthYear ? parseInt(userData.birthYear, 10) : '',
+          gender: userData.gender || '',
+          identityNumber: userData.identityNumber || '',
+          isForeigner: userData.isForeigner || false,
+        });
+      }
+    } catch (error) {
+      console.error('Kullanıcı bilgileri çekilemedi:', error);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -88,6 +120,10 @@ export default function HesabimPage() {
 
       if (response.ok) {
         toast.success('Bilgileriniz başarıyla güncellendi.');
+        // Session'ı güncelle
+        await fetch('/api/auth/session?update');
+        // Sayfayı yenile
+        window.location.reload();
       } else {
         const errorData = await response.json();
         toast.error(errorData.error || 'Bir hata oluştu.');
@@ -111,7 +147,7 @@ export default function HesabimPage() {
     { icon: User, label: 'Hesabım', href: '/hesabim' },
     { icon: Plane, label: 'Seyahatlerim', href: '/hesabim/seyahatlerim' },
     { icon: Users, label: 'Yolcularım', href: '/hesabim/yolcularim' },
-    { icon: Star, label: 'Puanlarım', href: '/hesabim/puanlarim' },
+    // { icon: Star, label: 'Puanlarım', href: '/hesabim/puanlarim' }, // Geçici olarak gizlendi
     { icon: Receipt, label: 'Fatura Bilgilerim', href: '/hesabim/fatura' },
     { icon: Search, label: 'Aramalarım', href: '/hesabim/aramalarim' },
     { icon: Bell, label: 'Fiyat Alarmlarım', href: '/hesabim/alarmlar' },
@@ -343,6 +379,8 @@ export default function HesabimPage() {
         isOpen={isDeleteAccountModalOpen}
         onClose={() => setIsDeleteAccountModalOpen(false)}
       />
+      <SurveyPopup />
+      <Footer />
     </main>
   );
 } 

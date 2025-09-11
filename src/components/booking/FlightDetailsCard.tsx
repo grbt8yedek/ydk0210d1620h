@@ -1,6 +1,8 @@
 'use client';
 
 import { PlaneTakeoff, PlaneLanding } from 'lucide-react';
+import { format } from 'date-fns';
+import { tr } from 'date-fns/locale';
 
 interface FlightDetailsCardProps {
     flight: any;
@@ -21,14 +23,14 @@ export default function FlightDetailsCard({ flight }: FlightDetailsCardProps) {
                       <span className="flex flex-col items-center text-gray-500 text-xs mt-1 w-full">
                         <span className="flex items-center gap-1 justify-center w-full">
                           <PlaneTakeoff className="w-4 h-4 text-green-600" />
-                          {flight.departureTime ? new Date(flight.departureTime).toLocaleDateString('tr-TR') : ''}
+                          {flight.departureTime ? format(new Date(flight.departureTime), 'dd MMM yyyy', { locale: tr }) : ''}
                         </span>
                         <span className="block w-full text-center">{flight.departureTime?.slice(11, 16)}</span>
                       </span>
                     ) : (
                       <span className="flex items-center gap-1 text-gray-500 text-sm">
                         <PlaneTakeoff className="w-6 h-6 text-green-600" />
-                        {flight.departureTime ? new Date(flight.departureTime).toLocaleDateString('tr-TR') : ''} - {flight.departureTime?.slice(11, 16)}
+                        {flight.departureTime ? format(new Date(flight.departureTime), 'dd MMM yyyy', { locale: tr }) : ''} - {flight.departureTime?.slice(11, 16)}
                       </span>
                     )}
                 </div>
@@ -41,14 +43,14 @@ export default function FlightDetailsCard({ flight }: FlightDetailsCardProps) {
                     {isMobile ? (
                       <span className="flex flex-col items-center text-gray-500 text-xs mt-1 w-full">
                         <span className="flex items-center gap-1 justify-center w-full">
-                          {flight.arrivalTime ? new Date(flight.arrivalTime).toLocaleDateString('tr-TR') : ''}
+                          {flight.arrivalTime ? format(new Date(flight.arrivalTime), 'dd MMM yyyy', { locale: tr }) : ''}
                           <PlaneLanding className="w-4 h-4 text-green-600" />
                         </span>
                         <span className="block w-full text-center">{flight.arrivalTime?.slice(11, 16)}</span>
                       </span>
                     ) : (
                       <span className="flex items-center gap-1 text-gray-500 text-sm">
-                        {flight.arrivalTime ? new Date(flight.arrivalTime).toLocaleDateString('tr-TR') : ''} - {flight.arrivalTime?.slice(11, 16)}
+                        {flight.arrivalTime ? format(new Date(flight.arrivalTime), 'dd MMM yyyy', { locale: tr }) : ''} - {flight.arrivalTime?.slice(11, 16)}
                         <PlaneLanding className="w-6 h-6 text-green-600" />
                       </span>
                     )}

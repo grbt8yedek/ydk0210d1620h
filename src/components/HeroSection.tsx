@@ -4,7 +4,7 @@ export default function HeroSection() {
   return (
     <div className="bg-green-500 text-center text-white pb-5 sm:pb-32 pt-[1.2rem] sm:pt-8 relative z-10 rounded-b-[16px] sm:rounded-b-[32px]">
       <div className="container mx-auto px-4">
-        <h1 className="hidden sm:block sm:relative text-2xl sm:text-5xl font-bold mb-1 sm:mb-2 z-30">
+        <h1 className="hidden sm:block sm:relative text-2xl sm:text-5xl font-bold mb-0 sm:mb-0 z-30">
           <span className="text-white">gurbet</span>
           <span className="text-black">biz</span>
         </h1>

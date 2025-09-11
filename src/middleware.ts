@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { createCSRFProtection } from './lib/csrfProtection';
 
 // Rate limiting için basit bir Map
 const rateLimit = new Map<string, number[]>();
 const RATE_LIMIT_DURATION = 60 * 1000; // 1 dakika
 const MAX_REQUESTS = 100; // 1 dakikada maksimum istek sayısı
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   // Giriş sayfasına yönlendirme kontrolü
   if (request.nextUrl.pathname === '/giris') {
     return NextResponse.next();
@@ -42,7 +43,7 @@ export function middleware(request: NextRequest) {
     upgrade-insecure-requests;
   `.replace(/\s+/g, ' ').trim());
 
-  // API Rate Limiting
+  // API Rate Limiting ve CSRF Protection
   if (request.nextUrl.pathname.startsWith('/api')) {
     const ip = request.ip || 'unknown';
     const now = Date.now();
@@ -66,6 +67,15 @@ export function middleware(request: NextRequest) {
     
     recentRequests.push(now);
     rateLimit.set(ip, recentRequests);
+
+    // CSRF Protection for POST, PUT, DELETE requests (şimdilik devre dışı)
+    // if (['POST', 'PUT', 'DELETE'].includes(request.method)) {
+    //   const csrfMiddleware = createCSRFProtection();
+    //   const csrfResponse = await csrfMiddleware(request);
+    //   if (csrfResponse.status === 403) {
+    //     return csrfResponse;
+    //   }
+    // }
   }
 
   return response;

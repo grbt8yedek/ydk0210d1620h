@@ -32,16 +32,19 @@ export default function ContactForm({
                     <div className="flex">
                         <select 
                             onChange={(e) => onCountryCodeChange(e.target.value)}
-                            className="p-3 border border-r-0 border-gray-300 rounded-l-lg bg-gray-50 focus:ring-1 focus:ring-green-500 focus:border-green-500 appearance-none"
+                            className="p-3 border border-r-0 border-gray-300 rounded-l-lg bg-gray-50 focus:ring-1 focus:ring-green-500 focus:border-green-500 appearance-none bg-no-repeat bg-right pr-8"
+                            style={{ backgroundImage: 'none' }}
                         >
                             <option value="+90">🇹🇷 +90</option>
                             <option value="+49">🇩🇪 +49</option>
-                            <option value="+44">🇬🇧 +44</option>
                             <option value="+33">🇫🇷 +33</option>
                             <option value="+32">🇧🇪 +32</option>
                             <option value="+31">🇳🇱 +31</option>
-                            <option value="+41">🇨🇭 +41</option>
                             <option value="+45">🇩🇰 +45</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+46">🇸🇪 +46</option>
+                            <option value="+41">🇨🇭 +41</option>
+                            <option value="+43">🇦🇹 +43</option>
                         </select>
                         <input 
                             type="tel" 

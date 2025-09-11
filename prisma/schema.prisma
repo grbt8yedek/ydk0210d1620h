@@ -36,6 +36,7 @@ model User {
   reservations    Reservation[]
   searchFavorites SearchFavorite[]
   sessions        Session[]
+  surveyResponses SurveyResponse[]
 }
 
 model Account {
@@ -134,7 +135,6 @@ model Passenger {
   isAccountOwner Boolean   @default(false)
   user           User      @relation(fields: [userId], references: [id])
 
-  @@unique([userId, identityNumber])
   @@index([userId])
 }
 
@@ -158,4 +158,16 @@ model SearchFavorite {
   departureDate DateTime
   createdAt     DateTime @default(now())
   user          User     @relation(fields: [userId], references: [id])
+}
+
+model SurveyResponse {
+  id           String   @id @default(cuid())
+  userId       String   // Kullanıcı ID'si eklendi
+  answers      String   // JSON string olarak saklanacak
+  completedAt  DateTime
+  userAgent    String?
+  ipAddress    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
 }

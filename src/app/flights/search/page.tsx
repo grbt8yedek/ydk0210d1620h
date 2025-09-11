@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { format, addDays, subDays, isSameDay, parseISO, startOfDay } from "date-fns";
 import { tr } from "date-fns/locale";
-import { Bell, Heart, Filter, PlaneTakeoff, PlaneLanding, Users, Star, Plus, Minus, Search, Edit, Trash2, Loader2 } from 'lucide-react';
+import { Bell, Heart, Filter, Users, Loader2 } from 'lucide-react';
 import Header from '@/components/Header';
 import FlightSearchBox from '@/components/FlightSearchBox';
 import { useSession } from 'next-auth/react';
@@ -16,6 +16,7 @@ import MobileFlightSearchBox from '@/components/MobileFlightSearchBox';
 import FlightFilters from '@/components/FlightFilters';
 import PriceDateSelector from '@/components/PriceDateSelector';
 import ModalManager from '@/components/ModalManager';
+import Footer from '@/components/Footer';
 import React from 'react';
 import { useFlightState, useFilterState, useModalState, useUIState, usePriceState } from '@/hooks';
 
@@ -37,7 +38,8 @@ function getDemoPrices(baseDate: Date, currency: string = "EUR") {
 // API'den fiyat çekme fonksiyonu (gelecekte kullanılacak)
 async function fetchPricesFromAPI(origin: string, destination: string, baseDate: Date, currency: string = "EUR") {
   try {
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Demo timeout kaldırıldı - sistem daha hızlı
+    // await new Promise(resolve => setTimeout(resolve, 1000));
     const demo = getDemoPrices(baseDate, currency);
     if (!demo || demo.length === 0) throw new Error('Demo veri boş');
     return demo;
@@ -942,6 +944,7 @@ export default function FlightSearchPage() {
         }
         isMobile={isMobile}
       />
+      <Footer />
     </>
   );
 } 

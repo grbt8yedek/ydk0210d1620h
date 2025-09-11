@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface PassengerFormProps {
     passengerNumber: number;
@@ -25,8 +25,16 @@ export default function PassengerForm({
     shouldSave,
     flight
 }: PassengerFormProps) {
-    const [activePassengerId, setActivePassengerId] = useState<string | null>(passengerData.id || null);
+    const [activePassengerId, setActivePassengerId] = useState<string | null>(passengerData?.id || null);
     const [isModified, setIsModified] = useState(false);
+
+    // passengerData değişikliklerini izle
+    useEffect(() => {
+        console.log(`PassengerForm ${passengerNumber} - passengerData changed:`, {
+            isForeigner: passengerData?.isForeigner,
+            identityNumber: passengerData?.identityNumber
+        });
+    }, [passengerData, passengerNumber]);
 
     const handleSelect = (passenger: any) => {
         onSelectPassenger(passenger);
@@ -47,14 +55,12 @@ export default function PassengerForm({
         // @ts-ignore
         const formValue = isCheckbox ? e.target.checked : value;
         
+        console.log('Form change:', { name, value: formValue, type }); // Debug log
+        console.log('Calling onFormChange with:', { name, formValue }); // Debug log
+        console.log('Current passengerData:', passengerData); // Debug log
+        
+        // Form değerini güncelle
         onFormChange(name, formValue);
-
-        if (name === 'isForeigner' && isCheckbox) {
-             // @ts-ignore
-            if (e.target.checked) {
-                onFormChange('identityNumber', '');
-            }
-        }
     };
 
     return (
@@ -89,11 +95,11 @@ export default function PassengerForm({
                     <label className="text-sm font-medium text-gray-700">Cinsiyet:</label>
                     <div className="flex items-center gap-4">
                          <label className="flex items-center">
-                            <input type="radio" name="gender" value="male" checked={passengerData.gender === 'male'} onChange={handleChange} className="form-radio text-green-600" />
+                            <input type="radio" name="gender" value="male" checked={passengerData?.gender === 'male'} onChange={handleChange} className="form-radio text-green-600" />
                             <span className="ml-2">Erkek</span>
                         </label>
                          <label className="flex items-center">
-                            <input type="radio" name="gender" value="female" checked={passengerData.gender === 'female'} onChange={handleChange} className="form-radio text-green-600" />
+                            <input type="radio" name="gender" value="female" checked={passengerData?.gender === 'female'} onChange={handleChange} className="form-radio text-green-600" />
                             <span className="ml-2">Kadın</span>
                         </label>
                     </div>
@@ -101,11 +107,11 @@ export default function PassengerForm({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Adı*</label>
-                        <input type="text" name="firstName" value={passengerData.firstName || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50" placeholder="" />
+                        <input type="text" name="firstName" value={passengerData?.firstName || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50" placeholder="" />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Soyadı*</label>
-                        <input type="text" name="lastName" value={passengerData.lastName || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50" placeholder="" />
+                        <input type="text" name="lastName" value={passengerData?.lastName || ''} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50" placeholder="" />
                     </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -114,7 +120,7 @@ export default function PassengerForm({
                         <div className="flex gap-2">
                             <select
                                 name="birthDay"
-                                value={passengerData.birthDay || ''}
+                                value={passengerData?.birthDay || ''}
                                 onChange={handleChange}
                                 className="w-1/3 p-2 border border-gray-300 rounded-lg bg-gray-50"
                             >
@@ -125,7 +131,7 @@ export default function PassengerForm({
                             </select>
                             <select
                                 name="birthMonth"
-                                value={passengerData.birthMonth || ''}
+                                value={passengerData?.birthMonth || ''}
                                 onChange={handleChange}
                                 className="w-1/3 p-2 border border-gray-300 rounded-lg bg-gray-50"
                             >
@@ -136,7 +142,7 @@ export default function PassengerForm({
                             </select>
                             <select
                                 name="birthYear"
-                                value={passengerData.birthYear || ''}
+                                value={passengerData?.birthYear || ''}
                                 onChange={handleChange}
                                 className="w-1/3 p-2 border border-gray-300 rounded-lg bg-gray-50"
                             >
@@ -153,18 +159,17 @@ export default function PassengerForm({
                             <input 
                                 type="text" 
                                 name="identityNumber" 
-                                value={passengerData.identityNumber || ''} 
+                                value={passengerData?.identityNumber || ''} 
                                 onChange={handleChange} 
                                 className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 pr-32"
-                                placeholder=""
-                                disabled={passengerData.isForeigner}
+                                disabled={passengerData?.isForeigner === true}
                             />
                             <div className="absolute right-2 flex items-center">
                                 <input 
                                     type="checkbox" 
                                     id={`isForeigner-${passengerNumber}`}
                                     name="isForeigner"
-                                    checked={passengerData.isForeigner || false}
+                                    checked={passengerData?.isForeigner === true}
                                     onChange={handleChange}
                                     className="h-3.5 w-3.5 rounded text-green-600 focus:ring-green-500 border-gray-300"
                                 />
@@ -177,7 +182,16 @@ export default function PassengerForm({
                 {(!activePassengerId || (activePassengerId && isModified)) && (
                     <div className="border-t pt-4 mt-4">
                         <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-                            <input type="checkbox" checked={shouldSave} onChange={(e) => onSaveToggle(e.target.checked)} className="h-5 w-5 rounded text-green-600 focus:ring-green-500 border-gray-300"/>
+                            <div 
+                                className={`w-5 h-5 rounded border-2 cursor-pointer flex items-center justify-center ${shouldSave ? 'bg-green-600 border-green-600' : 'bg-white border-gray-300'}`}
+                                onClick={() => onSaveToggle(!shouldSave)}
+                            >
+                                {shouldSave && (
+                                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                )}
+                            </div>
                             {!activePassengerId ? 'Yolcu Listeme Ekle' : 'Yolcu Listemde Güncelle'}
                         </label>
                     </div>

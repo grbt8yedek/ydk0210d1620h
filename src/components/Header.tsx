@@ -3,27 +3,38 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react';
-import { User, LogOut, TrendingDown, Menu, X } from 'lucide-react';
+import { User, LogOut, TrendingDown, Menu, X, Plane, Users, Receipt, Search, Bell, Heart } from '@/components/common/Icons';
 import LanguageDropdown from './LanguageDropdown';
 import LoginModal from './LoginModal';
 import { getEuroRate } from '@/services/exchangeRate';
 import Image from 'next/image';
 import AccountSidebar from './AccountSidebar';
-import { Plane, Users, Star, Receipt, Search, Bell, Heart } from 'lucide-react';
 
 export default function Header() {
     const { data: session, status } = useSession();
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-    const [euroRate, setEuroRate] = useState<number | null>(null);
+    const [euroRate, setEuroRate] = useState<number | null>(null); // Başlangıçta null
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isAccountSidebarOpen, setIsAccountSidebarOpen] = useState(false);
 
     useEffect(() => {
         const fetchRate = async () => {
-            const rate = await getEuroRate();
-            setEuroRate(rate);
+            try {
+                const rate = await getEuroRate();
+                setEuroRate(rate);
+            } catch (error) {
+                console.error('Döviz kuru alınamadı:', error);
+                // Fallback değer kaldırıldı - sadece "Yükleniyor..." gösterilecek
+            }
         };
+        
+        // İlk yükleme
         fetchRate();
+        
+        // Her 5 dakikada bir güncelle
+        const interval = setInterval(fetchRate, 5 * 60 * 1000);
+        
+        return () => clearInterval(interval);
     }, []);
 
     const handleLogout = () => {
@@ -34,7 +45,7 @@ export default function Header() {
         { icon: User, label: 'Hesabım', href: '/hesabim' },
         { icon: Plane, label: 'Seyahatlerim', href: '/hesabim/seyahatlerim' },
         { icon: Users, label: 'Yolcularım', href: '/hesabim/yolcularim' },
-        { icon: Star, label: 'Puanlarım', href: '/hesabim/puanlarim' },
+        // { icon: Star, label: 'Puanlarım', href: '/hesabim/puanlarim' }, // Geçici olarak gizlendi
         { icon: Receipt, label: 'Fatura Bilgilerim', href: '/hesabim/fatura' },
         { icon: Search, label: 'Aramalarım', href: '/hesabim/aramalarim' },
         { icon: Bell, label: 'Fiyat Alarmlarım', href: '/hesabim/alarmlar' },
@@ -49,20 +60,19 @@ export default function Header() {
                     <div className="sm:hidden w-full">
                         <div className="flex flex-row justify-end items-center pt-3.5 w-full gap-2">
                             {/* Döviz alanı - Sadece mobilde görünür */}
-                            {euroRate !== null && (
-                                <span className="flex items-center flex-nowrap whitespace-nowrap text-xs mr-auto">
-                                    <Image src="/eu.svg" alt="EU" width={18} height={18} className="inline-block align-middle mr-1" />
-                                    <span className="font-medium">€ = {euroRate.toFixed(2)} TL</span>
-                                </span>
-                            )}
+                            <span className="flex items-center flex-nowrap whitespace-nowrap text-xs mr-auto">
+                                <Image src="/eu.svg" alt="EU" width={16} height={16} className="inline-block align-middle mr-1" />
+                                <span className="font-medium">€ = {euroRate?.toFixed(2) || 'Yükleniyor...'} TL</span>
+                            </span>
                             <LanguageDropdown />
                             <button onClick={() => setIsMenuOpen(true)} style={{ lineHeight: 0 }}>
                                 <Menu className="w-6 h-6" />
                             </button>
                         </div>
                         <div className="flex justify-center items-center -mt-[0.1rem] mb-0">
-                            <Link href="/" className="text-sm font-normal text-white leading-tight underline hover:text-gray-100 transition-colors">
-                                gurbetbiz.com
+                            <Link href="/" className="text-2xl font-bold text-white leading-tight hover:text-gray-100 transition-colors">
+                                <span className="text-white">gurbet</span>
+                                <span className="text-black">biz</span>
                             </Link>
                         </div>
                     </div>
@@ -71,12 +81,10 @@ export default function Header() {
                         <div className="flex items-center gap-2">
                             <Link href="/" className="text-sm font-normal text-white leading-tight underline hover:text-gray-100 transition-colors">gurbetbiz.com</Link>
                             {/* Döviz alanı - Sadece masaüstünde görünür */}
-                            {euroRate !== null && (
-                                <span className="sm:ml-6 ml-2 items-center flex-nowrap whitespace-nowrap text-xs sm:text-sm flex">
-                                    <Image src="/eu.svg" alt="EU" width={18} height={18} className="inline-block align-middle mr-1" />
-                                    <span className="font-medium">€ = {euroRate.toFixed(2)} TL</span>
-                                </span>
-                            )}
+                            <span className="sm:ml-6 ml-2 items-center flex-nowrap whitespace-nowrap text-xs sm:text-sm flex">
+                                <Image src="/eu.svg" alt="EU" width={18} height={18} className="inline-block align-middle mr-1" />
+                                <span className="font-medium">€ = {euroRate?.toFixed(2) || 'Yükleniyor...'} TL</span>
+                            </span>
                         </div>
                         <div className="flex items-center gap-6 mr-4">
                             <LanguageDropdown />

@@ -19,8 +19,8 @@ export default function CheckInPage() {
     setCheckInResult(null);
 
     try {
-      // Demo check-in işlemi
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Demo timeout kaldırıldı - sistem daha hızlı
+      // await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Demo sonuç
       setCheckInResult({

@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Ana sayfalar
+Allow: /hesabim
+Allow: /flights/search
+Allow: /flights/booking
+Allow: /check-in
+Allow: /gizlilik-politikasi
+Allow: /kullanim-kosullari
+
+# Admin paneli - arama motorlarından gizle
+Disallow: /admin
+Disallow: /api/
+Disallow: /_next/
+Disallow: /node_modules/
+
+# Sitemap
+Sitemap: https://gurbet.biz/sitemap.xml

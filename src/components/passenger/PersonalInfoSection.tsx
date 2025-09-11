@@ -90,14 +90,16 @@ export default function PersonalInfoSection({ formData, onFormDataChange }: Pers
                 className="w-20 h-11 sm:px-3 px-1 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-sm"
               >
                 <option value="">Seç</option>
-                <option value="+90">+90</option>
-                <option value="+1">+1</option>
-                <option value="+44">+44</option>
-                <option value="+49">+49</option>
-                <option value="+33">+33</option>
-                <option value="+971">+971</option>
-                <option value="+20">+20</option>
-                <option value="+98">+98</option>
+                <option value="+90">🇹🇷 +90</option>
+                <option value="+49">🇩🇪 +49</option>
+                <option value="+33">🇫🇷 +33</option>
+                <option value="+32">🇧🇪 +32</option>
+                <option value="+31">🇳🇱 +31</option>
+                <option value="+45">🇩🇰 +45</option>
+                <option value="+44">🇬🇧 +44</option>
+                <option value="+46">🇸🇪 +46</option>
+                <option value="+41">🇨🇭 +41</option>
+                <option value="+43">🇦🇹 +43</option>
               </select>
             </div>
             <div className="flex-1">

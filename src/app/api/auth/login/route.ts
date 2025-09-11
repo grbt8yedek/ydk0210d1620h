@@ -4,14 +4,45 @@ import { userSchema } from '@/utils/validation';
 import { logger } from '@/utils/error';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
+import { createBruteForceProtection, resetLoginAttempts, getLoginAttempts } from '@/lib/authSecurity';
+import { getClientIP } from '@/lib/authSecurity';
+import { isValidCSRFToken } from '@/lib/csrfProtection';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     
+    // CSRF Token kontrolü (şimdilik devre dışı)
+    // const csrfToken = request.headers.get('x-csrf-token');
+    // if (!csrfToken || !isValidCSRFToken(csrfToken)) {
+    //   return NextResponse.json({
+    //     success: false,
+    //     message: 'CSRF token gerekli'
+    //   }, { status: 403 });
+    // }
+    
     // Input validation
     await validate(userSchema.login, body);
     const { email, password } = body;
+
+    // Brute force koruması
+    const nextRequest = new Request(request.url, {
+      method: request.method,
+      headers: request.headers,
+      body: JSON.stringify(body)
+    });
+    
+    const bruteForceMiddleware = createBruteForceProtection({
+      maxLoginAttempts: 5,
+      lockoutDuration: 15 * 60 * 1000, // 15 dakika
+      windowMs: 15 * 60 * 1000 // 15 dakika
+    });
+
+    // Brute force kontrolü
+    const bruteForceResponse = await bruteForceMiddleware(nextRequest as any);
+    if (bruteForceResponse.status === 429) {
+      return bruteForceResponse;
+    }
 
     // Veritabanından kullanıcıyı bul
     const user = await prisma.user.findUnique({
@@ -23,6 +54,10 @@ export async function POST(request: Request) {
       const isPasswordValid = await bcrypt.compare(password, user.password);
       
       if (isPasswordValid) {
+        // Başarılı giriş - brute force sayacını sıfırla
+        const ip = getClientIP(nextRequest as any);
+        resetLoginAttempts(ip);
+        
         logger.info(`Başarılı giriş: ${email}`);
         return NextResponse.json({
           success: true,

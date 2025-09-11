@@ -4,6 +4,8 @@ import { CalendarDays, UserCircle2, ArrowRightLeft } from 'lucide-react';
 import TripTypeSelector from './TripTypeSelector';
 import AirportInput from './AirportInput';
 import DateInput from './DateInput';
+import PassengerSelector from './PassengerSelector';
+import { useState } from 'react';
 
 interface Airport {
   code: string;
@@ -39,6 +41,9 @@ interface FlightSearchFormProps {
   childCount: number;
   infantCount: number;
   onPassengerModalOpen: () => void;
+  onAdultCountChange: (count: number) => void;
+  onChildCountChange: (count: number) => void;
+  onInfantCountChange: (count: number) => void;
   
   // Search props
   isLoading: boolean;
@@ -67,10 +72,15 @@ export default function FlightSearchForm({
   childCount,
   infantCount,
   onPassengerModalOpen,
+  onAdultCountChange,
+  onChildCountChange,
+  onInfantCountChange,
   isLoading,
   onSearch,
   onSwapAirports
 }: FlightSearchFormProps) {
+  const [showPassengerModal, setShowPassengerModal] = useState(false);
+  
   return (
     <>
       {/* Masaüstü için uçuş arama formu */}
@@ -86,68 +96,89 @@ export default function FlightSearchForm({
           />
           <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
             {/* Nereden */}
-            <AirportInput
-              label="Nereden"
-              placeholder="Şehir veya havali"
-              value={fromInput}
-              onChange={onFromInputChange}
-              onAirportSelect={onFromAirportSelect}
-              selectedAirports={fromAirports}
-              isMobile={false}
-            />
+            <div className="md:col-span-1">
+              <label className="text-xs text-gray-500 mb-1 ml-1 font-medium">Nereden</label>
+              <div className="relative h-12 border border-gray-300 rounded-xl focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-200 transition-all duration-200">
+                <AirportInput
+                  label=""
+                  placeholder="Şehir veya havali"
+                  value={fromInput}
+                  onChange={onFromInputChange}
+                  onAirportSelect={onFromAirportSelect}
+                  selectedAirports={fromAirports}
+                  isMobile={false}
+                />
+              </div>
+            </div>
             {/* Nereye */}
-            <AirportInput
-              label="Nereye"
-              placeholder="Şehir veya havali"
-              value={toInput}
-              onChange={onToInputChange}
-              onAirportSelect={onToAirportSelect}
-              selectedAirports={toAirports}
-              isMobile={false}
-            />
+            <div className="md:col-span-1">
+              <label className="text-xs text-gray-500 mb-1 ml-1 font-medium">Nereye</label>
+              <div className="relative h-12 border border-gray-300 rounded-xl focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-200 transition-all duration-200">
+                <AirportInput
+                  label=""
+                  placeholder="Şehir veya havali"
+                  value={toInput}
+                  onChange={onToInputChange}
+                  onAirportSelect={onToAirportSelect}
+                  selectedAirports={toAirports}
+                  isMobile={false}
+                />
+              </div>
+            </div>
             {/* Gidiş Tarihi */}
-            <div className="flex flex-col">
+            <div className="flex flex-col md:col-span-1">
               <label className="text-xs text-gray-500 mb-1 ml-1 font-medium">Gidiş Tarihi</label>
               <div className="relative w-full flex items-center">
-                <CalendarDays className="absolute left-2 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" strokeWidth={1.5} />
                 <DateInput
                   value={departureDate}
                   onChange={onDepartureDateChange}
-                  className="w-full pl-10 pr-4 h-12 leading-[44px] py-0 text-base text-gray-700 placeholder-gray-400 focus:outline-none bg-white border border-gray-300 rounded-xl"
+                  className="w-full pl-10 pr-4 h-12 leading-[44px] py-0 text-sm text-gray-500 placeholder-gray-400 focus:outline-none focus:border-none focus:ring-0 bg-white border border-gray-300 rounded-xl focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-200 transition-all duration-200 text-left font-light"
                   placeholder="gg.aa.yyyy"
                 />
               </div>
             </div>
             {/* Dönüş Tarihi */}
-            <div className="flex flex-col">
+            <div className="flex flex-col md:col-span-1">
               <label className="text-xs text-gray-500 mb-1 ml-1 font-medium">Dönüş Tarihi</label>
               <div className="relative w-full flex items-center">
-                <CalendarDays className="absolute left-2 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none z-10" strokeWidth={1.5} />
                 <DateInput
                   value={returnDate}
                   onChange={onReturnDateChange}
-                  className={`w-full pl-10 pr-4 h-12 leading-[44px] py-0 text-base text-gray-700 placeholder-gray-400 focus:outline-none bg-white border border-gray-300 rounded-xl ${tripType === 'oneWay' ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''}`}
+                  className={`w-full pl-10 pr-4 h-12 leading-[44px] py-0 text-sm text-gray-500 placeholder-gray-400 focus:outline-none focus:border-none focus:ring-0 bg-white border border-gray-300 rounded-xl focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-200 transition-all duration-200 text-left font-light ${tripType === 'oneWay' ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''}`}
                   placeholder="gg.aa.yyyy"
                   disabled={tripType === 'oneWay'}
                 />
               </div>
             </div>
             {/* Yolcu */}
-            <div className="flex flex-col relative">
+            <div className="flex flex-col relative md:col-span-1">
               <label className="text-xs text-gray-500 mb-1 ml-1 font-medium">Yolcu</label>
               <div className="relative w-full flex items-center">
                 <UserCircle2 className="absolute left-2 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <button
                   type="button"
-                  onClick={onPassengerModalOpen}
-                  className="w-full pl-10 pr-4 h-12 text-base text-gray-700 text-left focus:outline-none bg-white border border-gray-300 rounded-xl appearance-none cursor-pointer hover:border-green-500 transition-colors"
+                  onClick={() => setShowPassengerModal(!showPassengerModal)}
+                  className="w-full pl-10 pr-4 h-12 text-base text-gray-700 text-left focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 bg-white border border-gray-300 rounded-xl appearance-none cursor-pointer hover:border-green-500 transition-all duration-200"
                 >
                   {adultCount} Yetişkin{childCount > 0 ? `, ${childCount} Çocuk` : ''}{infantCount > 0 ? `, ${infantCount} Bebek` : ''}
                 </button>
+                {/* Yolcu Seçimi Dropdown */}
+                <PassengerSelector
+                  isOpen={showPassengerModal}
+                  onClose={() => setShowPassengerModal(false)}
+                  adultCount={adultCount}
+                  childCount={childCount}
+                  infantCount={infantCount}
+                  onAdultCountChange={onAdultCountChange}
+                  onChildCountChange={onChildCountChange}
+                  onInfantCountChange={onInfantCountChange}
+                />
               </div>
             </div>
             {/* Uçuş Ara Butonu */}
-            <div className="flex flex-col justify-end">
+            <div className="flex flex-col justify-end md:col-span-1">
               <button
                 type="submit"
                 className="w-full bg-green-500 text-white py-3 rounded-xl font-semibold text-lg shadow-md hover:bg-green-600 transition-all"
@@ -164,7 +195,7 @@ export default function FlightSearchForm({
       {/* Mobil için özel uçuş arama kutusu */}
       <div className="block sm:hidden w-full px-4 mt-16">
         <div className="bg-gray-50 rounded-2xl shadow-lg p-4 flex flex-col gap-2">
-          {/* Tek yön / Gidiş-dönüş / Yolcu satırı */}
+          {/* Tek yön / Gidiş-dönüş */}
           <div className="flex items-center w-full gap-1 mb-0 mt-0">
             <TripTypeSelector
               tripType={tripType}
@@ -173,71 +204,80 @@ export default function FlightSearchForm({
               onDirectOnlyChange={onDirectOnlyChange}
               isMobile={true}
             />
-            <button
-              type="button"
-              onClick={onPassengerModalOpen}
-              className="flex items-center gap-1 text-[#23272F] rounded-xl px-3 py-1.5 bg-white ml-auto text-[14px] font-normal min-w-[90px] justify-center border border-gray-200 hover:border-green-500 transition-colors"
-              style={{lineHeight: '1.1'}}
-            >
-              <UserCircle2 className="w-4 h-4" />
-              <span className="truncate">{adultCount} Yetişkin{childCount > 0 ? `, ${childCount} Çocuk` : ''}{infantCount > 0 ? `, ${infantCount} Bebek` : ''}</span>
-              <svg className="w-4 h-4 ml-1 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-            </button>
           </div>
-          {/* Nereden-Nereye kutuları ve swap */}
-          <div className="relative flex flex-col gap-3 w-full mt-2">
-            <AirportInput
-              label=""
-              placeholder="Kalkış"
-              value={fromInput}
-              onChange={onFromInputChange}
-              onAirportSelect={onFromAirportSelect}
-              selectedAirports={fromAirports}
-              isMobile={true}
-            />
+          {/* Nereden-Nereye kutuları ve swap - YAN YANA */}
+          <div className="relative flex items-center gap-0 w-full mt-2">
+            <div className="flex-1 min-w-0 -mr-1">
+              <AirportInput
+                label=""
+                placeholder="Nereden"
+                value={fromInput}
+                onChange={onFromInputChange}
+                onAirportSelect={onFromAirportSelect}
+                selectedAirports={fromAirports}
+                isMobile={true}
+              />
+            </div>
             <button
               type="button"
               onClick={onSwapAirports}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-10 h-10 rounded-full border-2 border-[#0a2342] bg-white shadow"
+              className="flex-shrink-0 flex items-center justify-center w-10 h-10 z-10"
               aria-label="Kalkış/Varış değiştir"
             >
               <ArrowRightLeft className="w-6 h-6 text-[#0a2342]" strokeWidth={1.2} />
             </button>
-            <AirportInput
-              label=""
-              placeholder="Varış"
-              value={toInput}
-              onChange={onToInputChange}
-              onAirportSelect={onToAirportSelect}
-              selectedAirports={toAirports}
-              isMobile={true}
-            />
+            <div className="flex-1 min-w-0 -ml-1">
+              <AirportInput
+                label=""
+                placeholder="Nereye"
+                value={toInput}
+                onChange={onToInputChange}
+                onAirportSelect={onToAirportSelect}
+                selectedAirports={toAirports}
+                isMobile={true}
+              />
+            </div>
           </div>
           {/* Tarih kutuları */}
           <div className="flex gap-2 w-full mt-2">
             <div className="flex-1">
-              <div className="flex items-center bg-white border border-black rounded-lg h-11 px-3 text-[15px] font-semibold focus:outline-none min-w-0">
-                <CalendarDays className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" />
+              <div className="relative w-full h-11 border border-gray-300 rounded-lg bg-white focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-200 transition-all duration-200">
+                <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500 pointer-events-none" />
                 <DateInput
                   value={departureDate}
                   onChange={onDepartureDateChange}
-                  className="flex-1 bg-transparent border-none outline-none text-[14px] font-semibold placeholder-[#6b7280] p-0"
+                  className="w-full h-full text-center bg-transparent border-none outline-none text-[14px] font-semibold placeholder-[#6b7280] focus:outline-none focus:ring-0"
                   placeholder="Gidis Tarihi"
                 />
               </div>
             </div>
             <div className="flex-1">
-              <div className="flex items-center bg-white border border-black rounded-lg h-11 px-3 text-[15px] font-semibold focus:outline-none min-w-0">
-                <CalendarDays className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" />
+              <div className={`relative w-full h-11 border border-gray-300 rounded-lg ${tripType === 'oneWay' ? 'bg-gray-50' : 'bg-white'} focus-within:border-green-500 focus-within:ring-2 focus-within:ring-green-200 transition-all duration-200`}>
+                <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500 pointer-events-none" />
                 <DateInput
                   value={returnDate}
                   onChange={onReturnDateChange}
-                  className={`flex-1 bg-transparent border-none outline-none text-[14px] font-semibold placeholder-[#6b7280] p-0 ${tripType === 'oneWay' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`w-full h-full text-center bg-transparent border-none outline-none text-[14px] font-semibold placeholder-[#6b7280] focus:outline-none focus:ring-0 ${tripType === 'oneWay' ? 'opacity-50 cursor-not-allowed' : ''}`}
                   placeholder="Donus Tarihi"
                   disabled={tripType === 'oneWay'}
                 />
               </div>
             </div>
+          </div>
+          {/* Yolcu seçimi - uzun kutucuk */}
+          <div className="w-full mt-2">
+            <button
+              type="button"
+              onClick={() => setShowPassengerModal(true)}
+              className="w-full h-11 bg-white border border-gray-300 rounded-lg px-4 flex items-center justify-between hover:border-green-500 transition-all duration-200"
+            >
+              <span className="text-[14px] font-semibold text-gray-800">
+                {adultCount + childCount + infantCount} Yolcu /
+              </span>
+              <span className="text-[14px] font-semibold text-gray-800">
+                + Yolcu Ekle
+              </span>
+            </button>
           </div>
           {/* Uçuş Ara Butonu */}
           <button
@@ -250,6 +290,18 @@ export default function FlightSearchForm({
           </button>
         </div>
       </div>
+
+      {/* Mobil için PassengerSelector */}
+      <PassengerSelector
+        isOpen={showPassengerModal}
+        onClose={() => setShowPassengerModal(false)}
+        adultCount={adultCount}
+        childCount={childCount}
+        infantCount={infantCount}
+        onAdultCountChange={onAdultCountChange}
+        onChildCountChange={onChildCountChange}
+        onInfantCountChange={onInfantCountChange}
+      />
     </>
   );
 } 

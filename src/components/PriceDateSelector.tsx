@@ -3,7 +3,7 @@
 import React from 'react';
 import { format, addDays, subDays, isSameDay, startOfDay } from 'date-fns';
 import { tr } from 'date-fns/locale';
-import { PlaneTakeoff, Loader2 } from 'lucide-react';
+import { PlaneTakeoff, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PriceDateSelectorProps {
   // Temel veriler
@@ -40,56 +40,87 @@ export default function PriceDateSelector({
   onStepChange
 }: PriceDateSelectorProps) {
   
-  // Desktop için bar chart content oluşturma
-  const createBarChartContent = () => {
-    if (departurePrices.length === 0) return null;
-    
-    const prices = departurePrices.map(p => p.price);
-    const minPrice = Math.min(...prices);
-    const maxPrice = Math.max(...prices);
-    
-    const getBarHeight = (price: number) => {
-      if (maxPrice === minPrice) return 92;
-      const norm = (price - minPrice) / (maxPrice - minPrice);
-      return 72 + Math.sqrt(norm) * 40;
-    };
-    
-    return departurePrices.map(({ date, price, currency }) => {
-      const isSelected = selectedDeparture ? isSameDay(date, selectedDeparture) : false;
-      const barHeight = getBarHeight(price);
-      const dayStr = format(date, "dd MMM", { locale: tr });
-      const weekDay = format(date, "EEE", { locale: tr });
-      
-      return (
-        <button
-          key={date.toISOString()}
-          onClick={() => {
-            onDateSelect(date);
-            if (tripType === "roundTrip" && onStepChange) {
-              onStepChange("return");
-            }
-          }}
-          className={`flex flex-col items-center min-w-[56px] w-14 pt-0 pb-0 rounded-b-2xl border-0 bg-transparent transition-all duration-200 cursor-pointer select-none group items-end
-            ${isSelected ? "scale-105 border-b-4 border-green-500" : "hover:scale-105"}
-          `}
-          style={{ outline: 'none' }}
-        >
-          {/* Fiyat barın üstünde */}
-          <span className={`text-lg font-bold mb-2 ${isSelected ? "text-green-700" : "text-gray-700"}`}>{price.toLocaleString()} €</span>
-          {/* Bar */}
-          <div className={`w-14 flex flex-col items-center justify-end rounded-t-xl transition-all duration-200 mb-1
-            ${isSelected ? "bg-green-700 shadow-lg" : "bg-green-400/90 group-hover:bg-green-500"}
-          `}
-            style={{ height: barHeight }}
-          >
-          </div>
-          {/* Tarih ve gün */}
-          <span className={`mt-1 text-sm font-semibold leading-tight ${isSelected ? "text-green-700" : "text-gray-700"}`}>{dayStr}</span>
-          <span className={`text-xs ${isSelected ? "text-green-600 font-bold" : "text-gray-400"}`}>{weekDay}</span>
-        </button>
-      );
-    });
-  };
+  // Desktop için merkez tarih state'i
+  const [desktopCenterDate, setDesktopCenterDate] = React.useState<Date>(mobilePriceBarStartDate);
+  
+  // Seçili tarih değiştiğinde desktop merkez tarihini güncelle
+  React.useEffect(() => {
+    if (selectedDeparture) {
+      setDesktopCenterDate(selectedDeparture);
+    }
+  }, [selectedDeparture]);
+  
+         // Desktop için tarih kartları oluşturma (9 gün göster, seçili tarih ortada)
+         const createDesktopDateCards = () => {
+           if (loadingPrices) {
+             return (
+               <div className="flex items-center justify-center w-full h-32 text-gray-400">
+                 <Loader2 className="w-6 h-6 animate-spin" />
+               </div>
+             );
+           }
+           
+           if (errorPrices) {
+             return <div className="text-red-500 text-sm">{errorPrices}</div>;
+           }
+           
+           // Desktop merkez tarihini kullan
+           const centerDate = desktopCenterDate;
+           
+           // 9 gün üret: 4 önceki + seçili + 4 sonraki
+           const days = Array.from({ length: 9 }, (_, i) => addDays(centerDate, i - 4));
+           
+           return days.map((date) => {
+             // departurePrices'da bu güne ait fiyat var mı?
+             const found = departurePrices.find(p => isSameDay(p.date, date));
+             const price = found ? found.price : null;
+             const currency = found ? found.currency : null;
+             const isSelected = selectedDeparture ? isSameDay(date, selectedDeparture) : false;
+             const dayStr = format(date, "dd MMM", { locale: tr });
+             const weekDay = format(date, "EEE", { locale: tr });
+             
+             return (
+               <button
+                 key={date.toISOString()}
+                 onClick={() => {
+                   onDateSelect(date);
+                   if (tripType === "roundTrip" && onStepChange) {
+                     onStepChange("return");
+                   }
+                 }}
+                 className={`group relative flex flex-col items-center min-w-[60px] w-16 p-2 rounded-lg transition-all duration-300 cursor-pointer select-none
+                   ${isSelected 
+                     ? "bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25 scale-105" 
+                     : "bg-white hover:bg-gray-50 border border-gray-200 hover:border-green-300 hover:shadow-md"
+                   }
+                 `}
+                 style={{ outline: 'none' }}
+               >
+                 {/* Fiyat */}
+                 <div className={`text-center mb-1 ${isSelected ? "text-white" : "text-gray-800"}`}>
+                   <div className={`text-sm font-semibold ${isSelected ? "text-white" : "text-gray-700"}`}>
+                     {price !== null ? `${price.toLocaleString()} €` : '-'}
+                   </div>
+                 </div>
+                 
+                 {/* Tarih ve gün */}
+                 <div className="text-center">
+                   <div className={`text-xs font-semibold ${isSelected ? "text-white" : "text-gray-700"}`}>
+                     {dayStr}
+                   </div>
+                   <div className={`text-xs ${isSelected ? "text-green-100" : "text-gray-500"}`}>
+                     {weekDay}
+                   </div>
+                 </div>
+                 
+                 {/* Hover efekti için alt çizgi */}
+                 <div className={`absolute bottom-0 left-0 right-0 h-0.5 rounded-b-lg transition-all duration-300
+                   ${isSelected ? "bg-white" : "bg-transparent group-hover:bg-green-400"}
+                 `} />
+               </button>
+             );
+           });
+         };
 
   // Mobil için tarih kartları oluşturma
   const createMobileDateCards = () => {
@@ -200,31 +231,50 @@ export default function PriceDateSelector({
           </div>
         </div>
         
-        <div className="flex items-center gap-2 mt-2">
+        <div className="flex items-center gap-2 mt-0.5">
           <span className="text-lg font-bold text-gray-800">Gidiş Uçuşları</span>
         </div>
         <div className="text-gray-500 text-sm mt-0 mb-1">{origin} → {destination}</div>
       </div>
       
-      {/* Desktop eski barChartContent */}
+      {/* Desktop modern kart tasarımı */}
       <div className="hidden md:flex flex-col items-center w-full">
-        <div className="flex-grow flex gap-6 mt-0 overflow-x-auto pb-2 items-end justify-center w-full">
-          {loadingPrices ? (
-            <div className="flex items-center justify-center w-full h-full text-gray-400">
-              <Loader2 className="w-5 h-5 animate-spin" />
+        <div className="w-full max-w-4xl mx-auto px-4">
+                 {/* Başlık - Desktop'ta gizli */}
+                 <div className="flex items-center justify-center gap-2 mb-4 md:hidden">
+                   <PlaneTakeoff className="w-4 h-4 text-green-600" />
+                   <span className="text-lg font-semibold text-gray-800">Gidiş Tarihi Seçimi</span>
+                 </div>
+          <div className="text-gray-500 text-sm mb-6 text-center md:hidden">{origin} → {destination}</div>
+          
+          {/* Fiyat kartları */}
+          <div className="relative flex items-center justify-center">
+            {/* Sol ok */}
+            <button 
+              className="absolute left-0 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors"
+              onClick={() => {
+                setDesktopCenterDate(subDays(desktopCenterDate, 5));
+              }}
+            >
+              <ChevronLeft className="w-4 h-4 text-gray-600" />
+            </button>
+            
+            {/* Kartlar */}
+            <div className="flex gap-2 pb-2">
+              {createDesktopDateCards()}
             </div>
-          ) : errorPrices ? (
-            <div className="text-red-500 text-sm">{errorPrices}</div>
-          ) : (
-            createBarChartContent()
-          )}
+            
+            {/* Sağ ok */}
+            <button 
+              className="absolute right-0 z-10 bg-white shadow-lg rounded-full p-2 hover:bg-gray-50 transition-colors"
+              onClick={() => {
+                setDesktopCenterDate(addDays(desktopCenterDate, 5));
+              }}
+            >
+              <ChevronRight className="w-4 h-4 text-gray-600" />
+            </button>
+          </div>
         </div>
-        
-        <div className="flex items-center gap-2 mt-4">
-          <PlaneTakeoff className="w-6 h-6 text-green-600" />
-          <span className="text-lg font-bold text-gray-800">Gidiş Tarihi Seçimi</span>
-        </div>
-        <div className="text-gray-500 text-sm mt-0 mb-1">{origin} → {destination}</div>
       </div>
     </div>
   );

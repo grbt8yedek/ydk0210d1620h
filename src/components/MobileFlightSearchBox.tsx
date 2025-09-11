@@ -160,7 +160,7 @@ export default function MobileFlightSearchBox({
               <input
                 ref={fromInputRef}
                 type="text"
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-base font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-base font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 flight-search-input"
                 placeholder="Nereden"
                 value={fromInput}
                 onChange={e => {
@@ -199,7 +199,7 @@ export default function MobileFlightSearchBox({
               <input
                 ref={toInputRef}
                 type="text"
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-base font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-base font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 flight-search-input"
                 placeholder="Nereye"
                 value={toInput}
                 onChange={e => {
@@ -232,24 +232,24 @@ export default function MobileFlightSearchBox({
         <div className="flex gap-2 mt-2">
           <div className="flex-1">
             <label className="block text-green-700 text-sm font-semibold mb-1">Gidiş Tarihi</label>
-            <div className="relative">
+            <div className="relative flex items-center justify-center">
               <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
               <DateInput
                 value={departureDate}
                 onChange={setDepartureDate}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-base font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-base font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 text-center flight-search-input"
                 placeholder="Gidiş Tarihi"
               />
             </div>
           </div>
           <div className="flex-1">
             <label className="block text-green-700 text-sm font-semibold mb-1">Dönüş Tarihi</label>
-            <div className="relative">
+            <div className="relative flex items-center justify-center">
               <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />
               <DateInput
                 value={returnDate}
                 onChange={setReturnDate}
-                className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-base font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 ${tripType === 'oneWay' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-base font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 text-center flight-search-input ${tripType === 'oneWay' ? 'opacity-50 cursor-not-allowed' : ''}`}
                 placeholder="Dönüş Tarihi"
                 disabled={tripType === 'oneWay'}
               />

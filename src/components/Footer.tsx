@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -9,8 +10,7 @@ export default function Footer() {
             <h3 className="text-base font-semibold text-gray-600 mb-4">Şirket</h3>
             <ul className="space-y-2">
               <li><Link href="/hakkimizda" className="text-sm text-gray-700 hover:text-gray-900">Hakkımızda</Link></li>
-              <li><Link href="/blog" className="text-sm text-gray-700 hover:text-gray-900">gurbet.biz Blog</Link></li>
-              <li><Link href="/resmi-tatiller" className="text-sm text-gray-700 hover:text-gray-900">Resmi Tatiller</Link></li>
+              <li><Link href="/blog" className="text-sm text-gray-700 hover:text-gray-900">gurbetbiz Blog</Link></li>
             </ul>
           </div>
           
@@ -18,9 +18,6 @@ export default function Footer() {
             <h3 className="text-base font-semibold text-gray-600 mb-4">Yardım ve Destek</h3>
             <ul className="space-y-2">
               <li><Link href="/yardim" className="text-sm text-gray-700 hover:text-gray-900">Yardım ve İletişim</Link></li>
-              <li><Link href="/sss" className="text-sm text-gray-700 hover:text-gray-900">Sıkça Sorulan Sorular</Link></li>
-              <li><Link href="/iletisim" className="text-sm text-gray-700 hover:text-gray-900">E-Posta</Link></li>
-              <li><Link href="/api" className="text-sm text-gray-700 hover:text-gray-900">gurbet.biz API</Link></li>
             </ul>
           </div>
           
@@ -50,7 +47,7 @@ export default function Footer() {
               </li>
               <li className="text-sm text-gray-700">
                 <strong>E-posta:</strong><br />
-                info@gurbet.biz
+                info@gurbetbiz.com
               </li>
             </ul>
           </div>
@@ -58,12 +55,40 @@ export default function Footer() {
 
         <div className="mt-16 pt-8 border-t border-gray-200">
           <div className="flex justify-between items-center">
-            <div className="flex items-baseline">
-              <span className="text-[17px] font-bold text-gray-700">gurbet</span>
-              <span className="text-[17px] font-bold text-green-500">biz</span>
+            <div className="flex items-center space-x-6">
+              <div className="flex items-baseline">
+                <span className="text-[17px] font-bold text-gray-700">gurbet</span>
+                <span className="text-[17px] font-bold text-green-500">biz</span>
+              </div>
+              <div className="flex items-center space-x-3 bg-gray-100 px-3 py-2 rounded">
+                {/* PayPal */}
+                <Image
+                  src="/images/payment/paypal.png"
+                  alt="PayPal"
+                  width={40}
+                  height={25}
+                  className="object-contain"
+                />
+                {/* Visa */}
+                <Image
+                  src="/images/payment/visa.png"
+                  alt="Visa"
+                  width={40}
+                  height={25}
+                  className="object-contain"
+                />
+                {/* Mastercard */}
+                <Image
+                  src="/images/payment/mastercard.png"
+                  alt="Mastercard"
+                  width={40}
+                  height={25}
+                  className="object-contain"
+                />
+              </div>
             </div>
             <p className="text-sm text-gray-500">
-              © {new Date().getFullYear()} gurbet.biz. Tüm hakları saklıdır.
+              © {new Date().getFullYear()} gurbetbiz. Tüm hakları saklıdır.
             </p>
           </div>
         </div>

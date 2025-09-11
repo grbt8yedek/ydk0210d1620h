@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { X } from 'lucide-react';
+import { X, Eye, EyeOff } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { signIn } from 'next-auth/react';
+import ValidationPopup from './ValidationPopup';
+import CountryDropdown from './CountryDropdown';
+import { Country, defaultCountry } from '@/data/countries';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -21,9 +24,15 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [showValidationPopup, setShowValidationPopup] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState<Country>(defaultCountry);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,8 +62,49 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+    setValidationErrors([]);
+    
+    // Form validasyonu
+    const errors: string[] = [];
+    
+    if (!firstName.trim()) {
+      errors.push('Ad alanı zorunludur');
+    }
+    
+    if (!lastName.trim()) {
+      errors.push('Soyad alanı zorunludur');
+    }
+    
+    if (!email.trim()) {
+      errors.push('E-posta adresi zorunludur');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.push('Geçerli bir e-posta adresi giriniz');
+    }
+    
+    if (!phone.trim()) {
+      errors.push('Cep telefonu numarası zorunludur');
+    }
+    
+    if (!password.trim()) {
+      errors.push('Şifre alanı zorunludur');
+    } else if (password.length < 6) {
+      errors.push('Şifre en az 6 karakter olmalıdır');
+    }
+    
+    if (!confirmPassword.trim()) {
+      errors.push('Şifre tekrar alanı zorunludur');
+    } else if (password !== confirmPassword) {
+      errors.push('Şifreler eşleşmiyor');
+    }
+    
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      setShowValidationPopup(true);
+      return;
+    }
+    
+    setLoading(true);
     
     const res = await fetch('/api/register', {
       method: 'POST',
@@ -76,7 +126,7 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="fixed inset-0 bg-black/20 z-50 flex items-center justify-center p-4" onClick={onClose}>
         <div className="bg-white rounded-2xl shadow-xl w-full max-w-md relative flex flex-col max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
           {/* Header */}
           <div className="p-8 pb-4 flex-shrink-0">
@@ -98,19 +148,32 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="mt-1 w-full p-2 border border-gray-300 rounded-lg"
+                    className="mt-1 w-full p-2 border border-gray-300 rounded-lg bg-gray-50 focus:border-gray-300 focus:ring-0 focus:outline-none"
                     required
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Şifre</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="mt-1 w-full p-2 border border-gray-300 rounded-lg"
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="mt-1 w-full p-2 pr-10 border border-gray-300 rounded-lg bg-gray-50 focus:border-gray-300 focus:ring-0 focus:outline-none"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 {error && <p className="text-red-500 text-sm">{error}</p>}
                 <button type="submit" disabled={loading} className="w-full bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 disabled:bg-gray-400">
@@ -130,13 +193,13 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                 <div className="flex flex-col md:flex-row gap-4">
                   <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700">Adı</label>
-                    <input
-                      type="text"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      className="mt-1 w-full p-2 border border-gray-300 rounded-lg"
-                      required
-                    />
+                                      <input
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="mt-1 w-full p-2 border border-gray-300 rounded-lg bg-gray-50 focus:border-gray-300 focus:ring-0 focus:outline-none"
+                    required
+                  />
                   </div>
                   <div className="flex-1">
                     <label className="block text-sm font-medium text-gray-700">Soyadı</label>
@@ -144,7 +207,7 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                       type="text"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="mt-1 w-full p-2 border border-gray-300 rounded-lg"
+                      className="mt-1 w-full p-2 border border-gray-300 rounded-lg bg-gray-50 focus:border-gray-300 focus:ring-0 focus:outline-none"
                       required
                     />
                   </div>
@@ -155,35 +218,73 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="mt-1 w-full p-2 border border-gray-300 rounded-lg"
+                    className="mt-1 w-full p-2 border border-gray-300 rounded-lg bg-gray-50 focus:border-gray-300 focus:ring-0 focus:outline-none"
                     required
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Cep Telefonu</label>
                   <div className="flex mt-1">
-                    <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                      🇹🇷 +90
-                    </span>
+                    <CountryDropdown
+                      selectedCountry={selectedCountry}
+                      onCountryChange={setSelectedCountry}
+                      className="w-24"
+                    />
                     <input
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded-r-lg"
-                      placeholder="5XX XXX XX XX"
+                      className="flex-1 p-2 border border-gray-300 rounded-r-lg bg-gray-50 focus:border-gray-300 focus:ring-0 focus:outline-none"
+                      placeholder="Telefon numaranız"
                       required
                     />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Şifre</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="mt-1 w-full p-2 border border-gray-300 rounded-lg"
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="mt-1 w-full p-2 pr-10 border border-gray-300 rounded-lg bg-gray-50 focus:border-gray-300 focus:ring-0 focus:outline-none"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Şifre Tekrar</label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="mt-1 w-full p-2 pr-10 border border-gray-300 rounded-lg bg-gray-50 focus:border-gray-300 focus:ring-0 focus:outline-none"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4 text-gray-400" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-gray-400" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 {error && <p className="text-red-500 text-sm">{error}</p>}
                 <button type="submit" disabled={loading} className="w-full bg-green-500 text-white p-2 rounded-lg hover:bg-green-600 disabled:bg-gray-400">
@@ -200,14 +301,6 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
 
             {/* Social Logins */}
             <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">veya sosyal medya ile devam et</span>
-                </div>
-              </div>
 
               <div className="mt-6 grid grid-cols-1 gap-3">
                 <div>
@@ -246,6 +339,13 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
           </div>
         </div>
       </div>
+      
+      {/* Validation Popup */}
+      <ValidationPopup
+        isOpen={showValidationPopup}
+        onClose={() => setShowValidationPopup(false)}
+        errors={validationErrors}
+      />
     </>
   );
 };

@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import AccountSidebar from '@/components/AccountSidebar';
-import { Heart, ArrowRight, Calendar, Trash2, User, Plane, Users, Star, Receipt, Search, Bell } from 'lucide-react';
+import { Heart, ArrowRight, Calendar, Trash2 } from 'lucide-react';
 
 export default function FavorilerPage() {
   const { data: session, status } = useSession();
@@ -13,16 +12,6 @@ export default function FavorilerPage() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const menuItems = [
-    { icon: User, label: 'Hesabım', href: '/hesabim' },
-    { icon: Plane, label: 'Seyahatlerim', href: '/hesabim/seyahatlerim' },
-    { icon: Users, label: 'Yolcularım', href: '/hesabim/yolcularim' },
-    { icon: Star, label: 'Puanlarım', href: '/hesabim/puanlarim' },
-    { icon: Receipt, label: 'Fatura Bilgilerim', href: '/hesabim/fatura' },
-    { icon: Search, label: 'Aramalarım', href: '/hesabim/aramalarim' },
-    { icon: Bell, label: 'Fiyat Alarmlarım', href: '/hesabim/alarmlar' },
-    { icon: Heart, label: 'Favorilerim', href: '/hesabim/favoriler' },
-  ];
   const handleLogout = () => { signOut({ callbackUrl: '/' }); };
 
   useEffect(() => {
