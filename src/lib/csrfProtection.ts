@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { randomBytes } from 'crypto'
 
 // CSRF token store (production'da Redis kullanılmalı)
-const csrfTokens = new Set<string>()
+interface TokenData {
+  token: string;
+  expires: number;
+}
+
+const csrfTokens = new Map<string, TokenData>();
 
 interface CSRFConfig {
   tokenLength: number
