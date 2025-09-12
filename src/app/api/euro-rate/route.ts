@@ -62,7 +62,8 @@ export async function GET() {
         }
         return { success: false, apiUrl };
       } catch (apiError) {
-        console.log(`API hatası (${apiUrl}):`, apiError.message);
+        const errorMessage = apiError instanceof Error ? apiError.message : 'Bilinmeyen hata';
+        console.log(`API hatası (${apiUrl}):`, errorMessage);
         return { success: false, apiUrl };
       }
     });
