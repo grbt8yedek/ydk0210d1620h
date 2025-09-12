@@ -67,7 +67,8 @@ export function generateCSRFToken(): string {
 
 // CSRF token'ı kaydet
 export function storeCSRFToken(sessionId: string, token: string): void {
-  csrfTokens.add(token)
+  const expires = Date.now() + defaultConfig.tokenExpiry;
+  csrfTokens.set(sessionId, { token, expires });
   
   // Eski token'ları temizle (basit yaklaşım)
   if (csrfTokens.size > 1000) {
