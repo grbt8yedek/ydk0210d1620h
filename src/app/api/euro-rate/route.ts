@@ -84,7 +84,8 @@ export async function GET() {
             timestamp: Date.now()
           });
         
-        return NextResponse.json(responseData);
+          return NextResponse.json(responseData);
+        }
       }
     }
 
