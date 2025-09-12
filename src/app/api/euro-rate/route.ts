@@ -116,6 +116,7 @@ export async function GET() {
     };
     
     // Error'u da cache'e kaydet (kısa süre)
+    const cacheKey = 'euro-rate';
     cache.set(cacheKey, {
       data: errorData,
       timestamp: Date.now()
