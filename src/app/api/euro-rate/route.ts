@@ -75,13 +75,14 @@ export async function GET() {
     for (const result of results) {
       if (result.status === 'fulfilled' && result.value.success) {
         const responseData = result.value.data;
-        console.log(`Döviz kuru başarıyla alındı: €1 = ${responseData.eurTry} TL (${result.value.apiUrl})`);
-        
-        // Cache'e kaydet
-        cache.set(cacheKey, {
-          data: responseData,
-          timestamp: Date.now()
-        });
+        if (responseData && responseData.eurTry) {
+          console.log(`Döviz kuru başarıyla alındı: €1 = ${responseData.eurTry} TL (${result.value.apiUrl})`);
+          
+          // Cache'e kaydet
+          cache.set(cacheKey, {
+            data: responseData,
+            timestamp: Date.now()
+          });
         
         return NextResponse.json(responseData);
       }
