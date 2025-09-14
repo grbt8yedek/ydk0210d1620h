@@ -113,7 +113,7 @@ export default function CampaignsSection() {
                 <div className="relative w-full h-48 cursor-pointer">
                   {campaign.imageUrl ? (
                     <Image
-                      src={`http://localhost:3004${campaign.imageUrl}`}
+                      src={campaign.imageUrl.startsWith('data:') ? campaign.imageUrl : `https://www.grbt8.store${campaign.imageUrl}`}
                       alt={campaign.altText}
                       fill
                       className="object-cover"
@@ -131,7 +131,7 @@ export default function CampaignsSection() {
               <div className="relative w-full h-48">
                 {campaign.imageUrl ? (
                   <Image
-                    src={`http://localhost:3004${campaign.imageUrl}`}
+                    src={campaign.imageUrl.startsWith('data:') ? campaign.imageUrl : `https://www.grbt8.store${campaign.imageUrl}`}
                     alt={campaign.altText}
                     fill
                     className="object-cover"

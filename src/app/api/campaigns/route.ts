@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function GET(request: NextRequest) {
   try {
     // Admin panel API'sine proxy request
-    const response = await fetch('http://localhost:3004/api/campaigns', {
+    const adminApiUrl = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'https://www.grbt8.store'
+    const response = await fetch(`${adminApiUrl}/api/campaigns`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

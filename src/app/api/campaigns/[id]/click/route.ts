@@ -8,7 +8,8 @@ export async function POST(
     const campaignId = params.id
     
     // Admin panel API'sine proxy request
-    const response = await fetch(`http://localhost:3004/api/campaigns/${campaignId}/click`, {
+    const adminApiUrl = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'https://www.grbt8.store'
+    const response = await fetch(`${adminApiUrl}/api/campaigns/${campaignId}/click`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
