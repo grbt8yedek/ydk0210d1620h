@@ -72,7 +72,8 @@ export async function POST(request: Request) {
 
     // Admin paneline kullanıcıyı otomatik kaydet
     try {
-      await fetch('http://localhost:3004/api/users/sync-single', {
+      const adminApiUrl = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'https://www.grbt8.store'
+      await fetch(`${adminApiUrl}/api/users/sync-single`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
