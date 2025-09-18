@@ -89,9 +89,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Kurumsal için şirket bilgileri kontrolü
-    if (type === 'corporate' && (!companyName || !taxOffice || !taxNumber)) {
+    if (type === 'corporate' && (!companyName || !taxNumber)) {
       return NextResponse.json(
-        { success: false, message: 'Şirket adı, vergi dairesi ve vergi numarası gereklidir' },
+        { success: false, message: 'Şirket adı ve vergi numarası gereklidir' },
         { status: 400 }
       )
     }
@@ -185,9 +185,9 @@ export async function PUT(request: NextRequest) {
     }
 
     // Kurumsal için şirket bilgileri kontrolü
-    if (type === 'corporate' && (!companyName || !taxOffice || !taxNumber)) {
+    if (type === 'corporate' && (!companyName || !taxNumber)) {
       return NextResponse.json(
-        { success: false, message: 'Şirket adı, vergi dairesi ve vergi numarası gereklidir' },
+        { success: false, message: 'Şirket adı ve vergi numarası gereklidir' },
         { status: 400 }
       )
     }
