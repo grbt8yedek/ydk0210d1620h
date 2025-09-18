@@ -117,7 +117,7 @@ export default function FaturaPage() {
       }
       
       // Temiz veri hazırla
-      const billingData = {
+      const billingData: any = {
         userId: session.user.id, // BU SATIR EKSİKTİ!
         type: form.type,
         title: form.title,
@@ -206,7 +206,7 @@ export default function FaturaPage() {
         return;
       }
 
-      const billingData = {
+      const billingData: any = {
         id: billingInfo.id,
         userId: session.user.id,
         type: billingInfo.type,
