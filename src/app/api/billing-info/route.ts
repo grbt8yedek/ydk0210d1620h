@@ -8,7 +8,10 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
+    console.log('Session:', session); // Debug için
+    
     if (!session?.user?.id) {
+      console.log('No session or user ID'); // Debug için
       return NextResponse.json(
         { success: false, message: 'Oturum açmanız gerekiyor' },
         { status: 401 }
@@ -45,7 +48,10 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
+    console.log('POST Session:', session); // Debug için
+    
     if (!session?.user?.id) {
+      console.log('POST No session or user ID'); // Debug için
       return NextResponse.json(
         { success: false, message: 'Oturum açmanız gerekiyor' },
         { status: 401 }
