@@ -59,7 +59,9 @@ export default function FaturaPage() {
   // Fatura bilgilerini getir
   const fetchBillingInfos = async () => {
     try {
-      const response = await fetch('/api/billing-info');
+      const response = await fetch('/api/billing-info', {
+        credentials: 'include'
+      });
       const result = await response.json();
       
       if (result.success) {
@@ -113,6 +115,7 @@ export default function FaturaPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           ...form,
           ...(editingId && { id: editingId })
@@ -145,6 +148,7 @@ export default function FaturaPage() {
     try {
       const response = await fetch(`/api/billing-info?id=${id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
 
       const result = await response.json();
@@ -172,6 +176,7 @@ export default function FaturaPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           ...billingInfo,
           isDefault: true
