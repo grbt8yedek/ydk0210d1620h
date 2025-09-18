@@ -20,6 +20,8 @@ model User {
   birthYear       String?
   gender          String?
   identityNumber  String?
+  address         String?
+  city            String?
   isForeigner     Boolean          @default(false)
   emailVerified   DateTime?
   image           String?
@@ -37,6 +39,9 @@ model User {
   searchFavorites SearchFavorite[]
   sessions        Session[]
   surveyResponses SurveyResponse[]
+  systemLogs      SystemLog[]
+  campaigns       Campaign[]
+  emailTemplates  EmailTemplate[]
 }
 
 model Account {
@@ -135,6 +140,7 @@ model Passenger {
   isAccountOwner Boolean   @default(false)
   user           User      @relation(fields: [userId], references: [id])
 
+  @@unique([userId, identityNumber])
   @@index([userId])
 }
 
@@ -170,4 +176,136 @@ model SurveyResponse {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   user         User     @relation(fields: [userId], references: [id])
+}
+
+// Sistem Ayarları ve Bakım Modu
+model SystemSettings {
+  id                String   @id @default(cuid())
+  maintenanceMode   Boolean  @default(false)
+  maintenanceReason String?
+  maintenanceStart  DateTime?
+  estimatedDuration String?
+  backupEnabled     Boolean  @default(false)
+  backupSchedule    String   @default("0 2 * * *")
+  backupRetention   Int      @default(7)
+  backupDatabase    Boolean  @default(true)
+  backupUploads     Boolean  @default(true)
+  backupLogs        Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Kampanyalar
+model Campaign {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String?
+  imageData   String?
+  altText     String
+  linkUrl     String?
+  status      String   @default("active")
+  position    Int      @default(0)
+  clickCount  Int      @default(0)
+  viewCount   Int      @default(0)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?
+
+  user User? @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+}
+
+// Sistem Logları
+model SystemLog {
+  id        String   @id @default(cuid())
+  level     String
+  message   String
+  source    String
+  userId    String?
+  metadata  String?
+  timestamp DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+// Email Template'leri
+model EmailTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  subject     String
+  content     String
+  type        String
+  language    String   @default("tr")
+  variables   String?
+  status      String   @default("active")
+  usageCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?
+
+  user        User?         @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  emails      EmailLog[]
+  queueEmails EmailQueue[]
+}
+
+// Email Kuyruğu
+model EmailQueue {
+  id           String         @id @default(cuid())
+  recipient    String
+  cc           String?
+  bcc          String?
+  subject      String
+  content      String
+  templateId   String?
+  priority     String         @default("normal")
+  status       String         @default("pending")
+  scheduledAt  DateTime?
+  sentAt       DateTime?
+  errorMessage String?
+  retryCount   Int            @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  template     EmailTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+}
+
+// Email Logları
+model EmailLog {
+  id           String         @id @default(cuid())
+  recipient    String
+  cc           String?
+  bcc          String?
+  subject      String
+  content      String
+  templateId   String?
+  status       String
+  sentAt       DateTime       @default(now())
+  deliveredAt  DateTime?
+  openedAt     DateTime?
+  clickedAt    DateTime?
+  bouncedAt    DateTime?
+  errorMessage String?
+  ipAddress    String?
+  userAgent    String?
+  trackingId   String?
+
+  template     EmailTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+}
+
+// Email Ayarları
+model EmailSettings {
+  id            String   @id @default(cuid())
+  smtpHost      String
+  smtpPort      Int      @default(587)
+  smtpUser      String
+  smtpPassword  String
+  fromEmail     String
+  fromName      String
+  dailyLimit    Int      @default(1000)
+  rateLimit     Int      @default(100)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
