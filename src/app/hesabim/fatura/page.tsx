@@ -273,8 +273,9 @@ export default function FaturaPage() {
     setForm({});
   };
 
-  const inputClass = "w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 text-[16px] text-gray-800";
-  const selectClass = "w-full px-3 py-2 rounded-xl bg-gray-50 border-0 focus:ring-2 focus:ring-green-500 text-[16px]";
+  // Mobil-first responsive input stilleri
+  const inputClass = "w-full px-4 py-3 sm:px-3 sm:py-2 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 text-[16px] sm:text-[14px] text-gray-800 placeholder-gray-500";
+  const selectClass = "w-full px-4 py-3 sm:px-3 sm:py-2 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-green-500 text-[16px] sm:text-[14px] text-gray-800";
 
   if (status === 'loading' || loading) {
     return (
@@ -290,51 +291,51 @@ export default function FaturaPage() {
 
   return (
     <main className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-800">Fatura Bilgilerim</h1>
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Fatura Bilgilerim</h1>
               <button
                 onClick={handleAdd}
-                className="px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 flex items-center gap-2"
+                className="w-full sm:w-auto px-6 py-3 sm:px-4 sm:py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 flex items-center justify-center gap-2 text-sm sm:text-base font-medium"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-5 h-5 sm:w-4 sm:h-4" />
                 <span>Yeni Adres Ekle</span>
               </button>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {billingInfos.map((billingInfo) => (
                 <div 
                   key={billingInfo.id}
-                  className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  className="border rounded-lg p-3 sm:p-4 hover:bg-gray-50 transition-colors"
                 >
                   {editingId === billingInfo.id ? (
                     <div className="space-y-3">
                       {/* Fatura Tipi Seçimi - Radio Button */}
-                      <div className="flex gap-6 mb-4">
-                        <label className="flex items-center gap-2 cursor-pointer">
+                      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-4">
+                        <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50">
                           <input
                             type="radio"
                             name="billingType"
                             value="individual"
                             checked={form.type === 'individual'}
                             onChange={e => setForm({ ...form, type: e.target.value as 'individual' | 'corporate' })}
-                            className="w-4 h-4 text-green-600 border-2 border-gray-300 focus:ring-green-500 focus:ring-2"
+                            className="w-5 h-5 sm:w-4 sm:h-4 text-green-600 border-2 border-gray-300 focus:ring-green-500 focus:ring-2"
                           />
-                          <span className="text-gray-700 font-medium">Bireysel</span>
+                          <span className="text-gray-700 font-medium text-sm sm:text-base">Bireysel</span>
                         </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
+                        <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50">
                           <input
                             type="radio"
                             name="billingType"
                             value="corporate"
                             checked={form.type === 'corporate'}
                             onChange={e => setForm({ ...form, type: e.target.value as 'individual' | 'corporate' })}
-                            className="w-4 h-4 text-green-600 border-2 border-gray-300 focus:ring-green-500 focus:ring-2"
+                            className="w-5 h-5 sm:w-4 sm:h-4 text-green-600 border-2 border-gray-300 focus:ring-green-500 focus:ring-2"
                           />
-                          <span className="text-gray-700 font-medium">Kurumsal</span>
+                          <span className="text-gray-700 font-medium text-sm sm:text-base">Kurumsal</span>
                         </label>
                       </div>
                       
@@ -347,35 +348,33 @@ export default function FaturaPage() {
                       />
                       
                       {form.type === 'individual' ? (
-                        <>
-                          <div className="flex gap-2">
-                            <input 
-                              value={form.firstName} 
-                              onChange={e => setForm({ ...form, firstName: e.target.value })} 
-                              placeholder="Ad" 
-                              className={inputClass + ' flex-1'} 
-                            />
-                            <input 
-                              value={form.lastName} 
-                              onChange={e => setForm({ ...form, lastName: e.target.value })} 
-                              placeholder="Soyad" 
-                              className={inputClass + ' flex-1'} 
-                            />
-                          </div>
-                        </>
+                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
+                          <input 
+                            value={form.firstName} 
+                            onChange={e => setForm({ ...form, firstName: e.target.value })} 
+                            placeholder="Ad" 
+                            className={inputClass + ' sm:flex-1'} 
+                          />
+                          <input 
+                            value={form.lastName} 
+                            onChange={e => setForm({ ...form, lastName: e.target.value })} 
+                            placeholder="Soyad" 
+                            className={inputClass + ' sm:flex-1'} 
+                          />
+                        </div>
                       ) : (
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
                           <input 
                             value={form.companyName} 
                             onChange={e => setForm({ ...form, companyName: e.target.value })} 
                             placeholder="Şirket Adı" 
-                            className={inputClass + ' flex-1'} 
+                            className={inputClass + ' sm:flex-1'} 
                           />
                           <input 
                             value={form.taxNumber} 
                             onChange={e => setForm({ ...form, taxNumber: e.target.value })} 
                             placeholder="Vergi Numarası" 
-                            className={inputClass + ' flex-1'} 
+                            className={inputClass + ' sm:flex-1'} 
                           />
                         </div>
                       )}
@@ -386,17 +385,17 @@ export default function FaturaPage() {
                         placeholder="Tam Adres" 
                         className={inputClass} 
                       />
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
                         <input 
                           value={form.city} 
                           onChange={e => setForm({ ...form, city: e.target.value })} 
                           placeholder="İl" 
-                          className={inputClass + ' flex-1'} 
+                          className={inputClass + ' sm:flex-1'} 
                         />
                         <select 
                           value={form.country} 
                           onChange={e => setForm({ ...form, country: e.target.value })} 
-                          className={selectClass + ' flex-1'}
+                          className={selectClass + ' sm:flex-1'}
                         >
                           <option value="">Ülke Seçin</option>
                           {countries.map(country => (
@@ -407,26 +406,26 @@ export default function FaturaPage() {
                         </select>
                       </div>
                       
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
                         <input 
                           type="checkbox" 
                           checked={form.isDefault || false}
                           onChange={e => setForm({ ...form, isDefault: e.target.checked })}
-                          className="w-4 h-4 text-green-600"
+                          className="w-5 h-5 sm:w-4 sm:h-4 text-green-600"
                         />
-                        <label className="text-sm text-gray-600">Varsayılan Adres</label>
+                        <label className="text-sm sm:text-sm text-gray-600 font-medium">Varsayılan Adres</label>
                       </div>
                       
-                      <div className="flex gap-2 mt-3">
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 mt-4">
                         <button 
                           onClick={handleSave} 
-                          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                          className="w-full sm:w-auto px-6 py-3 sm:px-4 sm:py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 font-medium text-sm sm:text-base"
                         >
                           Kaydet
                         </button>
                         <button 
                           onClick={handleCancel} 
-                          className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                          className="w-full sm:w-auto px-6 py-3 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 font-medium text-sm sm:text-base"
                         >
                           Vazgeç
                         </button>
@@ -434,15 +433,15 @@ export default function FaturaPage() {
                     </div>
                   ) : (
                     <>
-                      <div className="flex justify-between items-start">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
                         <div className="flex items-center gap-3">
                           {billingInfo.type === 'individual' ? (
-                            <Home className="w-5 h-5 text-blue-600" />
+                            <Home className="w-6 h-6 sm:w-5 sm:h-5 text-blue-600" />
                           ) : (
-                            <Building2 className="w-5 h-5 text-purple-600" />
+                            <Building2 className="w-6 h-6 sm:w-5 sm:h-5 text-purple-600" />
                           )}
                           <div>
-                            <h3 className="font-medium text-gray-800">{billingInfo.title}</h3>
+                            <h3 className="font-medium text-gray-800 text-sm sm:text-base">{billingInfo.title}</h3>
                             {billingInfo.isDefault && (
                               <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
                                 Varsayılan
@@ -450,41 +449,41 @@ export default function FaturaPage() {
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 justify-end sm:justify-start">
                           {!billingInfo.isDefault && (
                             <button 
                               onClick={() => handleSetDefault(billingInfo.id)}
-                              className="p-2 text-gray-600 hover:text-green-600 rounded-lg hover:bg-gray-100"
+                              className="p-3 sm:p-2 text-gray-600 hover:text-green-600 rounded-lg hover:bg-gray-100"
                               title="Varsayılan Yap"
                             >
-                              <Check className="w-4 h-4" />
+                              <Check className="w-5 h-5 sm:w-4 sm:h-4" />
                             </button>
                           )}
                           <button 
                             onClick={() => handleEdit(billingInfo)}
-                            className="p-2 text-gray-600 hover:text-blue-600 rounded-lg hover:bg-gray-100"
+                            className="p-3 sm:p-2 text-gray-600 hover:text-blue-600 rounded-lg hover:bg-gray-100"
                           >
-                            <Edit className="w-4 h-4" />
+                            <Edit className="w-5 h-5 sm:w-4 sm:h-4" />
                           </button>
                           <button 
                             onClick={() => handleDelete(billingInfo.id)}
-                            className="p-2 text-gray-600 hover:text-red-600 rounded-lg hover:bg-gray-100"
+                            className="p-3 sm:p-2 text-gray-600 hover:text-red-600 rounded-lg hover:bg-gray-100"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-5 h-5 sm:w-4 sm:h-4" />
                           </button>
                         </div>
                       </div>
-                      <div className="mt-3 space-y-1 text-gray-600">
+                      <div className="mt-3 space-y-1 text-gray-600 text-sm sm:text-base">
                         {billingInfo.type === 'individual' ? (
-                          <p>{billingInfo.firstName} {billingInfo.lastName}</p>
+                          <p className="font-medium">{billingInfo.firstName} {billingInfo.lastName}</p>
                         ) : (
                           <>
-                            <p>{billingInfo.companyName}</p>
-                            <p>Vergi No: {billingInfo.taxNumber}</p>
+                            <p className="font-medium">{billingInfo.companyName}</p>
+                            <p className="text-xs sm:text-sm">Vergi No: {billingInfo.taxNumber}</p>
                           </>
                         )}
-                        <p>{billingInfo.address}</p>
-                        <p>{billingInfo.city} / {billingInfo.country}</p>
+                        <p className="text-gray-700">{billingInfo.address}</p>
+                        <p className="text-gray-500">{billingInfo.city} / {billingInfo.country}</p>
                       </div>
                     </>
                   )}
@@ -493,31 +492,31 @@ export default function FaturaPage() {
               
               {/* Yeni adres ekleme formu */}
               {isAdding && (
-                <div className="border border-gray-200 rounded-lg p-4 bg-white">
+                <div className="border border-gray-200 rounded-lg p-3 sm:p-4 bg-white">
                   <div className="space-y-3">
                     {/* Fatura Tipi Seçimi - Radio Button */}
-                    <div className="flex gap-6 mb-4">
-                      <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-4">
+                      <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50">
                         <input
                           type="radio"
                           name="billingTypeNew"
                           value="individual"
                           checked={form.type === 'individual'}
                           onChange={e => setForm({ ...form, type: e.target.value as 'individual' | 'corporate' })}
-                          className="w-4 h-4 text-green-600 border-2 border-gray-300 focus:ring-green-500 focus:ring-2"
+                          className="w-5 h-5 sm:w-4 sm:h-4 text-green-600 border-2 border-gray-300 focus:ring-green-500 focus:ring-2"
                         />
-                        <span className="text-gray-700 font-medium">Bireysel</span>
+                        <span className="text-gray-700 font-medium text-sm sm:text-base">Bireysel</span>
                       </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
+                      <label className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-50">
                         <input
                           type="radio"
                           name="billingTypeNew"
                           value="corporate"
                           checked={form.type === 'corporate'}
                           onChange={e => setForm({ ...form, type: e.target.value as 'individual' | 'corporate' })}
-                          className="w-4 h-4 text-green-600 border-2 border-gray-300 focus:ring-green-500 focus:ring-2"
+                          className="w-5 h-5 sm:w-4 sm:h-4 text-green-600 border-2 border-gray-300 focus:ring-green-500 focus:ring-2"
                         />
-                        <span className="text-gray-700 font-medium">Kurumsal</span>
+                        <span className="text-gray-700 font-medium text-sm sm:text-base">Kurumsal</span>
                       </label>
                     </div>
                     
@@ -530,33 +529,33 @@ export default function FaturaPage() {
                     />
                     
                     {form.type === 'individual' ? (
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
                         <input 
                           value={form.firstName} 
                           onChange={e => setForm({ ...form, firstName: e.target.value })} 
                           placeholder="Ad" 
-                          className={inputClass + ' flex-1'} 
+                          className={inputClass + ' sm:flex-1'} 
                         />
                         <input 
                           value={form.lastName} 
                           onChange={e => setForm({ ...form, lastName: e.target.value })} 
                           placeholder="Soyad" 
-                          className={inputClass + ' flex-1'} 
+                          className={inputClass + ' sm:flex-1'} 
                         />
                       </div>
                     ) : (
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
                         <input 
                           value={form.companyName} 
                           onChange={e => setForm({ ...form, companyName: e.target.value })} 
                           placeholder="Şirket Adı" 
-                          className={inputClass + ' flex-1'} 
+                          className={inputClass + ' sm:flex-1'} 
                         />
                         <input 
                           value={form.taxNumber} 
                           onChange={e => setForm({ ...form, taxNumber: e.target.value })} 
                           placeholder="Vergi Numarası" 
-                          className={inputClass + ' flex-1'} 
+                          className={inputClass + ' sm:flex-1'} 
                         />
                       </div>
                     )}
@@ -567,17 +566,17 @@ export default function FaturaPage() {
                       placeholder="Tam Adres" 
                       className={inputClass} 
                     />
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
                       <input 
                         value={form.city} 
                         onChange={e => setForm({ ...form, city: e.target.value })} 
                         placeholder="İl" 
-                        className={inputClass + ' flex-1'} 
+                        className={inputClass + ' sm:flex-1'} 
                       />
                       <select 
                         value={form.country} 
                         onChange={e => setForm({ ...form, country: e.target.value })} 
-                        className={selectClass + ' flex-1'}
+                        className={selectClass + ' sm:flex-1'}
                       >
                         <option value="">Ülke Seçin</option>
                         {countries.map(country => (
@@ -588,26 +587,26 @@ export default function FaturaPage() {
                       </select>
                     </div>
                     
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50">
                       <input 
                         type="checkbox" 
                         checked={form.isDefault || false}
                         onChange={e => setForm({ ...form, isDefault: e.target.checked })}
-                        className="w-4 h-4 text-green-600"
+                        className="w-5 h-5 sm:w-4 sm:h-4 text-green-600"
                       />
-                      <label className="text-sm text-gray-600">Varsayılan Adres</label>
+                      <label className="text-sm sm:text-sm text-gray-600 font-medium">Varsayılan Adres</label>
                     </div>
                     
-                    <div className="flex gap-2 mt-3">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 mt-4">
                       <button 
                         onClick={handleSave} 
-                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                        className="w-full sm:w-auto px-6 py-3 sm:px-4 sm:py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 font-medium text-sm sm:text-base"
                       >
                         Kaydet
                       </button>
                       <button 
                         onClick={handleCancel} 
-                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                        className="w-full sm:w-auto px-6 py-3 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 font-medium text-sm sm:text-base"
                       >
                         Vazgeç
                       </button>
@@ -617,8 +616,8 @@ export default function FaturaPage() {
               )}
             </div>
 
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="text-sm text-gray-600">
+            <div className="mt-6 p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                 Bireysel ve kurumsal fatura bilgilerinizi kaydedebilir, düzenleyebilir veya silebilirsiniz.
                 Bilet alırken kayıtlı fatura bilgilerinizi kolayca seçebilirsiniz.
               </p>
