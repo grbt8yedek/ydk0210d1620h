@@ -324,7 +324,6 @@ model BillingInfo {
 
   // Kurumsal bilgiler
   companyName     String?
-  taxOffice       String?  // Vergi Dairesi
   taxNumber       String?  // Vergi Numarası
 
   // Adres bilgileri

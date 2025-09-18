@@ -62,7 +62,6 @@ export default function FaturaPage() {
     firstName: '',
     lastName: '',
     companyName: '',
-    taxOffice: '',
     taxNumber: '',
     address: '',
     city: '', // İl
@@ -110,7 +109,6 @@ export default function FaturaPage() {
       firstName: '',
       lastName: '',
       companyName: '',
-      taxOffice: '',
       taxNumber: '',
       address: '',
       city: '', // İl
@@ -154,7 +152,6 @@ export default function FaturaPage() {
       // Sadece kurumsal ise ekle
       if (form.type === 'corporate') {
         billingData.companyName = form.companyName;
-        billingData.taxOffice = form.taxOffice;
         billingData.taxNumber = form.taxNumber;
       }
       
@@ -243,7 +240,6 @@ export default function FaturaPage() {
       // Sadece kurumsal ise ekle
       if (billingInfo.type === 'corporate') {
         billingData.companyName = billingInfo.companyName;
-        billingData.taxOffice = billingInfo.taxOffice;
         billingData.taxNumber = billingInfo.taxNumber;
       }
 
@@ -368,28 +364,20 @@ export default function FaturaPage() {
                           </div>
                         </>
                       ) : (
-                        <>
+                        <div className="flex gap-2">
                           <input 
                             value={form.companyName} 
                             onChange={e => setForm({ ...form, companyName: e.target.value })} 
                             placeholder="Şirket Adı" 
-                            className={inputClass} 
+                            className={inputClass + ' flex-1'} 
                           />
-                          <div className="flex gap-2">
-                            <input 
-                              value={form.taxOffice} 
-                              onChange={e => setForm({ ...form, taxOffice: e.target.value })} 
-                              placeholder="Vergi Dairesi" 
-                              className={inputClass + ' flex-1'} 
-                            />
-                            <input 
-                              value={form.taxNumber} 
-                              onChange={e => setForm({ ...form, taxNumber: e.target.value })} 
-                              placeholder="Vergi Numarası" 
-                              className={inputClass + ' flex-1'} 
-                            />
-                          </div>
-                        </>
+                          <input 
+                            value={form.taxNumber} 
+                            onChange={e => setForm({ ...form, taxNumber: e.target.value })} 
+                            placeholder="Vergi Numarası" 
+                            className={inputClass + ' flex-1'} 
+                          />
+                        </div>
                       )}
                       
                       <input 
@@ -492,7 +480,6 @@ export default function FaturaPage() {
                         ) : (
                           <>
                             <p>{billingInfo.companyName}</p>
-                            <p>Vergi Dairesi: {billingInfo.taxOffice}</p>
                             <p>Vergi No: {billingInfo.taxNumber}</p>
                           </>
                         )}
@@ -558,28 +545,20 @@ export default function FaturaPage() {
                         />
                       </div>
                     ) : (
-                      <>
+                      <div className="flex gap-2">
                         <input 
                           value={form.companyName} 
                           onChange={e => setForm({ ...form, companyName: e.target.value })} 
                           placeholder="Şirket Adı" 
-                          className={inputClass} 
+                          className={inputClass + ' flex-1'} 
                         />
-                        <div className="flex gap-2">
-                          <input 
-                            value={form.taxOffice} 
-                            onChange={e => setForm({ ...form, taxOffice: e.target.value })} 
-                            placeholder="Vergi Dairesi" 
-                            className={inputClass + ' flex-1'} 
-                          />
-                          <input 
-                            value={form.taxNumber} 
-                            onChange={e => setForm({ ...form, taxNumber: e.target.value })} 
-                            placeholder="Vergi Numarası" 
-                            className={inputClass + ' flex-1'} 
-                          />
-                        </div>
-                      </>
+                        <input 
+                          value={form.taxNumber} 
+                          onChange={e => setForm({ ...form, taxNumber: e.target.value })} 
+                          placeholder="Vergi Numarası" 
+                          className={inputClass + ' flex-1'} 
+                        />
+                      </div>
                     )}
                     
                     <input 
