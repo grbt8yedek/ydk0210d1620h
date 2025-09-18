@@ -15,7 +15,7 @@ export async function getEuroRate(): Promise<number> {
     return response.data.eurTry || response.data.rate;
   } catch (error) {
     console.error('Döviz kuru çekilirken hata oluştu:', error);
-    return 44.50; // Hata durumunda varsayılan değer
+    return 48.50; // Hata durumunda varsayılan değer
   }
 }
 
@@ -26,8 +26,8 @@ export async function getExchangeRates(): Promise<ExchangeRateResponse> {
   } catch (error) {
     console.error('Döviz kurları çekilirken hata oluştu:', error);
     return {
-      eurTry: 44.50,
-      eurUsd: 1.08,
+      eurTry: 48.50,
+      eurUsd: 1.18,
       source: 'error',
       timestamp: new Date().toISOString()
     };

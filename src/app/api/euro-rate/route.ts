@@ -17,9 +17,9 @@ export async function GET() {
 
     // Gerçek zamanlı döviz kuru için farklı API'ler - paralel çağrı
     const apis = [
-      'https://api.exchangerate.host/latest?base=EUR&symbols=TRY,USD',
       'https://api.frankfurter.app/latest?from=EUR&to=TRY,USD',
-      'https://api.currencyapi.com/v3/latest?apikey=YOUR_API_KEY&currencies=TRY,USD&base_currency=EUR'
+      'https://api.exchangerate-api.com/v4/latest/EUR',
+      'https://api.ratesapi.io/api/latest?base=EUR&symbols=TRY,USD'
     ];
 
     // Paralel API çağrıları - Promise.allSettled kullan
@@ -92,8 +92,8 @@ export async function GET() {
     // Tüm API'ler başarısız olursa fallback
     console.log('Tüm API\'ler başarısız, fallback değer kullanılıyor');
     const fallbackData = { 
-      eurTry: 35.50,
-      eurUsd: 1.08,
+      eurTry: 48.50,
+      eurUsd: 1.18,
       source: 'fallback',
       timestamp: new Date().toISOString()
     };
@@ -109,8 +109,8 @@ export async function GET() {
   } catch (error) {
     console.error('Euro kuru çekilemedi:', error);
     const errorData = { 
-      eurTry: 35.50,
-      eurUsd: 1.08,
+      eurTry: 48.50,
+      eurUsd: 1.18,
       source: 'error',
       timestamp: new Date().toISOString()
     };

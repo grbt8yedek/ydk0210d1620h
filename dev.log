@@ -8,3 +8,10 @@
 
  ✓ Ready in 12.6s
    Reload env: .env
+ ✓ Compiled /src/middleware in 1071ms (54 modules)
+ ✓ Compiled /api/euro-rate/route in 1695ms (163 modules)
+API hatası (https://api.currencyapi.com/v3/latest?apikey=YOUR_API_KEY&currencies=TRY,USD&base_currency=EUR): Request failed with status code 401
+Döviz kuru başarıyla alındı: €1 = 48.81 TL (https://api.frankfurter.app/latest?from=EUR&to=TRY,USD)
+ ✓ Compiled in 486ms (163 modules)
+ ✓ Compiled in 310ms (163 modules)
+ ✓ Compiled in 303ms (163 modules)
