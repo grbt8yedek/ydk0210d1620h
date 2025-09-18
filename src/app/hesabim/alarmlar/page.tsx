@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Bell, ArrowRight, Calendar, Trash2, Plus } from 'lucide-react';
+import Footer from '@/components/Footer';
 
 export default function AlarmlarPage() {
   const { data: session, status } = useSession();
@@ -160,6 +161,7 @@ export default function AlarmlarPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </main>
   );
 } 

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Heart, ArrowRight, Calendar, Trash2 } from 'lucide-react';
+import Footer from '@/components/Footer';
 
 export default function FavorilerPage() {
   const { data: session, status } = useSession();
@@ -132,6 +133,7 @@ export default function FavorilerPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </main>
   );
 } 

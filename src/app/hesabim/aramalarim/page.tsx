@@ -1,6 +1,7 @@
 'use client';
 
 import AccountSidebar from '@/components/AccountSidebar';
+import Footer from '@/components/Footer';
 import { useSession, signOut } from 'next-auth/react';
 import { User, Plane, Users, Star, Receipt, Search, Bell, Heart, ArrowRight, Calendar } from 'lucide-react';
 
@@ -114,6 +115,7 @@ export default function AramalarimPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </main>
   );
 } 

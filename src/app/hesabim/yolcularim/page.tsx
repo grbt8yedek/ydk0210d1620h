@@ -5,6 +5,7 @@ import { User, Edit, Trash2, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useSession, signOut } from 'next-auth/react';
+import Footer from '@/components/Footer';
 
 interface Passenger {
   id: string;
@@ -227,6 +228,7 @@ export default function YolcularimPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </main>
   );
 } 

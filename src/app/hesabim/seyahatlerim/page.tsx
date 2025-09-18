@@ -8,6 +8,7 @@ import FlightCard from '@/components/travel/FlightCard';
 import HotelCard from '@/components/travel/HotelCard';
 import CarCard from '@/components/travel/CarCard';
 import EmptyState from '@/components/travel/EmptyState';
+import Footer from '@/components/Footer';
 
 export default function SeyahatlerimPage() {
   const [activeTab, setActiveTab] = useState<TabType>('ucak');
@@ -339,6 +340,7 @@ export default function SeyahatlerimPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </main>
   );
 } 
