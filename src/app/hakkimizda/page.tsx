@@ -1,11 +1,13 @@
 'use client';
 
 import { Plane, Home, Car, Shield, Users, Heart } from 'lucide-react';
+import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export default function HakkimizdaPage() {
   return (
     <main className="min-h-screen bg-white">
+      <Header />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         
         {/* Ana Başlık */}
