@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
       address,
       district,
       city,
-      country = 'Türkiye',
+      country,
       isDefault = false
     } = body
 
@@ -163,7 +163,7 @@ export async function PUT(request: NextRequest) {
       address,
       district,
       city,
-      country = 'Türkiye',
+      country,
       isDefault = false
     } = body
 

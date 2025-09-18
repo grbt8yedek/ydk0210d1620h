@@ -43,7 +43,7 @@ export default function FaturaPage() {
     address: '',
     district: '',
     city: '',
-    country: 'Türkiye',
+    country: '',
     isDefault: false
   });
 
@@ -92,7 +92,7 @@ export default function FaturaPage() {
       address: '',
       district: '',
       city: '',
-      country: 'Türkiye',
+      country: '',
       isDefault: false
     });
   };
