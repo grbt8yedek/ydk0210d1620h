@@ -66,11 +66,10 @@ export default function HesabimPage() {
         identityNumber: user.identityNumber || '',
         isForeigner: user.isForeigner || false,
       });
-      
-      // Eğer session'da eksik bilgiler varsa veritabanından çek
-      if (!user.birthDay || !user.gender || !user.identityNumber) {
-        fetchUserData();
-      }
+
+      // Her zaman profili API'den tazeleyerek güncel veri göster
+      // (Admin panelde yapılan değişiklikler session'a yansımasa da burada görünür.)
+      fetchUserData();
     }
   }, [session, status, router]);
 
