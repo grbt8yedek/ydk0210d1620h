@@ -199,12 +199,12 @@ export default function FaturaPage() {
     setForm({});
   };
 
-  const inputClass = "w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 text-[16px]";
+  const inputClass = "w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-green-500 focus:border-green-500 text-[16px] text-gray-800";
   const selectClass = "w-full px-3 py-2 rounded-xl bg-gray-50 border-0 focus:ring-2 focus:ring-green-500 text-[16px]";
 
   if (status === 'loading' || loading) {
     return (
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-white">
         <div className="container mx-auto px-4 py-8">
           <div className="flex justify-center items-center h-64">
             <div className="text-lg text-gray-600">Yükleniyor...</div>
@@ -215,7 +215,7 @@ export default function FaturaPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-sm p-6">
@@ -422,7 +422,7 @@ export default function FaturaPage() {
               
               {/* Yeni adres ekleme formu */}
               {isAdding && (
-                <div className="border rounded-lg p-4 bg-gray-50">
+                <div className="border border-gray-200 rounded-lg p-4 bg-white">
                   <div className="space-y-3">
                     {/* Fatura Tipi Seçimi - Radio Button */}
                     <div className="flex gap-6 mb-4">
@@ -548,7 +548,7 @@ export default function FaturaPage() {
               )}
             </div>
 
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
               <p className="text-sm text-gray-600">
                 Bireysel ve kurumsal fatura bilgilerinizi kaydedebilir, düzenleyebilir veya silebilirsiniz.
                 Bilet alırken kayıtlı fatura bilgilerinizi kolayca seçebilirsiniz.
