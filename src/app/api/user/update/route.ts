@@ -4,17 +4,25 @@ import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { z } from 'zod';
 
+// Form tarafında bazı alanlar number olarak gelebiliyor; string'e dönüştür.
+const numberLikeToString = z
+  .union([z.string(), z.number()])
+  .transform((v) => (typeof v === 'number' ? String(v) : v))
+  .optional();
+
 const updateUserSchema = z.object({
   firstName: z.string().min(2, "Ad en az 2 karakter olmalıdır.").optional(),
   lastName: z.string().min(2, "Soyad en az 2 karakter olmalıdır.").optional(),
   countryCode: z.string().optional(),
   phone: z.string().optional(),
-  birthDay: z.string().optional(),
-  birthMonth: z.string().optional(),
-  birthYear: z.string().optional(),
+  birthDay: numberLikeToString,
+  birthMonth: numberLikeToString,
+  birthYear: numberLikeToString,
   gender: z.string().optional(),
   identityNumber: z.string().optional(),
   isForeigner: z.boolean().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
 });
 
 export async function PUT(request: Request) {
@@ -49,16 +57,16 @@ export async function PUT(request: Request) {
           isAccountOwner: true,
         },
         data: {
-          firstName: dataToUpdate.firstName,
-          lastName: dataToUpdate.lastName,
-          phone: dataToUpdate.phone,
-          countryCode: dataToUpdate.countryCode,
-          birthDay: dataToUpdate.birthDay,
-          birthMonth: dataToUpdate.birthMonth,
-          birthYear: dataToUpdate.birthYear,
-          gender: dataToUpdate.gender,
-          identityNumber: dataToUpdate.identityNumber,
-          isForeigner: dataToUpdate.isForeigner,
+          ...(dataToUpdate.firstName ? { firstName: dataToUpdate.firstName } : {}),
+          ...(dataToUpdate.lastName ? { lastName: dataToUpdate.lastName } : {}),
+          ...(dataToUpdate.phone ? { phone: dataToUpdate.phone } : {}),
+          ...(dataToUpdate.countryCode ? { countryCode: dataToUpdate.countryCode } : {}),
+          ...(dataToUpdate.birthDay ? { birthDay: dataToUpdate.birthDay } : {}),
+          ...(dataToUpdate.birthMonth ? { birthMonth: dataToUpdate.birthMonth } : {}),
+          ...(dataToUpdate.birthYear ? { birthYear: dataToUpdate.birthYear } : {}),
+          ...(dataToUpdate.gender ? { gender: dataToUpdate.gender } : {}),
+          ...(dataToUpdate.identityNumber ? { identityNumber: dataToUpdate.identityNumber } : {}),
+          ...(typeof dataToUpdate.isForeigner === 'boolean' ? { isForeigner: dataToUpdate.isForeigner } : {}),
         },
       });
 
