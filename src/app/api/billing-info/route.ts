@@ -68,7 +68,6 @@ export async function POST(request: NextRequest) {
       taxOffice,
       taxNumber,
       address,
-      district,
       city,
       country,
       isDefault = false
@@ -161,7 +160,6 @@ export async function PUT(request: NextRequest) {
       taxOffice,
       taxNumber,
       address,
-      district,
       city,
       country,
       isDefault = false

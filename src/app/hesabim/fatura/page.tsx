@@ -28,6 +28,30 @@ interface BillingInfo {
 export default function FaturaPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+
+  // Ülke listesi (telefon kodları ile)
+  const countries = [
+    { code: 'TR', name: 'Türkiye', phone: '+90' },
+    { code: 'DE', name: 'Almanya', phone: '+49' },
+    { code: 'FR', name: 'Fransa', phone: '+33' },
+    { code: 'NL', name: 'Hollanda', phone: '+31' },
+    { code: 'BE', name: 'Belçika', phone: '+32' },
+    { code: 'AT', name: 'Avusturya', phone: '+43' },
+    { code: 'CH', name: 'İsviçre', phone: '+41' },
+    { code: 'IT', name: 'İtalya', phone: '+39' },
+    { code: 'ES', name: 'İspanya', phone: '+34' },
+    { code: 'GB', name: 'İngiltere', phone: '+44' },
+    { code: 'US', name: 'Amerika', phone: '+1' },
+    { code: 'CA', name: 'Kanada', phone: '+1' },
+    { code: 'AU', name: 'Avustralya', phone: '+61' },
+    { code: 'SE', name: 'İsveç', phone: '+46' },
+    { code: 'NO', name: 'Norveç', phone: '+47' },
+    { code: 'DK', name: 'Danimarka', phone: '+45' },
+    { code: 'FI', name: 'Finlandiya', phone: '+358' },
+    { code: 'PL', name: 'Polonya', phone: '+48' },
+    { code: 'CZ', name: 'Çekya', phone: '+420' },
+    { code: 'HU', name: 'Macaristan', phone: '+36' }
+  ];
   const [billingInfos, setBillingInfos] = useState<BillingInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -41,9 +65,8 @@ export default function FaturaPage() {
     taxOffice: '',
     taxNumber: '',
     address: '',
-    district: '',
-    city: '',
-    country: '',
+    city: '', // İl
+    country: '', // Ülke
     isDefault: false
   });
 
@@ -90,9 +113,8 @@ export default function FaturaPage() {
       taxOffice: '',
       taxNumber: '',
       address: '',
-      district: '',
-      city: '',
-      country: '',
+      city: '', // İl
+      country: '', // Ülke
       isDefault: false
     });
   };
@@ -118,15 +140,14 @@ export default function FaturaPage() {
       
       // Temiz veri hazırla
       const billingData: any = {
-        userId: session.user.id, // BU SATIR EKSİKTİ!
+        userId: session.user.id,
         type: form.type,
         title: form.title,
         firstName: form.firstName,
         lastName: form.lastName,
         address: form.address,
-        city: form.city,
-        district: form.district,
-        country: form.country || 'Türkiye',
+        city: form.city, // İl
+        country: form.country, // Ülke
         isDefault: form.isDefault || false
       };
       
@@ -214,9 +235,8 @@ export default function FaturaPage() {
         firstName: billingInfo.firstName,
         lastName: billingInfo.lastName,
         address: billingInfo.address,
-        city: billingInfo.city,
-        district: billingInfo.district,
-        country: billingInfo.country,
+        city: billingInfo.city, // İl
+        country: billingInfo.country, // Ülke
         isDefault: true
       };
 
@@ -380,17 +400,23 @@ export default function FaturaPage() {
                       />
                       <div className="flex gap-2">
                         <input 
-                          value={form.district} 
-                          onChange={e => setForm({ ...form, district: e.target.value })} 
-                          placeholder="İlçe" 
-                          className={inputClass + ' flex-1'} 
-                        />
-                        <input 
                           value={form.city} 
                           onChange={e => setForm({ ...form, city: e.target.value })} 
-                          placeholder="Şehir/İl" 
+                          placeholder="İl" 
                           className={inputClass + ' flex-1'} 
                         />
+                        <select 
+                          value={form.country} 
+                          onChange={e => setForm({ ...form, country: e.target.value })} 
+                          className={selectClass + ' flex-1'}
+                        >
+                          <option value="">Ülke Seçin</option>
+                          {countries.map(country => (
+                            <option key={country.code} value={country.name}>
+                              {country.name} ({country.phone})
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       
                       <div className="flex items-center gap-2">
@@ -471,7 +497,7 @@ export default function FaturaPage() {
                           </>
                         )}
                         <p>{billingInfo.address}</p>
-                        <p>{billingInfo.district} / {billingInfo.city}</p>
+                        <p>{billingInfo.city} / {billingInfo.country}</p>
                       </div>
                     </>
                   )}
@@ -564,17 +590,23 @@ export default function FaturaPage() {
                     />
                     <div className="flex gap-2">
                       <input 
-                        value={form.district} 
-                        onChange={e => setForm({ ...form, district: e.target.value })} 
-                        placeholder="İlçe" 
-                        className={inputClass + ' flex-1'} 
-                      />
-                      <input 
                         value={form.city} 
                         onChange={e => setForm({ ...form, city: e.target.value })} 
-                        placeholder="Şehir/İl" 
+                        placeholder="İl" 
                         className={inputClass + ' flex-1'} 
                       />
+                      <select 
+                        value={form.country} 
+                        onChange={e => setForm({ ...form, country: e.target.value })} 
+                        className={selectClass + ' flex-1'}
+                      >
+                        <option value="">Ülke Seçin</option>
+                        {countries.map(country => (
+                          <option key={country.code} value={country.name}>
+                            {country.name} ({country.phone})
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     
                     <div className="flex items-center gap-2">

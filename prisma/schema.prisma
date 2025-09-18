@@ -329,9 +329,8 @@ model BillingInfo {
 
   // Adres bilgileri
   address         String
-  district        String?  // İlçe
-  city            String
-  country         String   @default("Türkiye")
+  city            String   // İl
+  country         String   // Ülke
 
   // Durum
   isDefault       Boolean  @default(false)
