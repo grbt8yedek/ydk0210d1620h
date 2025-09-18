@@ -110,16 +110,45 @@ export default function FaturaPage() {
       const url = editingId ? '/api/billing-info' : '/api/billing-info';
       const method = editingId ? 'PUT' : 'POST';
       
+      // Session'dan userId'yi al
+      if (!session?.user?.id) {
+        toast.error('Oturum bilgisi bulunamadı');
+        return;
+      }
+      
+      // Temiz veri hazırla
+      const billingData = {
+        userId: session.user.id, // BU SATIR EKSİKTİ!
+        type: form.type,
+        title: form.title,
+        firstName: form.firstName,
+        lastName: form.lastName,
+        address: form.address,
+        city: form.city,
+        district: form.district,
+        country: form.country || 'Türkiye',
+        isDefault: form.isDefault || false
+      };
+      
+      // Sadece kurumsal ise ekle
+      if (form.type === 'corporate') {
+        billingData.companyName = form.companyName;
+        billingData.taxOffice = form.taxOffice;
+        billingData.taxNumber = form.taxNumber;
+      }
+      
+      // Eğer düzenleme ise id ekle
+      if (editingId) {
+        billingData.id = editingId;
+      }
+      
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({
-          ...form,
-          ...(editingId && { id: editingId })
-        }),
+        body: JSON.stringify(billingData),
       });
 
       const result = await response.json();
@@ -171,16 +200,40 @@ export default function FaturaPage() {
       const billingInfo = billingInfos.find(b => b.id === id);
       if (!billingInfo) return;
 
+      // Session'dan userId'yi al
+      if (!session?.user?.id) {
+        toast.error('Oturum bilgisi bulunamadı');
+        return;
+      }
+
+      const billingData = {
+        id: billingInfo.id,
+        userId: session.user.id,
+        type: billingInfo.type,
+        title: billingInfo.title,
+        firstName: billingInfo.firstName,
+        lastName: billingInfo.lastName,
+        address: billingInfo.address,
+        city: billingInfo.city,
+        district: billingInfo.district,
+        country: billingInfo.country,
+        isDefault: true
+      };
+
+      // Sadece kurumsal ise ekle
+      if (billingInfo.type === 'corporate') {
+        billingData.companyName = billingInfo.companyName;
+        billingData.taxOffice = billingInfo.taxOffice;
+        billingData.taxNumber = billingInfo.taxNumber;
+      }
+
       const response = await fetch('/api/billing-info', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({
-          ...billingInfo,
-          isDefault: true
-        }),
+        body: JSON.stringify(billingData),
       });
 
       const result = await response.json();
