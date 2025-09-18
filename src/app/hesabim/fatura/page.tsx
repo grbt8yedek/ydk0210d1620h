@@ -199,7 +199,7 @@ export default function FaturaPage() {
     setForm({});
   };
 
-  const inputClass = "w-full px-3 py-2 rounded-xl bg-gray-50 border-0 focus:ring-2 focus:ring-green-500 text-[16px]";
+  const inputClass = "w-full px-3 py-2 rounded-xl bg-gray-50 border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 text-[16px]";
   const selectClass = "w-full px-3 py-2 rounded-xl bg-gray-50 border-0 focus:ring-2 focus:ring-green-500 text-[16px]";
 
   if (status === 'loading' || loading) {
@@ -238,22 +238,39 @@ export default function FaturaPage() {
                 >
                   {editingId === billingInfo.id ? (
                     <div className="space-y-3">
-                      <div className="flex gap-2">
-                        <select 
-                          value={form.type} 
-                          onChange={e => setForm({ ...form, type: e.target.value as 'individual' | 'corporate' })} 
-                          className={selectClass}
-                        >
-                          <option value="individual">Bireysel</option>
-                          <option value="corporate">Kurumsal</option>
-                        </select>
-                        <input 
-                          value={form.title} 
-                          onChange={e => setForm({ ...form, title: e.target.value })} 
-                          placeholder="Adres Başlığı" 
-                          className={inputClass + ' flex-1'} 
-                        />
+                      {/* Fatura Tipi Seçimi - Radio Button */}
+                      <div className="flex gap-6 mb-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="billingType"
+                            value="individual"
+                            checked={form.type === 'individual'}
+                            onChange={e => setForm({ ...form, type: e.target.value as 'individual' | 'corporate' })}
+                            className="w-4 h-4 text-green-600 border-2 border-gray-300 focus:ring-green-500 focus:ring-2"
+                          />
+                          <span className="text-gray-700 font-medium">Bireysel</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="billingType"
+                            value="corporate"
+                            checked={form.type === 'corporate'}
+                            onChange={e => setForm({ ...form, type: e.target.value as 'individual' | 'corporate' })}
+                            className="w-4 h-4 text-green-600 border-2 border-gray-300 focus:ring-green-500 focus:ring-2"
+                          />
+                          <span className="text-gray-700 font-medium">Kurumsal</span>
+                        </label>
                       </div>
+                      
+                      {/* Adres Başlığı */}
+                      <input 
+                        value={form.title} 
+                        onChange={e => setForm({ ...form, title: e.target.value })} 
+                        placeholder="Adres Başlığı" 
+                        className={inputClass} 
+                      />
                       
                       {form.type === 'individual' ? (
                         <>
@@ -407,22 +424,39 @@ export default function FaturaPage() {
               {isAdding && (
                 <div className="border rounded-lg p-4 bg-gray-50">
                   <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <select 
-                        value={form.type} 
-                        onChange={e => setForm({ ...form, type: e.target.value as 'individual' | 'corporate' })} 
-                        className={selectClass}
-                      >
-                        <option value="individual">Bireysel</option>
-                        <option value="corporate">Kurumsal</option>
-                      </select>
-                      <input 
-                        value={form.title} 
-                        onChange={e => setForm({ ...form, title: e.target.value })} 
-                        placeholder="Adres Başlığı" 
-                        className={inputClass + ' flex-1'} 
-                      />
+                    {/* Fatura Tipi Seçimi - Radio Button */}
+                    <div className="flex gap-6 mb-4">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="billingTypeNew"
+                          value="individual"
+                          checked={form.type === 'individual'}
+                          onChange={e => setForm({ ...form, type: e.target.value as 'individual' | 'corporate' })}
+                          className="w-4 h-4 text-green-600 border-2 border-gray-300 focus:ring-green-500 focus:ring-2"
+                        />
+                        <span className="text-gray-700 font-medium">Bireysel</span>
+                      </label>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="billingTypeNew"
+                          value="corporate"
+                          checked={form.type === 'corporate'}
+                          onChange={e => setForm({ ...form, type: e.target.value as 'individual' | 'corporate' })}
+                          className="w-4 h-4 text-green-600 border-2 border-gray-300 focus:ring-green-500 focus:ring-2"
+                        />
+                        <span className="text-gray-700 font-medium">Kurumsal</span>
+                      </label>
                     </div>
+                    
+                    {/* Adres Başlığı */}
+                    <input 
+                      value={form.title} 
+                      onChange={e => setForm({ ...form, title: e.target.value })} 
+                      placeholder="Adres Başlığı" 
+                      className={inputClass} 
+                    />
                     
                     {form.type === 'individual' ? (
                       <div className="flex gap-2">
