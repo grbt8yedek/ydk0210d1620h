@@ -165,16 +165,16 @@ export default function Home() {
 
           {/* Desktop özel geniş banner - Online check-in alanının altında */}
           <div className="hidden sm:block w-full sm:container sm:mx-auto px-4 mt-6">
-            <div className="relative w-full overflow-hidden">
+            <div className="relative w-full overflow-hidden rounded-xl shadow-lg">
               <Image
                 src="/images/mobilappdestkop.png"
                 alt="Masaüstü uygulama tanıtım görseli"
-                width={1600}
-                height={400}
-                className="w-full h-auto object-cover"
-                quality={100}
-                unoptimized
+                width={2400}
+                height={600}
+                className="w-full h-auto object-contain bg-gradient-to-r from-green-50 to-blue-50"
+                quality={95}
                 priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
               />
             </div>
           </div>
