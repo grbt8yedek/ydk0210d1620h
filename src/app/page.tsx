@@ -167,8 +167,8 @@ export default function Home() {
           {/* <AppBanner /> */}
 
           {/* Mobil özel görsel - AppBanner altında */}
-          <div className="sm:hidden mb-4">
-            <div className="relative w-full overflow-hidden">
+          <div className="sm:hidden px-3 mb-4">
+            <div className="relative w-full overflow-hidden rounded-xl shadow-sm">
               <Image
                 src="/images/Ekran Resmi 2025-09-19 09.25.26.png"
                 alt="Mobil ekran görseli"
