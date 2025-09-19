@@ -6,8 +6,13 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const token = searchParams.get('token')
 
+    console.log('Debug - API received token:', token)
+    console.log('Debug - Token length:', token?.length)
+    console.log('Debug - Token type:', typeof token)
+
     if (!token) {
-      return NextResponse.json({ valid: false })
+      console.log('Debug - No token provided')
+      return NextResponse.json({ valid: false, error: 'No token provided' })
     }
 
     const user = await prisma.user.findFirst({
@@ -19,10 +24,33 @@ export async function GET(request: NextRequest) {
       }
     })
 
+    console.log('Debug - User found:', !!user)
+    if (user) {
+      console.log('Debug - User ID:', user.id)
+      console.log('Debug - Reset token expiry:', user.resetTokenExpiry)
+      console.log('Debug - Current time:', new Date())
+    } else {
+      // Tüm resetToken'ları kontrol et
+      const allUsersWithTokens = await prisma.user.findMany({
+        where: {
+          resetToken: {
+            not: null
+          }
+        },
+        select: {
+          id: true,
+          email: true,
+          resetToken: true,
+          resetTokenExpiry: true
+        }
+      })
+      console.log('Debug - All users with reset tokens:', allUsersWithTokens)
+    }
+
     return NextResponse.json({ valid: !!user })
 
   } catch (error) {
     console.error('Token verification error:', error)
-    return NextResponse.json({ valid: false })
+    return NextResponse.json({ valid: false, error: error.message })
   }
 }

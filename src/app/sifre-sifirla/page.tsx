@@ -24,8 +24,14 @@ export default function ResetPasswordPage() {
 
   const checkToken = async () => {
     try {
+      console.log('Debug - Token from URL:', token)
+      console.log('Debug - Token length:', token?.length)
+      console.log('Debug - Token type:', typeof token)
+      
       const response = await fetch(`/api/auth/verify-token?token=${token}`)
       const data = await response.json()
+      
+      console.log('Debug - API Response:', data)
       
       if (data.valid) {
         setTokenValid(true)
@@ -33,6 +39,7 @@ export default function ResetPasswordPage() {
         setMessage('Token geçersiz veya süresi dolmuş.')
       }
     } catch (error) {
+      console.error('Debug - Token verification error:', error)
       setMessage('Token doğrulanırken hata oluştu.')
     } finally {
       setCheckingToken(false)
