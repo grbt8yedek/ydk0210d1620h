@@ -8,7 +8,7 @@ import AirportInput from '@/components/AirportInput';
 import TripTypeSelector from '@/components/TripTypeSelector';
 import PassengerSelector from '@/components/PassengerSelector';
 import ServiceButtons from '@/components/ServiceButtons';
-import AppBanner from '@/components/AppBanner';
+// import AppBanner from '@/components/AppBanner';
 import FlightSearchForm from '@/components/FlightSearchForm';
 import HeroSection from '@/components/HeroSection';
 import { tr } from 'date-fns/locale';
@@ -163,12 +163,12 @@ export default function Home() {
           {/* İşlem Butonları */}
           <ServiceButtons />
 
-          {/* Uygulama Banner - Hem Mobil Hem Masaüstü */}
-          <AppBanner />
+          {/* Uygulama Banner kaldırıldı (eski mobil reklam) */}
+          {/* <AppBanner /> */}
 
           {/* Mobil özel görsel - AppBanner altında */}
-          <div className="sm:hidden px-4 mb-4">
-            <div className="relative w-full overflow-hidden rounded-2xl shadow-md">
+          <div className="sm:hidden mb-4">
+            <div className="relative w-full overflow-hidden">
               <Image
                 src="/images/Ekran Resmi 2025-09-19 09.25.26.png"
                 alt="Mobil ekran görseli"
