@@ -30,6 +30,21 @@ html, body {
   background: #f5f5f5;
   overflow-x: hidden;
 }
+
+/* Mobilde scrollbar gizleme */
+@media (max-width: 768px) {
+  html, body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+  
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+}
 /* --- Sonu --- */
 
 body {
