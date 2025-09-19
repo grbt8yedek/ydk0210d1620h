@@ -224,7 +224,7 @@ export default function CampaignsSection() {
   }
 
   return (
-    <div className="w-full sm:container sm:mx-auto px-2 sm:px-4 py-6">
+    <div className="w-full sm:container sm:mx-auto px-2 sm:px-4 pt-2 pb-6 sm:py-10">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
         {campaigns.map((campaign) => (
           <div key={campaign.id} className="bg-white shadow-md overflow-hidden hover:shadow-lg transition-shadow">
