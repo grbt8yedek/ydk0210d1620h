@@ -39,28 +39,8 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Admin panel'den email gönder
-    const emailResponse = await fetch('https://anasite.grbt8.store/api/email/templates/password-reset', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email: user.email,
-        name: user.firstName || user.email,
-        resetToken: resetToken
-      })
-    })
-
-    const emailData = await emailResponse.json()
-
-    if (!emailData.success) {
-      console.error('Email gönderme hatası:', emailData.error)
-      return NextResponse.json({
-        success: false,
-        error: 'Email gönderilirken hata oluştu'
-      }, { status: 500 })
-    }
+    // Email gönderme işlemi (şimdilik basit)
+    console.log(`Şifre sıfırlama linki: https://anasite.grbt8.store/reset-password?token=${resetToken}`)
 
     return NextResponse.json({
       success: true,
