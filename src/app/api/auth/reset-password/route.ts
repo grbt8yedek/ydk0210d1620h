@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import bcrypt from 'bcryptjs'
 
 export async function POST(request: NextRequest) {
   try {
     const { token, password } = await request.json()
+
+    console.log('Şifre sıfırlama isteği:', { token: token ? 'var' : 'yok' })
 
     if (!token || !password) {
       return NextResponse.json({
@@ -11,11 +15,55 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Şimdilik başarısız döndür
+    // Şifre uzunluğunu kontrol et
+    if (password.length < 6) {
+      return NextResponse.json({
+        success: false,
+        error: 'Şifre en az 6 karakter olmalıdır'
+      }, { status: 400 })
+    }
+
+    // Token'ı doğrula ve kullanıcıyı bul
+    const user = await prisma.user.findFirst({
+      where: {
+        resetToken: token,
+        resetTokenExpiry: {
+          gt: new Date()
+        }
+      }
+    })
+
+    if (!user) {
+      console.log('Geçersiz veya süresi dolmuş token:', token)
+      return NextResponse.json({
+        success: false,
+        error: 'Geçersiz veya süresi dolmuş token'
+      }, { status: 400 })
+    }
+
+    // Yeni şifreyi hashle
+    const hashedPassword = await bcrypt.hash(password, 12)
+
+    // Şifreyi güncelle ve token'ı temizle
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiry: null,
+        updatedAt: new Date()
+      }
+    })
+
+    console.log('Şifre başarıyla güncellendi:', {
+      userId: user.id,
+      email: user.email
+    })
+
     return NextResponse.json({
-      success: false,
-      error: 'Şifre sıfırlama sistemi yeniden kurulacak.'
-    }, { status: 400 })
+      success: true,
+      message: 'Şifreniz başarıyla güncellendi'
+    })
 
   } catch (error: any) {
     console.error('Reset password error:', error)
