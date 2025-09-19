@@ -15,3 +15,5 @@ Döviz kuru başarıyla alındı: €1 = 48.81 TL (https://api.frankfurter.app/l
  ✓ Compiled in 486ms (163 modules)
  ✓ Compiled in 310ms (163 modules)
  ✓ Compiled in 303ms (163 modules)
+   Reload env: .env.local
+ ✓ Compiled in 4.5s (238 modules)
