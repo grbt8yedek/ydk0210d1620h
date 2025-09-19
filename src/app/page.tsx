@@ -164,8 +164,8 @@ export default function Home() {
           <ServiceButtons />
 
           {/* Desktop özel geniş banner - Online check-in alanının altında */}
-          <div className="hidden sm:block w-full sm:container sm:mx-auto px-4 mt-6">
-            <div className="relative w-full max-w-4xl mx-auto overflow-hidden rounded-xl shadow-lg" style={{ width: '70%' }}>
+          <div className="hidden sm:block w-full sm:container sm:mx-auto px-0 sm:px-4 mt-6">
+            <div className="relative w-full overflow-hidden rounded-xl shadow-lg">
               <Image
                 src="/images/mobilappdestkop.png"
                 alt="Masaüstü uygulama tanıtım görseli"
@@ -174,7 +174,7 @@ export default function Home() {
                 className="w-full h-auto object-contain bg-gradient-to-r from-green-50 to-blue-50"
                 quality={95}
                 priority
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 70vw"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
               />
             </div>
           </div>
