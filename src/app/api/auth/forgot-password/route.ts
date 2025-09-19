@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
 import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
@@ -39,10 +39,32 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    // Admin panel'den email gönder
+    const emailResponse = await fetch('https://www.grbt8.store/api/email/templates/password-reset', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: user.email,
+        name: user.firstName || user.email,
+        resetToken: resetToken
+      })
+    })
+
+    const emailData = await emailResponse.json()
+
+    if (!emailData.success) {
+      console.error('Email gönderme hatası:', emailData.error)
+      return NextResponse.json({
+        success: false,
+        error: 'Email gönderilirken hata oluştu'
+      }, { status: 500 })
+    }
+
     return NextResponse.json({
       success: true,
-      message: `Şifre sıfırlama linki: https://anasite.grbt8.store/reset-password?token=${resetToken}`,
-      resetLink: `https://anasite.grbt8.store/reset-password?token=${resetToken}`
+      message: 'Şifre sıfırlama linki email adresinize gönderildi.'
     })
 
   } catch (error: any) {
