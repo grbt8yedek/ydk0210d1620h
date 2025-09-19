@@ -255,6 +255,13 @@ export default function CampaignsSection() {
                       <span className="text-white text-lg font-semibold">{campaign.title}</span>
                     </div>
                   )}
+                  {/* Overlay caption - bottom 20% gray with white text */}
+                  <div className="absolute inset-x-0 bottom-0 h-[20%] bg-gray-900/35 flex items-center">
+                    <div className="px-3 w-full">
+                      <h3 className="text-white text-sm font-semibold truncate">{campaign.title}</h3>
+                      <p className="text-white/90 text-xs truncate">{campaign.description}</p>
+                    </div>
+                  </div>
                 </div>
               </Link>
             ) : (
@@ -276,16 +283,15 @@ export default function CampaignsSection() {
                     <span className="text-white text-lg font-semibold">{campaign.title}</span>
                   </div>
                 )}
+                {/* Overlay caption - bottom 20% gray with white text */}
+                <div className="absolute inset-x-0 bottom-0 h-[20%] bg-gray-900/35 flex items-center">
+                  <div className="px-3 w-full">
+                    <h3 className="text-white text-sm font-semibold truncate">{campaign.title}</h3>
+                    <p className="text-white/90 text-xs truncate">{campaign.description}</p>
+                  </div>
+                </div>
               </div>
             )}
-            <div className="p-4">
-              <h3 className="text-gray-800 font-semibold text-lg mb-2 line-clamp-1">
-                {campaign.title}
-              </h3>
-              <p className="text-gray-600 text-sm line-clamp-2">
-                {campaign.description}
-              </p>
-            </div>
           </div>
         ))}
       </div>
