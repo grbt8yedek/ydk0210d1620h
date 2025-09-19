@@ -34,11 +34,11 @@ export async function GET(request: NextRequest) {
       currentTime: new Date().toISOString()
     })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Debug tokens error:', error)
     return NextResponse.json({
       success: false,
-      error: error.message
+      error: error.message || 'Unknown error'
     }, { status: 500 })
   }
 }
