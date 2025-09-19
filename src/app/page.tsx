@@ -163,6 +163,20 @@ export default function Home() {
           {/* İşlem Butonları */}
           <ServiceButtons />
 
+          {/* Desktop özel geniş banner - Online check-in alanının altında */}
+          <div className="hidden sm:block w-full sm:container sm:mx-auto px-4 mt-6">
+            <div className="relative w-full overflow-hidden">
+              <Image
+                src="/images/mobilappdestkop.png"
+                alt="Masaüstü uygulama tanıtım görseli"
+                width={1600}
+                height={400}
+                className="w-full h-auto object-cover"
+                priority
+              />
+            </div>
+          </div>
+
           {/* Uygulama Banner kaldırıldı (eski mobil reklam) */}
           {/* <AppBanner /> */}
 
