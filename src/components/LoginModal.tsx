@@ -153,7 +153,12 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Şifre</label>
+                  <div className="flex justify-between items-center">
+                    <label className="block text-sm font-medium text-gray-700">Şifre</label>
+                    <a href="/sifremi-unuttum" className="text-sm text-gray-600 hover:text-gray-800 hover:underline">
+                      Şifremi unuttum
+                    </a>
+                  </div>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}

@@ -25,6 +25,8 @@ model User {
   isForeigner     Boolean          @default(false)
   emailVerified   DateTime?
   image           String?
+  resetToken      String?
+  resetTokenExpiry DateTime?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   lastLoginAt     DateTime?
