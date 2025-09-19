@@ -39,6 +39,11 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    // Debug: Token bilgilerini logla
+    console.log('Debug - Generated reset token:', resetToken)
+    console.log('Debug - Reset token expiry:', resetTokenExpiry)
+    console.log('Debug - User email:', user.email)
+
     // Admin panel'den email gönder
     const emailResponse = await fetch('https://www.grbt8.store/api/email/templates/password-reset', {
       method: 'POST',
@@ -48,7 +53,8 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         email: user.email,
         name: user.firstName || user.email,
-        resetToken: resetToken
+        resetToken: resetToken,
+        baseUrl: 'https://anasite.grbt8.store' // Doğru domain'i gönder
       })
     })
 

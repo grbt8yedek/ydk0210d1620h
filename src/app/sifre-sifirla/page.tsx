@@ -6,6 +6,11 @@ export default function ResetPasswordPage() {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
   
+  // Debug: URL ve token bilgilerini logla
+  console.log('Debug - Current URL:', window.location.href)
+  console.log('Debug - Search params:', searchParams.toString())
+  console.log('Debug - All params:', Object.fromEntries(searchParams.entries()))
+  
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)

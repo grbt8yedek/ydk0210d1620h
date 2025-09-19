@@ -4,9 +4,21 @@ import { prisma } from '@/lib/prisma'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const token = searchParams.get('token')
+    let token = searchParams.get('token')
 
-    console.log('Debug - API received token:', token)
+    console.log('Debug - Raw token from URL:', token)
+    
+    // URL decode işlemi
+    if (token) {
+      try {
+        token = decodeURIComponent(token)
+        console.log('Debug - Decoded token:', token)
+      } catch (e) {
+        console.log('Debug - Token decode error:', e)
+      }
+    }
+
+    console.log('Debug - Final token:', token)
     console.log('Debug - Token length:', token?.length)
     console.log('Debug - Token type:', typeof token)
 
