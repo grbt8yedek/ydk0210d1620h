@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Admin panel'den email gönder
-    const emailResponse = await fetch('https://www.grbt8.store/api/email/templates/password-reset', {
+    const emailResponse = await fetch('https://anasite.grbt8.store/api/email/templates/password-reset', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
