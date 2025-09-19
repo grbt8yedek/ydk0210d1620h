@@ -61,8 +61,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ valid: !!user })
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Token verification error:', error)
-    return NextResponse.json({ valid: false, error: error.message })
+    return NextResponse.json({ valid: false, error: error.message || 'Unknown error' })
   }
 }
