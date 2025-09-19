@@ -130,19 +130,6 @@ export default function Home() {
         <HeroSection />
         {/* Beyaz alan ve içerik */}
         <div className="bg-white min-h-screen pt-6">
-          {/* Mobil özel görsel */}
-          <div className="sm:hidden px-4 mb-4">
-            <div className="relative w-full overflow-hidden rounded-2xl shadow-md">
-              <Image
-                src="/images/Ekran Resmi 2025-09-19 09.25.26.png"
-                alt="Mobil ekran görseli"
-                width={1200}
-                height={800}
-                className="w-full h-auto object-cover"
-                priority
-              />
-            </div>
-          </div>
           {/* Uçuş Arama Formu - Hem Mobil Hem Masaüstü */}
           <FlightSearchForm
             tripType={tripType}
@@ -178,6 +165,20 @@ export default function Home() {
 
           {/* Uygulama Banner - Hem Mobil Hem Masaüstü */}
           <AppBanner />
+
+          {/* Mobil özel görsel - AppBanner altında */}
+          <div className="sm:hidden px-4 mb-4">
+            <div className="relative w-full overflow-hidden rounded-2xl shadow-md">
+              <Image
+                src="/images/Ekran Resmi 2025-09-19 09.25.26.png"
+                alt="Mobil ekran görseli"
+                width={1200}
+                height={800}
+                className="w-full h-auto object-cover"
+                priority
+              />
+            </div>
+          </div>
 
           {/* Kampanyalar Bölümü */}
           <CampaignsSection />
