@@ -31,18 +31,17 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Mobilde scrollbar gizleme */
+/* Mobilde scrollbar gizleme (tüm öğeler) */
 @media (max-width: 768px) {
-  html, body {
-    scrollbar-width: none; /* Firefox */
+  *, *::before, *::after {
     -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none;    /* Firefox */
   }
-  
-  html::-webkit-scrollbar,
-  body::-webkit-scrollbar {
+  *::-webkit-scrollbar {
     width: 0;
     height: 0;
-    display: none;
+    display: none;            /* Chrome/Safari/Opera */
+    background: transparent;
   }
 }
 /* --- Sonu --- */
