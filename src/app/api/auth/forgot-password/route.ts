@@ -39,12 +39,10 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Email gönderme işlemi (şimdilik basit)
-    console.log(`Şifre sıfırlama linki: https://anasite.grbt8.store/reset-password?token=${resetToken}`)
-
     return NextResponse.json({
       success: true,
-      message: 'Şifre sıfırlama linki email adresinize gönderildi.'
+      message: `Şifre sıfırlama linki: https://anasite.grbt8.store/reset-password?token=${resetToken}`,
+      resetLink: `https://anasite.grbt8.store/reset-password?token=${resetToken}`
     })
 
   } catch (error: any) {
