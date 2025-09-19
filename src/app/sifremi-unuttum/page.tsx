@@ -20,12 +20,12 @@ export default function ForgotPasswordPage() {
       const data = await response.json()
       
       if (data.success) {
-        setMessage('Şifre sıfırlama linki email adresinize gönderildi.')
+        setMessage('Şifre sıfırlama sistemi yeniden kurulacak.')
       } else {
         setMessage(data.error || 'Bir hata oluştu.')
       }
     } catch (error) {
-      setMessage('Bir hata oluştu.')
+      setMessage('Şifre sıfırlama sistemi yeniden kurulacak.')
     } finally {
       setLoading(false)
     }
@@ -36,8 +36,12 @@ export default function ForgotPasswordPage() {
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
         <h2 className="text-2xl font-bold text-center">Şifremi Unuttum</h2>
         
+        <div className="p-4 rounded bg-blue-100 text-blue-700">
+          Şifre sıfırlama sistemi yeniden kurulacak. Lütfen bekleyiniz.
+        </div>
+        
         {message && (
-          <div className={`p-4 rounded ${message.includes('gönderildi') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          <div className={`p-4 rounded ${message.includes('kurulacak') ? 'bg-blue-100 text-blue-700' : 'bg-red-100 text-red-700'}`}>
             {message}
           </div>
         )}
@@ -59,9 +63,9 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50"
+            className="w-full py-2 px-4 bg-gray-400 text-white rounded-md cursor-not-allowed"
           >
-            {loading ? 'Gönderiliyor...' : 'Şifre Sıfırlama Linki Gönder'}
+            {loading ? 'Gönderiliyor...' : 'Sistem Yeniden Kurulacak'}
           </button>
         </form>
         

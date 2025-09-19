@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,64 +11,10 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Kullanıcıyı bul
-    const user = await prisma.user.findUnique({
-      where: { email }
-    })
-
-    if (!user) {
-      // Güvenlik için her zaman başarılı mesaj döndür
-      return NextResponse.json({
-        success: true,
-        message: 'Eğer bu email adresi kayıtlı ise, şifre sıfırlama linki gönderilecektir.'
-      })
-    }
-
-    // Token oluştur
-    const resetToken = crypto.randomUUID()
-    const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000) // 1 saat
-
-    // Token'ı kaydet
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        resetToken,
-        resetTokenExpiry
-      }
-    })
-
-    // Debug: Token bilgilerini logla
-    console.log('Debug - Generated reset token:', resetToken)
-    console.log('Debug - Reset token expiry:', resetTokenExpiry)
-    console.log('Debug - User email:', user.email)
-
-    // Admin panel'den email gönder
-    const emailResponse = await fetch('https://www.grbt8.store/api/email/templates/password-reset', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email: user.email,
-        name: user.firstName || user.email,
-        resetToken: resetToken,
-        baseUrl: 'https://anasite.grbt8.store' // Doğru domain'i gönder
-      })
-    })
-
-    const emailData = await emailResponse.json()
-
-    if (!emailData.success) {
-      console.error('Email gönderme hatası:', emailData.error)
-      return NextResponse.json({
-        success: false,
-        error: 'Email gönderilirken hata oluştu'
-      }, { status: 500 })
-    }
-
+    // Şimdilik sadece başarılı mesaj döndür
     return NextResponse.json({
       success: true,
-      message: 'Şifre sıfırlama linki email adresinize gönderildi.'
+      message: 'Şifre sıfırlama sistemi yeniden kurulacak.'
     })
 
   } catch (error: any) {
