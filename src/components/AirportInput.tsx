@@ -18,6 +18,7 @@ interface AirportInputProps {
   onAirportSelect: (airport: Airport) => void;
   selectedAirports: Airport[];
   isMobile?: boolean;
+  disabled?: boolean;
   className?: string;
 }
 
@@ -29,6 +30,7 @@ export default function AirportInput({
   onAirportSelect,
   selectedAirports,
   isMobile = false,
+  disabled = false,
   className = ""
 }: AirportInputProps) {
   const [suggestions, setSuggestions] = useState<Airport[]>([]);
@@ -125,6 +127,7 @@ export default function AirportInput({
             value={value}
             onChange={handleInputChange}
             onFocus={handleFocus}
+            disabled={disabled}
             placeholder={placeholder}
             className="w-full pl-10 pr-4 h-12 text-base text-gray-700 placeholder-gray-400 focus:ring-0 outline-none bg-transparent border-none"
             style={{ outline: 'none !important' }}
@@ -159,6 +162,7 @@ export default function AirportInput({
           className="flex-1 bg-transparent border-none outline-none text-[14px] font-semibold placeholder-[#6b7280] focus:outline-none focus:ring-0 focus:border-none min-w-0 h-full"
           placeholder={placeholder}
           value={value}
+          disabled={disabled}
           onChange={handleInputChange}
           onFocus={handleFocus}
           style={{ outline: 'none !important' }}

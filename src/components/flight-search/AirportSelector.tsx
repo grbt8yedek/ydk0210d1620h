@@ -26,8 +26,11 @@ export default function AirportSelector({
           Nereden
         </label>
         <AirportInput
+          label=""
           value={fromAirport}
           onChange={onFromChange}
+          onAirportSelect={() => {}}
+          selectedAirports={[]}
           placeholder="Kalkış havalimanı"
           disabled={disabled}
         />
@@ -54,8 +57,11 @@ export default function AirportSelector({
           Nereye
         </label>
         <AirportInput
+          label=""
           value={toAirport}
           onChange={onToChange}
+          onAirportSelect={() => {}}
+          selectedAirports={[]}
           placeholder="Varış havalimanı"
           disabled={disabled}
         />
