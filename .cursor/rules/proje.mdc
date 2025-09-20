@@ -15,7 +15,8 @@
 - **Son Commit:** Proje tam yedek - GitHub'a yükleme
 
 ### Vercel Deployment
-- **Vercel Adresi:** https://vercel.com/grbt8/grbt8
+- **Vercel Adresi:** ur
+https://vercel.com/grbt8/grbt8
 - **Domain:** grbt8.vercel.app (tahmini)
 - **Platform:** Vercel
 
@@ -25,7 +26,7 @@
 
 1. **Otomatik Push ve Deploy:**
    - AI asistan kodları GitHub'a push eder
-   - Vercel otomatik olarak GitHub'dan çeker ve deploy eder
+   - Vercel otomatik deploy kapali  asistan manuel olarak GitHub'dan çeker ve deploy eder
    - Hata çıktığında AI asistan otomatik düzeltme yapar
 
 2. **Hata Yönetimi:**
@@ -46,6 +47,47 @@
 **Veritabanı:** Neon PostgreSQL  
 **Bağlantı:** Prisma ORM ile  
 **Schema:** `prisma/schema.prisma`  
+
+### 🛡️ VERİTABANI KORUMA SİSTEMİ
+
+**ÖNEMLİ:** AI Asistanların veritabanı işlemlerini engellemek için koruma sistemi aktif!
+
+#### Yasaklı Komutlar:
+- `prisma db push --force-reset`
+- `prisma migrate reset`
+- `prisma db push --accept-data-loss`
+- `DROP TABLE`, `TRUNCATE TABLE`
+- `DELETE FROM users/passengers/reservations`
+
+#### Korunması Gereken Tablolar:
+- users, passengers, reservations, flights, airlines, airports
+
+#### Koruma Kuralları:
+1. **Production'da:** Hiçbir veritabanı silme işlemi yapılamaz
+2. **Development'da:** Onay istenir + otomatik backup alınır
+3. **Schema değişikliklerinde:** Özel onay gerekir
+4. **Backup:** Her tehlikeli işlem öncesi otomatik backup
+
+#### Kullanım:
+```bash
+# Komut kontrolü
+node scripts/prisma-guard.js "prisma db push"
+
+# Otomatik backup
+npm run backup:auto
+
+# Güvenli Prisma komutları
+npm run prisma:push
+npm run prisma:migrate
+```
+
+#### AI Asistan Kuralları:
+1. **ASLA** `prisma db push --force-reset` kullanmayın
+2. **ASLA** `prisma migrate reset` kullanmayın  
+3. **ASLA** `DROP TABLE` komutları kullanmayın
+4. **ASLA** `DELETE FROM` ile toplu silme yapmayın
+5. **HER ZAMAN** `npm run` script'lerini kullanın
+6. **VERİTABANI DEĞİŞİKLİĞİNDEN ÖNCE** backup alın
 
 #### Gerekli Environment Variables:
 ```env
@@ -83,23 +125,10 @@ NEXTAUTH_URL="https://grbt8.vercel.app"
 ### Öncesi Hazırlık
 - [ ] Neon PostgreSQL veritabanı kurulumu
 - [ ] Environment variables ayarlanması
-- [ ] Vercel projesi oluşturulması
-- [ ] GitHub repository bağlantısı
-
-### Deployment Süreci
-- [ ] Vercel'e GitHub repository bağlanması
-- [ ] Environment variables Vercel'e eklenmesi
-- [ ] İlk deployment test edilmesi
-- [ ] Veritabanı bağlantısı test edilmesi
-- [ ] API endpoints test edilmesi
-
-### Post-Deployment
-- [ ] Domain ayarları
-- [ ] SSL sertifikası kontrolü
-- [ ] Performance monitoring
-- [ ] Error tracking kurulumu
+- 
 
 ## Hata Çözüm Süreci
+prisma db push --force-reset g gibi buyuk islemler , birseyler resetlenecekse silinecekse, haber edilecek, yedek alinacak
 
 ### AI Asistan Hata Yönetimi
 
