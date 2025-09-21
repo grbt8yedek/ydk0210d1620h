@@ -28,9 +28,10 @@ export default function DateSelector({
           Gidiş Tarihi
         </label>
         <DateInput
-          value={departureDate}
-          onChange={onDepartureDateChange}
-          min={new Date().toISOString().split('T')[0]}
+          value={departureDate ? new Date(departureDate) : undefined}
+          onChange={(date: Date | undefined) => {
+            onDepartureDateChange(date ? date.toISOString().split('T')[0] : '');
+          }}
           disabled={disabled}
           className="w-full"
         />
@@ -43,9 +44,10 @@ export default function DateSelector({
             Dönüş Tarihi
           </label>
           <DateInput
-            value={returnDate}
-            onChange={onReturnDateChange}
-            min={departureDate || new Date().toISOString().split('T')[0]}
+            value={returnDate ? new Date(returnDate) : undefined}
+            onChange={(date: Date | undefined) => {
+              onReturnDateChange(date ? date.toISOString().split('T')[0] : '');
+            }}
             disabled={disabled}
             className="w-full"
           />
