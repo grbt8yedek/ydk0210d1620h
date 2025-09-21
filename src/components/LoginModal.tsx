@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { signIn } from 'next-auth/react';
 import ValidationPopup from './ValidationPopup';
+import { validatePasswordStrength } from '@/lib/authSecurity';
 import CountryDropdown from './CountryDropdown';
 import { Country, defaultCountry } from '@/data/countries';
 
@@ -88,8 +89,11 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
     
     if (!password.trim()) {
       errors.push('Şifre alanı zorunludur');
-    } else if (password.length < 6) {
-      errors.push('Şifre en az 6 karakter olmalıdır');
+    } else {
+      const passwordValidation = validatePasswordStrength(password);
+      if (!passwordValidation.isValid) {
+        errors.push(...passwordValidation.errors.map(err => err.replace('Password', 'Şifre')));
+      }
     }
     
     if (!confirmPassword.trim()) {

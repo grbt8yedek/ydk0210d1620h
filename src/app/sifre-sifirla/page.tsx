@@ -54,8 +54,29 @@ export default function ResetPasswordPage() {
       return
     }
     
-    if (password.length < 6) {
-      setMessage('Şifre en az 6 karakter olmalıdır.')
+    // Güçlü şifre kontrolü
+    if (password.length < 8) {
+      setMessage('Şifre en az 8 karakter olmalıdır.')
+      setMessageType('error')
+      return
+    }
+    if (!/[A-Z]/.test(password)) {
+      setMessage('Şifre en az bir büyük harf içermelidir.')
+      setMessageType('error')
+      return
+    }
+    if (!/[a-z]/.test(password)) {
+      setMessage('Şifre en az bir küçük harf içermelidir.')
+      setMessageType('error')
+      return
+    }
+    if (!/\d/.test(password)) {
+      setMessage('Şifre en az bir rakam içermelidir.')
+      setMessageType('error')
+      return
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      setMessage('Şifre en az bir özel karakter içermelidir.')
       setMessageType('error')
       return
     }

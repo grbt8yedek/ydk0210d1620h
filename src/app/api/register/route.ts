@@ -2,10 +2,11 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
 import { z } from 'zod';
+import { validatePasswordStrength } from '@/lib/authSecurity';
 
 const registerUserSchema = z.object({
     email: z.string().email({ message: "Geçerli bir e-posta adresi girin." }),
-    password: z.string().min(6, { message: "Şifre en az 6 karakter olmalıdır." }),
+    password: z.string().min(8, { message: "Şifre en az 8 karakter olmalıdır." }),
     firstName: z.string().min(2, { message: "Ad en az 2 karakter olmalıdır." }),
     lastName: z.string().min(2, { message: "Soyad en az 2 karakter olmalıdır." }),
     phone: z.string().optional(),
@@ -21,6 +22,14 @@ export async function POST(req: Request) {
         }
 
         const { email, password, firstName, lastName, phone } = validation.data;
+
+        // Güçlü şifre kontrolü
+        const passwordValidation = validatePasswordStrength(password);
+        if (!passwordValidation.isValid) {
+            return NextResponse.json({ 
+                error: 'Şifre güvenlik gereksinimlerini karşılamıyor: ' + passwordValidation.errors.join(', ') 
+            }, { status: 400 });
+        }
 
         const existingUser = await prisma.user.findUnique({
             where: { email },

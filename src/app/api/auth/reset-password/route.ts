@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { validatePasswordStrength } from '@/lib/authSecurity'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,11 +16,12 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Şifre uzunluğunu kontrol et
-    if (password.length < 6) {
+    // Güçlü şifre kontrolü
+    const passwordValidation = validatePasswordStrength(password);
+    if (!passwordValidation.isValid) {
       return NextResponse.json({
         success: false,
-        error: 'Şifre en az 6 karakter olmalıdır'
+        error: 'Şifre güvenlik gereksinimlerini karşılamıyor: ' + passwordValidation.errors.map(err => err.replace('Password', 'Şifre')).join(', ')
       }, { status: 400 })
     }
 

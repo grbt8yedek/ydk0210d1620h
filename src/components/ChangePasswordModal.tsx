@@ -3,6 +3,7 @@
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { toast } from 'react-hot-toast';
+import { validatePasswordStrength } from '@/lib/authSecurity';
 
 interface ChangePasswordModalProps {
   isOpen: boolean;
@@ -28,8 +29,10 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
       return;
     }
 
-    if (newPassword.length < 6) {
-      toast.error('Yeni şifre en az 6 karakter olmalıdır');
+    // Güçlü şifre kontrolü
+    const passwordValidation = validatePasswordStrength(newPassword);
+    if (!passwordValidation.isValid) {
+      toast.error('Şifre güvenlik gereksinimlerini karşılamıyor: ' + passwordValidation.errors.map(err => err.replace('Password', 'Şifre')).join(', '));
       return;
     }
 
