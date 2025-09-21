@@ -59,10 +59,11 @@ export default function PaymentPage() {
   const [binInfo, setBinInfo] = useState<BinInfo | null>(null);
   const [binLoading, setBinLoading] = useState(false);
   const [binError, setBinError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const brand = detectCardBrand(cardNumber);
 
-  // Kart numarası değiştiğinde BIN bilgisi çek
+  // Kart numarası değiştiğinde BIN bilgisi çek (GÜVENLİ POST)
   useEffect(() => {
     const fetchBinInfo = async () => {
       const cleanCardNumber = cardNumber.replace(/\s/g, '');
@@ -73,7 +74,20 @@ export default function PaymentPage() {
         setBinError(null);
         
         try {
-          const response = await fetch(`/api/payment/bin-info?cardNumber=${cleanCardNumber}&price=95&productType=flight&currencyCode=EUR`);
+          // GÜVENLİ: Kart numarasını POST body'de gönder
+          const response = await fetch('/api/payment/bin-info', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              cardNumber: cleanCardNumber,
+              price: 95,
+              productType: 'flight',
+              currencyCode: 'EUR'
+            })
+          });
+          
           const result = await response.json();
           
           if (result.success) {
@@ -130,12 +144,66 @@ export default function PaymentPage() {
     return errs;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs = validate();
     setErrors(errs);
+    
     if (Object.keys(errs).length === 0) {
-      setTimeout(() => setSuccess(true), 800);
+      setLoading(true);
+      
+      try {
+        // 1. Önce kart bilgilerini tokenize et
+        const tokenizeResponse = await fetch('/api/payment/tokenize', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            number: cardNumber,
+            expiryMonth: expiry.split('/')[0],
+            expiryYear: '20' + expiry.split('/')[1],
+            cvv: cvv,
+            name: name
+          })
+        });
+        
+        const tokenizeResult = await tokenizeResponse.json();
+        
+        if (!tokenizeResult.success) {
+          throw new Error(tokenizeResult.error || 'Kart bilgileri işlenemedi');
+        }
+        
+        // 2. Token ile ödeme işlemini başlat
+        const paymentResponse = await fetch('/api/payment/process', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            cardToken: tokenizeResult.token,
+            amount: 95,
+            currency: 'EUR',
+            description: 'Uçuş rezervasyonu',
+            requires3D: binInfo?.isThreeD || false
+          })
+        });
+        
+        const paymentResult = await paymentResponse.json();
+        
+        if (paymentResult.success) {
+          console.log('Ödeme başarılı:', paymentResult);
+          setSuccess(true);
+        } else {
+          throw new Error(paymentResult.error || 'Ödeme işlemi başarısız');
+        }
+        
+      } catch (error) {
+        console.error('Ödeme hatası:', error);
+        setErrors({ cardNumber: error instanceof Error ? error.message : 'Ödeme işlemi başarısız' });
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -286,8 +354,19 @@ export default function PaymentPage() {
             </span>
           </div>
           
-          <button type="submit" className="w-full mt-4 bg-green-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-green-700 transition">
-            {binInfo?.isThreeD ? '3D Secure ile Öde' : 'Ödemeyi Tamamla'}
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full mt-4 bg-green-600 text-white py-3 rounded-lg font-bold text-lg hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>İşleniyor...</span>
+              </div>
+            ) : (
+              binInfo?.isThreeD ? '3D Secure ile Öde' : 'Ödemeyi Tamamla'
+            )}
           </button>
         </form>
         

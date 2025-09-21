@@ -11,7 +11,19 @@ export default function DebugBinPage() {
     
     setLoading(true);
     try {
-      const response = await fetch(`/api/payment/bin-info?cardNumber=${cardNumber}&price=95&productType=flight&currencyCode=EUR`);
+      // GÜVENLİ: POST body ile kart numarasını gönder
+      const response = await fetch('/api/payment/bin-info', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cardNumber: cardNumber,
+          price: 95,
+          productType: 'flight',
+          currencyCode: 'EUR'
+        })
+      });
       const data = await response.json();
       setResult(data);
     } catch (error: any) {
