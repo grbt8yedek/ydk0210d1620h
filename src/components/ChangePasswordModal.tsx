@@ -32,7 +32,7 @@ export default function ChangePasswordModal({ isOpen, onClose }: ChangePasswordM
     // Güçlü şifre kontrolü
     const passwordValidation = validatePasswordStrength(newPassword);
     if (!passwordValidation.isValid) {
-      toast.error('Şifre güvenlik gereksinimlerini karşılamıyor: ' + passwordValidation.errors.map(err => err.replace('Password', 'Şifre')).join(', '));
+      toast.error('Şifre güvenlik gereksinimlerini karşılamıyor: ' + passwordValidation.errors.join(', '));
       return;
     }
 

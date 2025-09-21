@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     if (!passwordValidation.isValid) {
       return NextResponse.json({
         success: false,
-        error: 'Şifre güvenlik gereksinimlerini karşılamıyor: ' + passwordValidation.errors.map(err => err.replace('Password', 'Şifre')).join(', ')
+        error: 'Şifre güvenlik gereksinimlerini karşılamıyor: ' + passwordValidation.errors.join(', ')
       }, { status: 400 })
     }
 

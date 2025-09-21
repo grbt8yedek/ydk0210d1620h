@@ -90,23 +90,23 @@ export function validatePasswordStrength(password: string): {
   const errors: string[] = []
 
   if (password.length < 8) {
-    errors.push('Password must be at least 8 characters long')
+    errors.push('Şifre en az 8 karakter olmalıdır')
   }
 
   if (!/[A-Z]/.test(password)) {
-    errors.push('Password must contain at least one uppercase letter')
+    errors.push('Şifre en az bir büyük harf içermelidir')
   }
 
   if (!/[a-z]/.test(password)) {
-    errors.push('Password must contain at least one lowercase letter')
+    errors.push('Şifre en az bir küçük harf içermelidir')
   }
 
   if (!/\d/.test(password)) {
-    errors.push('Password must contain at least one number')
+    errors.push('Şifre en az bir rakam içermelidir')
   }
 
   if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    errors.push('Password must contain at least one special character')
+    errors.push('Şifre en az bir özel karakter içermelidir')
   }
 
   return {

@@ -92,7 +92,7 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
     } else {
       const passwordValidation = validatePasswordStrength(password);
       if (!passwordValidation.isValid) {
-        errors.push(...passwordValidation.errors.map(err => err.replace('Password', 'Şifre')));
+        errors.push(...passwordValidation.errors);
       }
     }
     
