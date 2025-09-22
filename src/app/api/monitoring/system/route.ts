@@ -106,29 +106,30 @@ export async function GET(request: NextRequest) {
         disk: filteredMetrics.length > 0 && (filteredMetrics[filteredMetrics.length - 1].diskUsage || 0) < 90 ? 'HEALTHY' : 'WARNING',
         responseTime: filteredMetrics.length > 0 && (filteredMetrics[filteredMetrics.length - 1].responseTime || 0) < 2000 ? 'HEALTHY' : 'WARNING'
       },
-      hourlyTrends: filteredMetrics.reduce((acc, metric) => {
-        const hour = new Date(metric.timestamp).getHours();
-        if (!acc[hour]) {
-          acc[hour] = { cpu: [], memory: [], responseTime: [] };
-        }
-        if (metric.cpuUsage !== undefined) acc[hour].cpu.push(metric.cpuUsage);
-        if (metric.memoryUsage !== undefined) acc[hour].memory.push(metric.memoryUsage);
-        if (metric.responseTime !== undefined) acc[hour].responseTime.push(metric.responseTime);
-        return acc;
-      }, {} as Record<number, { cpu: number[]; memory: number[]; responseTime: number[] }>)
-    };
+      hourlyTrends: (() => {
+        const hourlyData = filteredMetrics.reduce((acc, metric) => {
+          const hour = new Date(metric.timestamp).getHours();
+          if (!acc[hour]) {
+            acc[hour] = { cpu: [], memory: [], responseTime: [] };
+          }
+          if (metric.cpuUsage !== undefined) acc[hour].cpu.push(metric.cpuUsage);
+          if (metric.memoryUsage !== undefined) acc[hour].memory.push(metric.memoryUsage);
+          if (metric.responseTime !== undefined) acc[hour].responseTime.push(metric.responseTime);
+          return acc;
+        }, {} as Record<number, { cpu: number[]; memory: number[]; responseTime: number[] }>);
 
-    // Saatlik trendleri ortalama değerlere dönüştür
-    const processedTrends: Record<number, { cpu: number; memory: number; responseTime: number }> = {};
-    Object.keys(stats.hourlyTrends).forEach(hour => {
-      const trends = stats.hourlyTrends[parseInt(hour)];
-      processedTrends[parseInt(hour)] = {
-        cpu: trends.cpu.length > 0 ? trends.cpu.reduce((sum, val) => sum + val, 0) / trends.cpu.length : 0,
-        memory: trends.memory.length > 0 ? trends.memory.reduce((sum, val) => sum + val, 0) / trends.memory.length : 0,
-        responseTime: trends.responseTime.length > 0 ? trends.responseTime.reduce((sum, val) => sum + val, 0) / trends.responseTime.length : 0
-      };
-    });
-    stats.hourlyTrends = processedTrends;
+        // Ortalama değerlere dönüştür
+        const processedTrends: Record<number, { cpu: number; memory: number; responseTime: number }> = {};
+        Object.keys(hourlyData).forEach(hour => {
+          const trends = hourlyData[parseInt(hour)];
+          processedTrends[parseInt(hour)] = {
+            cpu: trends.cpu.length > 0 ? trends.cpu.reduce((sum, val) => sum + val, 0) / trends.cpu.length : 0,
+            memory: trends.memory.length > 0 ? trends.memory.reduce((sum, val) => sum + val, 0) / trends.memory.length : 0,
+            responseTime: trends.responseTime.length > 0 ? trends.responseTime.reduce((sum, val) => sum + val, 0) / trends.responseTime.length : 0
+          };
+        });
+        return processedTrends;
+      })()
 
     return NextResponse.json({
       success: true,
