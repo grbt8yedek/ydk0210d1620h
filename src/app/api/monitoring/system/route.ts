@@ -130,6 +130,7 @@ export async function GET(request: NextRequest) {
         });
         return processedTrends;
       })()
+    };
 
     return NextResponse.json({
       success: true,
