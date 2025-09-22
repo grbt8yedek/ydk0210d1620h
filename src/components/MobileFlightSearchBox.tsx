@@ -141,10 +141,10 @@ export default function MobileFlightSearchBox({
     <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-4 w-full max-w-md mx-auto">
       <div className="flex items-center gap-4 mb-4">
         <label className="flex items-center gap-2 text-sm font-medium">
-          <input type="radio" checked={tripType === 'oneWay'} onChange={() => setTripType('oneWay')} /> Tek yön
+          <input type="radio" checked={tripType === 'oneWay'} onChange={() => setTripType('oneWay')} aria-label="Tek yön uçuş" /> Tek yön
         </label>
         <label className="flex items-center gap-2 text-sm font-medium">
-          <input type="radio" checked={tripType === 'roundTrip'} onChange={() => setTripType('roundTrip')} /> Gidiş-dönüş
+          <input type="radio" checked={tripType === 'roundTrip'} onChange={() => setTripType('roundTrip')} aria-label="Gidiş-dönüş uçuş" /> Gidiş-dönüş
         </label>
         <button type="button" className="ml-auto flex items-center gap-1 px-3 py-1 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium" onClick={() => setShowPassengerModal(true)}>
           <UserCircle2 className="w-5 h-5" />
@@ -169,13 +169,18 @@ export default function MobileFlightSearchBox({
                   searchAirports(e.target.value, setFromSuggestions);
                 }}
                 onFocus={() => setShowFromSuggestions(true)}
+                aria-label="Kalkış havalimanı"
+                role="combobox"
+                aria-expanded={showFromSuggestions}
+                aria-autocomplete="list"
               />
-              {showFromSuggestions && fromSuggestions.length > 0 && (
-                <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg">
+              {showFromSuggestions && (
+                <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg min-h-[3rem]" role="listbox" aria-label="Kalkış havalimanı önerileri">
                   {fromSuggestions.map(airport => (
                     <li
                       key={airport.code}
                       className="px-4 py-2 hover:bg-green-50 cursor-pointer"
+                      role="option"
                       onMouseDown={() => {
                         setFromAirports([airport]);
                         setFromInput(airport.name + ' (' + airport.code + ')');
@@ -189,8 +194,13 @@ export default function MobileFlightSearchBox({
               )}
             </div>
           </div>
-          <button type="button" className="self-end mb-2" onClick={swapAirports}>
-            <ArrowRightLeft className="w-7 h-7 text-green-600" />
+          <button
+            type="button"
+            className="self-end mb-2 w-11 h-11 flex items-center justify-center rounded-full"
+            onClick={swapAirports}
+            aria-label="Havalimanlarını değiştir"
+          >
+            <ArrowRightLeft className="w-6 h-6 text-green-600" />
           </button>
           <div className="flex-1">
             <label className="block text-green-700 text-sm font-semibold mb-1">Nereye</label>
@@ -208,13 +218,18 @@ export default function MobileFlightSearchBox({
                   searchAirports(e.target.value, setToSuggestions);
                 }}
                 onFocus={() => setShowToSuggestions(true)}
+                aria-label="Varış havalimanı"
+                role="combobox"
+                aria-expanded={showToSuggestions}
+                aria-autocomplete="list"
               />
-              {showToSuggestions && toSuggestions.length > 0 && (
-                <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg">
+              {showToSuggestions && (
+                <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg min-h-[3rem]" role="listbox" aria-label="Varış havalimanı önerileri">
                   {toSuggestions.map(airport => (
                     <li
                       key={airport.code}
                       className="px-4 py-2 hover:bg-green-50 cursor-pointer"
+                      role="option"
                       onMouseDown={() => {
                         setToAirports([airport]);
                         setToInput(airport.name + ' (' + airport.code + ')');
@@ -239,6 +254,7 @@ export default function MobileFlightSearchBox({
                 onChange={setDepartureDate}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-base font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 text-center flight-search-input"
                 placeholder="Gidiş Tarihi"
+                aria-label="Gidiş tarihi seçimi"
               />
             </div>
           </div>
@@ -252,19 +268,26 @@ export default function MobileFlightSearchBox({
                 className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg text-base font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 text-center flight-search-input ${tripType === 'oneWay' ? 'opacity-50 cursor-not-allowed' : ''}`}
                 placeholder="Dönüş Tarihi"
                 disabled={tripType === 'oneWay'}
+                aria-label="Dönüş tarihi seçimi"
               />
             </div>
           </div>
         </div>
       </div>
-      <button type="submit" className="w-full bg-green-500 text-white py-3 rounded-xl font-semibold text-lg shadow-md hover:bg-green-600 transition-all mt-4" disabled={isLoading}>
+      <button type="submit" className="w-full bg-green-500 text-white py-3 rounded-xl font-semibold text-lg shadow-md hover:bg-green-600 transition-all mt-4" disabled={isLoading} aria-busy={isLoading} aria-live="polite">
         {isLoading ? 'Aranıyor...' : 'Uçuş Ara'}
       </button>
       {/* Yolcu modalı */}
       {showPassengerModal && (
-        <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center">
-          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-xs mx-2 relative">
-            <button className="absolute top-2 right-2 text-gray-400 text-2xl" onClick={()=>setShowPassengerModal(false)}>×</button>
+        <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center will-change-transform">
+          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-xs mx-2 relative" style={{ contain: 'layout' }}>
+            <button
+              className="absolute top-2 right-2 text-gray-400 text-2xl w-11 h-11 flex items-center justify-center"
+              onClick={()=>setShowPassengerModal(false)}
+              aria-label="Pencereyi kapat"
+            >
+              ×
+            </button>
             <div className="flex flex-col gap-4">
               {/* Yetişkin */}
               <div className="flex items-center justify-between">
@@ -272,9 +295,22 @@ export default function MobileFlightSearchBox({
                   <div className="font-medium text-gray-800">Yetişkin <span className="text-gray-500 text-sm">(12+)</span></div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setAdultCount(Math.max(1, adultCount-1))} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 disabled:opacity-40" disabled={adultCount === 1}>-</button>
+                  <button
+                    onClick={() => setAdultCount(Math.max(1, adultCount-1))}
+                    className="w-11 h-11 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 disabled:opacity-40"
+                    disabled={adultCount === 1}
+                    aria-label="Yetişkin sayısını azalt"
+                  >
+                    -
+                  </button>
                   <span className="w-4 text-center font-semibold text-gray-800">{adultCount}</span>
-                  <button onClick={() => setAdultCount(adultCount+1)} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-green-600">+</button>
+                  <button
+                    onClick={() => setAdultCount(adultCount+1)}
+                    className="w-11 h-11 rounded-full border border-gray-300 flex items-center justify-center text-green-600"
+                    aria-label="Yetişkin sayısını artır"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
               {/* Çocuk */}
@@ -283,9 +319,22 @@ export default function MobileFlightSearchBox({
                   <div className="font-medium text-gray-800">Çocuk <span className="text-gray-500 text-sm">(2-12)</span></div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setChildCount(Math.max(0, childCount-1))} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 disabled:opacity-40" disabled={childCount === 0}>-</button>
+                  <button
+                    onClick={() => setChildCount(Math.max(0, childCount-1))}
+                    className="w-11 h-11 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 disabled:opacity-40"
+                    disabled={childCount === 0}
+                    aria-label="Çocuk sayısını azalt"
+                  >
+                    -
+                  </button>
                   <span className="w-4 text-center font-semibold text-gray-800">{childCount}</span>
-                  <button onClick={() => setChildCount(childCount+1)} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-green-600">+</button>
+                  <button
+                    onClick={() => setChildCount(childCount+1)}
+                    className="w-11 h-11 rounded-full border border-gray-300 flex items-center justify-center text-green-600"
+                    aria-label="Çocuk sayısını artır"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
               {/* Bebek */}
@@ -294,9 +343,22 @@ export default function MobileFlightSearchBox({
                   <div className="font-medium text-gray-800">Bebek <span className="text-gray-500 text-sm">(0-2)</span></div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => setInfantCount(Math.max(0, infantCount-1))} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 disabled:opacity-40" disabled={infantCount === 0}>-</button>
+                  <button
+                    onClick={() => setInfantCount(Math.max(0, infantCount-1))}
+                    className="w-11 h-11 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 disabled:opacity-40"
+                    disabled={infantCount === 0}
+                    aria-label="Bebek sayısını azalt"
+                  >
+                    -
+                  </button>
                   <span className="w-4 text-center font-semibold text-gray-800">{infantCount}</span>
-                  <button onClick={() => setInfantCount(infantCount+1)} className="w-7 h-7 rounded-full border border-gray-300 flex items-center justify-center text-green-600">+</button>
+                  <button
+                    onClick={() => setInfantCount(infantCount+1)}
+                    className="w-11 h-11 rounded-full border border-gray-300 flex items-center justify-center text-green-600"
+                    aria-label="Bebek sayısını artır"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
             </div>

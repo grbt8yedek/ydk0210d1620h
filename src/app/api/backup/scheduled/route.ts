@@ -245,6 +245,80 @@ async function pushToGitHub(filePath: string): Promise<boolean> {
   }
 }
 
+// GitHub'dan eski backup'ları sil (10 günden eski)
+async function cleanupOldGitHubBackups(): Promise<void> {
+  try {
+    if (!GITHUB_TOKEN) {
+      console.log('⚠️ GitHub token yok, temizlik atlanıyor');
+      return;
+    }
+
+    console.log('🧹 GitHub temizlik başlatılıyor (10 günden eski dosyalar)...');
+
+    // GitHub'dan dosya listesi al
+    const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents`, {
+      headers: {
+        'Authorization': `token ${GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    if (!response.ok) {
+      console.error('❌ GitHub dosya listesi alınamadı');
+      return;
+    }
+
+    const files = await response.json();
+    const backupFiles = files.filter((file: any) => 
+      file.name.startsWith('grbt8-backup-') && file.name.endsWith('.zip')
+    );
+
+    const now = new Date();
+    const tenDaysAgo = new Date(now.getTime() - (10 * 24 * 60 * 60 * 1000));
+    let deletedCount = 0;
+
+    for (const file of backupFiles) {
+      try {
+        // Dosya tarihini parse et
+        const match = file.name.match(/grbt8-backup-(.+)\.zip/);
+        if (!match) continue;
+        
+        const dateStr = match[1].replace(/T(\d{2})-(\d{2})-(\d{2})-(\d{3})Z/, 'T$1:$2:$3.$4Z');
+        const fileDate = new Date(dateStr);
+        
+        if (fileDate < tenDaysAgo) {
+          // 10 günden eski dosyayı sil
+          const deleteResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${file.name}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `token ${GITHUB_TOKEN}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message: `Otomatik temizlik - 10 günden eski backup silindi: ${file.name}`,
+              sha: file.sha,
+              branch: 'main'
+            })
+          });
+
+          if (deleteResponse.ok) {
+            console.log(`🗑️ GitHub'dan eski backup silindi: ${file.name} (${fileDate.toLocaleDateString('tr-TR')})`);
+            deletedCount++;
+          } else {
+            console.error(`❌ GitHub'dan silinemedi: ${file.name}`);
+          }
+        }
+      } catch (error) {
+        console.error(`❌ Dosya işleme hatası: ${file.name}`, error);
+      }
+    }
+
+    console.log(`✅ GitHub temizlik tamamlandı: ${deletedCount} eski dosya silindi`);
+  } catch (error) {
+    console.error('❌ GitHub temizlik hatası:', error);
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Authorization kontrolü
@@ -283,6 +357,9 @@ export async function POST(request: NextRequest) {
     // GitHub'a yükle
     const uploaded = await pushToGitHub(backupFilePath);
     
+    // GitHub'da eski backup'ları temizle (10 günden eski)
+    await cleanupOldGitHubBackups();
+    
     // Yerel dosyayı sil (opsiyonel)
     if (uploaded) {
       fs.unlinkSync(backupFilePath);
@@ -307,9 +384,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Backup başarıyla oluşturuldu ve GitHub\'a yüklendi',
+      message: 'Backup başarıyla oluşturuldu, GitHub\'a yüklendi ve eski dosyalar temizlendi',
       timestamp: now.toISOString(),
       uploaded: uploaded,
+      githubCleanup: true,
+      retentionDays: 10,
       nextBackup: new Date(now.getTime() + (6 * 60 * 60 * 1000)).toISOString()
     });
 
@@ -344,10 +423,17 @@ export async function GET(request: NextRequest) {
       success: true,
       status: 'active',
       schedule: '6 hours',
+      retentionPolicy: '10 days on GitHub',
       lastBackup: lastBackup?.toISOString() || null,
       nextBackup: nextBackup.toISOString(),
       hoursSinceLastBackup: hoursSinceLastBackup,
-      readyForBackup: hoursSinceLastBackup >= 6 || !lastBackup
+      readyForBackup: hoursSinceLastBackup >= 6 || !lastBackup,
+      features: {
+        githubUpload: !!GITHUB_TOKEN,
+        autoCleanup: true,
+        retentionDays: 10,
+        localCleanup: true
+      }
     });
 
   } catch (error: any) {
