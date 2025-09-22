@@ -5,9 +5,9 @@ import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 
 export default function ApiDocsPage() {
-  const [swaggerDoc, setSwaggerDoc] = useState(null);
+  const [swaggerDoc, setSwaggerDoc] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSwaggerDoc = async () => {
