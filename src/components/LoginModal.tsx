@@ -10,6 +10,7 @@ import ValidationPopup from './ValidationPopup';
 import { validatePasswordStrength } from '@/lib/authSecurity';
 import CountryDropdown from './CountryDropdown';
 import { Country, defaultCountry } from '@/data/countries';
+import { monitoringClient } from '@/lib/monitoringClient';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -48,8 +49,12 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
 
       if (result?.error) {
         toast.error('Geçersiz e-posta veya şifre!');
+        // Monitoring: Başarısız giriş
+        monitoringClient.trackLoginAttempt(false);
       } else {
         toast.success('Başarıyla giriş yapıldı!');
+        // Monitoring: Başarılı giriş
+        monitoringClient.trackLoginAttempt(true);
         onClose();
         router.push('/hesabim');
         router.refresh(); // Session'ı yenile
@@ -118,7 +123,10 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
 
     setLoading(false);
     if (res.ok) {
+      const data = await res.json();
       toast.success('Hesabınız başarıyla oluşturuldu! Şimdi giriş yapabilirsiniz.');
+      // Monitoring: Başarılı kayıt
+      monitoringClient.trackUserRegistration(data.user?.id || 'new_user', email);
       setActiveTab('login'); // Yönlendirme yerine giriş sekmesini aç
     } else {
       const data = await res.json();

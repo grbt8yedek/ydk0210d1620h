@@ -7,6 +7,7 @@ import { tr } from 'date-fns/locale';
 import { format } from 'date-fns';
 import { searchAirports } from '@/services/flightApi';
 import { Airport } from '@/types/flight';
+import { monitoringClient } from '@/lib/monitoringClient';
 
 const DateInput = dynamic(() => import('./DateInput'), { ssr: false });
 
@@ -72,14 +73,20 @@ export default function FlightSearchBox({
     e.preventDefault();
     if (!fromAirports.length || !toAirports.length || !departureDate) return;
     setIsLoading(true);
-    onSubmit({
+    
+    const searchData = {
       origin: fromAirports.map(a => a.code).join(', '),
       destination: toAirports.map(a => a.code).join(', '),
       tripType,
       departureDate: departureDate.toISOString().slice(0, 10),
       returnDate: tripType === 'roundTrip' && returnDate ? returnDate.toISOString().slice(0, 10) : undefined,
       passengers: String(adultCount + childCount + infantCount),
-    });
+    };
+    
+    // Monitoring: Uçuş arama
+    monitoringClient.trackFlightSearch(searchData);
+    
+    onSubmit(searchData);
     setIsLoading(false);
   };
 

@@ -9,6 +9,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import { setupErrorTracking } from '@/lib/errorTracking'
+import '@/lib/monitoringClient'
 
 const inter = Inter({ subsets: ['latin'] })
 
