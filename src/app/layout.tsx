@@ -5,6 +5,10 @@ import { Toaster } from 'react-hot-toast'
 import SessionProviderWrapper from "../components/SessionProviderWrapper"
 import { metadata as siteMetadata } from './metadata'
 import { organizationSchema, websiteSchema } from '../lib/schemas'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import ErrorBoundary from '@/components/ErrorBoundary'
+import { setupErrorTracking } from '@/lib/errorTracking'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -32,10 +36,23 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <SessionProviderWrapper>
-          {children}
-        </SessionProviderWrapper>
+        <ErrorBoundary>
+          <SessionProviderWrapper>
+            {children}
+          </SessionProviderWrapper>
+        </ErrorBoundary>
         <Toaster />
+        <Analytics />
+        <SpeedInsights />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined') {
+                ${setupErrorTracking.toString()}();
+              }
+            `
+          }}
+        />
       </body>
     </html>
   )
