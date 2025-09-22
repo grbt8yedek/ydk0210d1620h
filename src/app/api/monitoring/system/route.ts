@@ -119,14 +119,16 @@ export async function GET(request: NextRequest) {
     };
 
     // Saatlik trendleri ortalama değerlere dönüştür
+    const processedTrends: Record<number, { cpu: number; memory: number; responseTime: number }> = {};
     Object.keys(stats.hourlyTrends).forEach(hour => {
       const trends = stats.hourlyTrends[parseInt(hour)];
-      stats.hourlyTrends[parseInt(hour)] = {
+      processedTrends[parseInt(hour)] = {
         cpu: trends.cpu.length > 0 ? trends.cpu.reduce((sum, val) => sum + val, 0) / trends.cpu.length : 0,
         memory: trends.memory.length > 0 ? trends.memory.reduce((sum, val) => sum + val, 0) / trends.memory.length : 0,
         responseTime: trends.responseTime.length > 0 ? trends.responseTime.reduce((sum, val) => sum + val, 0) / trends.responseTime.length : 0
       };
     });
+    stats.hourlyTrends = processedTrends;
 
     return NextResponse.json({
       success: true,
