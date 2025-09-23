@@ -50,6 +50,7 @@ export async function middleware(request: NextRequest) {
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
   // Content Security Policy
+  // Not: Admin paneli (https://www.grbt8.store) iframe ile ana sitede gösterilebilsin diye frame-src'e admin domaini eklendi
   response.headers.set('Content-Security-Policy', `
     default-src 'self';
     script-src 'self' 'unsafe-inline' 'unsafe-eval';
@@ -59,6 +60,7 @@ export async function middleware(request: NextRequest) {
     object-src 'none';
     base-uri 'self';
     form-action 'self';
+    frame-src 'self' https://www.grbt8.store https://grbt8.store http://localhost:3000 http://localhost:4000;
     frame-ancestors 'none';
     block-all-mixed-content;
     upgrade-insecure-requests;
