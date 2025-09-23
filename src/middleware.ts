@@ -15,10 +15,31 @@ export async function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
 
-  // CORS headers
-  response.headers.set('Access-Control-Allow-Origin', process.env.NEXT_PUBLIC_SITE_URL || '*');
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  // CORS allowlist (Admin ve Ana Site domainleri)
+  const allowedOrigins = new Set<string>([
+    'https://www.grbt8.store',
+    'https://grbt8.store',
+    'https://anasite.grbt8.store',
+    'http://localhost:3000',
+    'http://localhost:4000',
+  ]);
+  const requestOrigin = request.headers.get('origin') || '';
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api');
+  const isAllowedOrigin = allowedOrigins.has(requestOrigin);
+
+  // CORS headers (sadece API için uygula)
+  if (isApiRoute) {
+    response.headers.set('Vary', 'Origin');
+    response.headers.set('Access-Control-Allow-Origin', isAllowedOrigin ? requestOrigin : 'https://anasite.grbt8.store');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-CSRF-Token');
+    response.headers.set('Access-Control-Allow-Credentials', 'true');
+
+    // Preflight isteği ise erken dön
+    if (request.method === 'OPTIONS') {
+      return new NextResponse(null, { status: 204, headers: response.headers });
+    }
+  }
 
   // Security headers
   response.headers.set('X-DNS-Prefetch-Control', 'on');
