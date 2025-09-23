@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 // BIN bilgileri için tip tanımı (v2)
 interface SchemaRule {
@@ -255,7 +256,7 @@ export default function PaymentPage() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     {binInfo.logoUrl ? (
-                      <img src={binInfo.logoUrl} alt={binInfo.brand} className="h-6" />
+                      <Image src={binInfo.logoUrl} alt={binInfo.brand} width={24} height={24} className="h-6" />
                     ) : (
                       <div className="w-6 h-6 bg-gray-300 rounded flex items-center justify-center">
                         <span className="text-xs font-bold text-gray-600">{binInfo.brand.charAt(0)}</span>

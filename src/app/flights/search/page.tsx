@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import { format, addDays, subDays, isSameDay, parseISO, startOfDay } from "date-fns";
 import { tr } from "date-fns/locale";
 import { Bell, Heart, Filter, Users, Loader2 } from 'lucide-react';
@@ -112,7 +113,7 @@ function FlightCard({ flight, onSelect, airlinesList }: { flight: any, onSelect:
       <div className="flex items-center justify-between w-full mt-0.5">
         <div className="flex items-center gap-1.5 min-w-0">
           {airlineObj?.logoUrl ? (
-            <img src={airlineObj.logoUrl} alt={airlineObj.name} className="h-6 w-6 object-contain" />
+            <Image src={airlineObj.logoUrl} alt={airlineObj.name} width={24} height={24} className="h-6 w-6 object-contain" />
           ) : (
             <div className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center text-base font-bold text-gray-500">
               {(airlineObj?.name || flight.airlineName || flight.airline || 'H')[0]}
@@ -559,7 +560,7 @@ export default function FlightSearchPage() {
     if (tripType === "roundTrip" && !selectedReturn && returnPrices.length > 0 && step === "return") {
       setSelectedReturn(returnPrices[3].date);
     }
-  }, [returnPrices, tripType, step]);
+  }, [returnPrices, tripType, step, selectedReturn, setSelectedReturn]);
 
   // Gidiş/dönüş seçim adımı
   const showReturn = tripType === "roundTrip" && step === "return";

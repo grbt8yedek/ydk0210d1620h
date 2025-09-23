@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function AppBanner() {
   return (
     <>
@@ -40,16 +42,20 @@ export default function AppBanner() {
           {/* Store badge'leri */}
           <div className="flex gap-4 justify-center w-full mt-2 items-center">
             <a href="#" className="block">
-              <img
+              <Image
                 src="/images/app-store.png"
                 alt="App Store"
+                width={140}
+                height={44}
                 className="h-11 w-[140px] object-contain"
               />
             </a>
             <a href="#" className="block">
-              <img
+              <Image
                 src="/images/google-play.png"
                 alt="Google Play"
+                width={140}
+                height={44}
                 className="h-11 w-[140px] object-contain"
               />
             </a>

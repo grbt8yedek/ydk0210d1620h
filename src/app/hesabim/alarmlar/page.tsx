@@ -21,7 +21,7 @@ export default function AlarmlarPage() {
     } else if (status === "unauthenticated") {
       router.push("/giris");
     }
-  }, [status]);
+  }, [status, router]);
 
   const fetchAlerts = async () => {
     setLoading(true);

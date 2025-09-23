@@ -16,7 +16,7 @@ export default function PriceAlertsPage() {
     } else if (status === "unauthenticated") {
       router.push("/giris");
     }
-  }, [status]);
+  }, [status, router]);
 
   const fetchAlerts = async () => {
     setLoading(true);

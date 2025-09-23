@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image';
 import { Airline } from '@/types/airline';
 import CustomSlider from './CustomSlider';
 
@@ -75,7 +76,7 @@ export default function FlightFilters({
                     onChange={() => onAirlineChange(airlineName)}
                   />
                   {airlineObj?.logoUrl && (
-                    <img src={airlineObj.logoUrl} alt={airlineObj.name} className="h-5 w-5 object-contain" />
+                    <Image src={airlineObj.logoUrl} alt={airlineObj.name} width={20} height={20} className="h-5 w-5 object-contain" />
                   )}
                   <span>{airlineObj?.name || airlineName}</span>
                 </label>

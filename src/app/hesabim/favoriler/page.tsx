@@ -21,7 +21,7 @@ export default function FavorilerPage() {
     } else if (status === "unauthenticated") {
       router.push("/giris");
     }
-  }, [status]);
+  }, [status, router]);
 
   const fetchFavorites = async () => {
     setLoading(true);

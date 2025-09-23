@@ -172,15 +172,17 @@ export default function MobileFlightSearchBox({
                 aria-label="Kalkış havalimanı"
                 role="combobox"
                 aria-expanded={showFromSuggestions}
+                aria-controls="from-suggestions"
                 aria-autocomplete="list"
               />
               {showFromSuggestions && (
-                <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg min-h-[3rem]" role="listbox" aria-label="Kalkış havalimanı önerileri">
+                <ul id="from-suggestions" className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg min-h-[3rem]" role="listbox" aria-label="Kalkış havalimanı önerileri">
                   {fromSuggestions.map(airport => (
                     <li
                       key={airport.code}
                       className="px-4 py-2 hover:bg-green-50 cursor-pointer"
                       role="option"
+                      aria-selected={fromAirports.some(a => a.code === airport.code)}
                       onMouseDown={() => {
                         setFromAirports([airport]);
                         setFromInput(airport.name + ' (' + airport.code + ')');
@@ -221,15 +223,17 @@ export default function MobileFlightSearchBox({
                 aria-label="Varış havalimanı"
                 role="combobox"
                 aria-expanded={showToSuggestions}
+                aria-controls="to-suggestions"
                 aria-autocomplete="list"
               />
               {showToSuggestions && (
-                <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg min-h-[3rem]" role="listbox" aria-label="Varış havalimanı önerileri">
+                <ul id="to-suggestions" className="absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg min-h-[3rem]" role="listbox" aria-label="Varış havalimanı önerileri">
                   {toSuggestions.map(airport => (
                     <li
                       key={airport.code}
                       className="px-4 py-2 hover:bg-green-50 cursor-pointer"
                       role="option"
+                      aria-selected={toAirports.some(a => a.code === airport.code)}
                       onMouseDown={() => {
                         setToAirports([airport]);
                         setToInput(airport.name + ' (' + airport.code + ')');
