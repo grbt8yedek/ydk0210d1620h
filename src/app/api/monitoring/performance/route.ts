@@ -52,6 +52,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const timeframe = searchParams.get('timeframe') || '24h';
+    const page = searchParams.get('page');
     
     const now = new Date();
     let cutoffTime: Date;
@@ -74,26 +75,58 @@ export async function GET(request: NextRequest) {
     const { PrismaClient } = await import('@prisma/client');
     const prisma = new PrismaClient();
 
-    // Rezervasyon sayısını performans metrikleri olarak kullan
-    const totalRequests = await prisma.reservation.count({
-      where: {
-        createdAt: {
-          gte: cutoffTime
-        }
-      }
-    });
+    // Rezervasyon ve kullanıcı istatistikleri
+    const [totalReservations, totalUsers, totalPayments] = await Promise.all([
+      prisma.reservation.count({
+        where: { createdAt: { gte: cutoffTime } }
+      }),
+      prisma.user.count({
+        where: { createdAt: { gte: cutoffTime } }
+      }),
+      prisma.payment.count({
+        where: { createdAt: { gte: cutoffTime } }
+      })
+    ]);
 
-    // Performans istatistikleri simülasyonu
+    // Performans metrikleri (simüle edilmiş ama gerçekçi)
+    const baseLoadTime = 800 + (totalReservations * 2); // Rezervasyon sayısına göre yük artışı
     const stats = {
-      totalRequests: totalRequests,
-      averageLoadTime: Math.random() * 500 + 200, // 200-700ms arası
-      averageFCP: Math.random() * 200 + 100, // 100-300ms arası
-      averageLCP: Math.random() * 300 + 200, // 200-500ms arası
-      averageCLS: Math.random() * 0.1, // 0-0.1 arası
+      totalRequests: totalReservations + totalUsers + totalPayments,
+      averageLoadTime: Math.min(baseLoadTime, 3000),
+      averageFCP: Math.min(200 + (totalReservations * 0.5), 1000),
+      averageLCP: Math.min(400 + (totalReservations * 1), 2000),
+      averageCLS: Math.min(0.05 + (totalReservations * 0.001), 0.2),
+      performanceScore: Math.max(100 - (totalReservations * 0.5), 60),
+      totalReservations,
+      totalUsers,
+      totalPayments,
+      successRate: totalPayments > 0 ? (totalPayments / totalReservations) * 100 : 0,
+      hourlyTrends: (() => {
+        const trends: Record<number, number> = {};
+        for (let i = 0; i < 24; i++) {
+          trends[i] = Math.floor(Math.random() * 20) + 5;
+        }
+        return trends;
+      })(),
       slowestPages: [
-        { page: '/flights/search', totalTime: Math.random() * 1000 + 500, count: Math.floor(Math.random() * 50) + 10, avgTime: Math.random() * 800 + 300 },
-        { page: '/payment', totalTime: Math.random() * 800 + 400, count: Math.floor(Math.random() * 30) + 5, avgTime: Math.random() * 600 + 200 },
-        { page: '/hesabim', totalTime: Math.random() * 600 + 300, count: Math.floor(Math.random() * 20) + 3, avgTime: Math.random() * 400 + 150 }
+        { 
+          page: '/flights/search', 
+          avgTime: Math.min(1200 + (totalReservations * 2), 3000),
+          count: Math.floor(totalReservations * 0.8),
+          requests: Math.floor(totalReservations * 0.8)
+        },
+        { 
+          page: '/payment', 
+          avgTime: Math.min(800 + (totalPayments * 1), 2000),
+          count: totalPayments,
+          requests: totalPayments
+        },
+        { 
+          page: '/hesabim', 
+          avgTime: Math.min(600 + (totalUsers * 0.5), 1500),
+          count: Math.floor(totalUsers * 0.6),
+          requests: Math.floor(totalUsers * 0.6)
+        }
       ]
     };
 
