@@ -9,7 +9,7 @@ export const runtime = 'nodejs';
 
 // GitHub yapılandırması
 const GITHUB_TOKEN = process.env.GITHUB_BACKUP_TOKEN || '';
-const GITHUB_REPO = 'grbt8yedek/cronbackup';
+const DEFAULT_GITHUB_REPO = 'grbt8yedek/cronbackup';
 const BACKUP_SECRET = process.env.BACKUP_SECRET_TOKEN || 'BACKUP_SECRET_TOKEN_2025';
 
 // Son backup zamanını kontrol et
@@ -101,6 +101,11 @@ async function createFullBackup(): Promise<string> {
           searchFavorites: true
         }
       }),
+
+      // NextAuth / Auth tabloları
+      accounts: await (async () => { try { return await prisma.account.findMany(); } catch { return []; } })(),
+      sessions: await (async () => { try { return await prisma.session.findMany(); } catch { return []; } })(),
+      verificationTokens: await (async () => { try { return await prisma.verificationToken.findMany(); } catch { return []; } })(),
       
       // Rezervasyonlar
       reservations: await prisma.reservation.findMany({
@@ -212,7 +217,7 @@ async function createFullBackup(): Promise<string> {
 }
 
 // GitHub'a backup yükle
-async function pushToGitHub(filePath: string): Promise<boolean> {
+async function pushToGitHub(filePath: string, repoOverride?: string): Promise<boolean> {
   try {
     if (!GITHUB_TOKEN) {
       console.log('⚠️ GitHub token bulunamadı, backup yerel olarak saklanacak');
@@ -223,8 +228,9 @@ async function pushToGitHub(filePath: string): Promise<boolean> {
     const fileContent = fs.readFileSync(filePath);
     const base64Content = fileContent.toString('base64');
 
+    const targetRepo = repoOverride || DEFAULT_GITHUB_REPO;
     // GitHub API ile dosya yükle
-    const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${fileName}`, {
+    const response = await fetch(`https://api.github.com/repos/${targetRepo}/contents/${fileName}`, {
       method: 'PUT',
       headers: {
         'Authorization': `token ${GITHUB_TOKEN}`,
@@ -252,7 +258,7 @@ async function pushToGitHub(filePath: string): Promise<boolean> {
 }
 
 // GitHub'dan eski backup'ları sil (10 günden eski)
-async function cleanupOldGitHubBackups(): Promise<void> {
+async function cleanupOldGitHubBackups(repoOverride?: string): Promise<void> {
   try {
     if (!GITHUB_TOKEN) {
       console.log('⚠️ GitHub token yok, temizlik atlanıyor');
@@ -262,7 +268,8 @@ async function cleanupOldGitHubBackups(): Promise<void> {
     console.log('🧹 GitHub temizlik başlatılıyor (10 günden eski dosyalar)...');
 
     // GitHub'dan dosya listesi al
-    const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents`, {
+    const targetRepo = repoOverride || DEFAULT_GITHUB_REPO;
+    const response = await fetch(`https://api.github.com/repos/${targetRepo}/contents`, {
       headers: {
         'Authorization': `token ${GITHUB_TOKEN}`,
         'Accept': 'application/vnd.github.v3+json'
@@ -294,7 +301,7 @@ async function cleanupOldGitHubBackups(): Promise<void> {
         
         if (fileDate < tenDaysAgo) {
           // 10 günden eski dosyayı sil
-          const deleteResponse = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/${file.name}`, {
+          const deleteResponse = await fetch(`https://api.github.com/repos/${targetRepo}/contents/${file.name}`, {
             method: 'DELETE',
             headers: {
               'Authorization': `token ${GITHUB_TOKEN}`,
@@ -325,13 +332,13 @@ async function cleanupOldGitHubBackups(): Promise<void> {
   }
 }
 
-async function runScheduledBackupFlow(): Promise<{ uploaded: boolean }> {
+async function runScheduledBackupFlow(repoOverride?: string): Promise<{ uploaded: boolean }> {
   // Full backup oluştur
   const backupFilePath = await createFullBackup();
   // GitHub'a yükle
-  const uploaded = await pushToGitHub(backupFilePath);
+  const uploaded = await pushToGitHub(backupFilePath, repoOverride);
   // GitHub'da eski backup'ları temizle (10 günden eski)
-  await cleanupOldGitHubBackups();
+  await cleanupOldGitHubBackups(repoOverride);
   // Yerel dosyayı sil (opsiyonel)
   if (uploaded) {
     fs.unlinkSync(backupFilePath);
@@ -387,7 +394,9 @@ export async function POST(request: NextRequest) {
 
     console.log('🚀 Zamanlanmış backup başlatılıyor...');
 
-    const result = await runScheduledBackupFlow();
+    const url = new URL(request.url);
+    const repoParam = url.searchParams.get('repo') || undefined;
+    const result = await runScheduledBackupFlow(repoParam);
 
     return NextResponse.json({
       success: true,
@@ -418,6 +427,7 @@ export async function GET(request: NextRequest) {
     const url = new URL(request.url);
     const providedSecret = url.searchParams.get('secret');
     const isVercelCron = !!request.headers.get('x-vercel-cron');
+    const repoParam = url.searchParams.get('repo') || undefined;
 
     // Eğer Vercel Cron tetiklediyse veya doğru secret verildiyse backup'ı çalıştır
     if (isVercelCron || (providedSecret && providedSecret === BACKUP_SECRET)) {
@@ -437,7 +447,7 @@ export async function GET(request: NextRequest) {
           });
         }
       }
-      await runScheduledBackupFlow();
+      await runScheduledBackupFlow(repoParam);
       return NextResponse.json({ success: true, message: 'Backup GET ile başarıyla oluşturuldu' });
     }
 
