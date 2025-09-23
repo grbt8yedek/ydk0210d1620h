@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    container_name: grbt8-app
+    ports:
+      - "4000:3000"
+    environment:
+      # App
+      NODE_ENV: development
+      NEXTAUTH_URL: http://localhost:4000
+      NEXTAUTH_SECRET: dev-secret-change-me
+
+      # Database (connect to postgres service)
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/grbt8
+      DATABASE_URL_UNPOOLED: postgres://postgres:postgres@postgres:5432/grbt8
+
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: sh -c "npm install && npx prisma generate && npm run dev"
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: grbt8-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: grbt8
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: grbt8-mailhog
+    ports:
+      - "8025:8025" # UI
+      - "1025:1025" # SMTP
+
+volumes:
+  pgdata:
+
+
