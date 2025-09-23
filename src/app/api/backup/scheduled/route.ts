@@ -15,7 +15,7 @@ const BACKUP_SECRET = process.env.BACKUP_SECRET_TOKEN || 'BACKUP_SECRET_TOKEN_20
 // Son backup zamanını kontrol et
 async function getLastBackupTime(): Promise<Date | null> {
   try {
-    const backupDir = path.join(process.cwd(), 'backups', 'scheduled');
+    const backupDir = path.join('/tmp', 'backups', 'scheduled');
     if (!fs.existsSync(backupDir)) {
       return null;
     }
@@ -44,7 +44,7 @@ function createZipFile(files: { name: string, content: string }[], zipPath: stri
       const { execSync } = require('child_process');
       
       // Geçici klasör oluştur
-      const tempDir = path.join(process.cwd(), 'temp-backup');
+      const tempDir = path.join('/tmp', 'temp-backup');
       if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir, { recursive: true });
       }
@@ -70,7 +70,7 @@ function createZipFile(files: { name: string, content: string }[], zipPath: stri
 // Tüm database verilerini yedekle
 async function createFullBackup(): Promise<string> {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const backupDir = path.join(process.cwd(), 'backups', 'scheduled');
+  const backupDir = path.join('/tmp', 'backups', 'scheduled');
   
   if (!fs.existsSync(backupDir)) {
     fs.mkdirSync(backupDir, { recursive: true });
@@ -333,7 +333,7 @@ async function runScheduledBackupFlow(): Promise<{ uploaded: boolean }> {
     console.log('🗑️ Yerel backup dosyası silindi');
   }
   // Eski backup'ları temizle (son 10 tanesini sakla)
-  const backupDir = path.join(process.cwd(), 'backups', 'scheduled');
+  const backupDir = path.join('/tmp', 'backups', 'scheduled');
   if (fs.existsSync(backupDir)) {
     const files = fs.readdirSync(backupDir)
       .filter(file => file.startsWith('grbt8-backup-'))
