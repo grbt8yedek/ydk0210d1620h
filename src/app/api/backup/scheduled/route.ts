@@ -136,21 +136,26 @@ async function createFullBackup(): Promise<string> {
       
       // Anket yanıtları
       surveyResponses: await prisma.surveyResponse.findMany(),
-      
-      // Email kuyruğu
-      emailQueue: await prisma.emailQueue.findMany(),
-      
+
+      // Email ile ilgili tablolar kritik değil; yoksa boş döndür
+      emailQueue: await (async () => {
+        try { return await prisma.emailQueue.findMany(); } catch { return []; }
+      })(),
+
       // Sistem ayarları
       systemSettings: await prisma.systemSettings.findMany(),
-      
-      // Email template'leri
-      emailTemplates: await prisma.emailTemplate.findMany(),
-      
-      // Email logları
-      emailLogs: await prisma.emailLog.findMany(),
-      
-      // Email ayarları
-      emailSettings: await prisma.emailSettings.findMany(),
+
+      emailTemplates: await (async () => {
+        try { return await prisma.emailTemplate.findMany(); } catch { return []; }
+      })(),
+
+      emailLogs: await (async () => {
+        try { return await prisma.emailLog.findMany(); } catch { return []; }
+      })(),
+
+      emailSettings: await (async () => {
+        try { return await prisma.emailSettings.findMany(); } catch { return []; }
+      })(),
       
       // Sistem logları
       systemLogs: await prisma.systemLog.findMany(),
