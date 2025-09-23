@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Veritabanından gerçek veri çek
-    const { PrismaClient } = await import('@prisma/client');
+    const { PrismaClient } = await import('../../../../lib/prisma');
     const prisma = new PrismaClient();
 
     const [totalUsers, recentLogins, failedLogins] = await Promise.all([
