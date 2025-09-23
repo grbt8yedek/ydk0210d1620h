@@ -5,6 +5,7 @@ import path from 'path';
 import { execSync } from 'child_process';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 // GitHub yapılandırması
 const GITHUB_TOKEN = process.env.GITHUB_BACKUP_TOKEN || '';
@@ -319,11 +320,40 @@ async function cleanupOldGitHubBackups(): Promise<void> {
   }
 }
 
+async function runScheduledBackupFlow() {
+  // Full backup oluştur
+  const backupFilePath = await createFullBackup();
+  // GitHub'a yükle
+  const uploaded = await pushToGitHub(backupFilePath);
+  // GitHub'da eski backup'ları temizle (10 günden eski)
+  await cleanupOldGitHubBackups();
+  // Yerel dosyayı sil (opsiyonel)
+  if (uploaded) {
+    fs.unlinkSync(backupFilePath);
+    console.log('🗑️ Yerel backup dosyası silindi');
+  }
+  // Eski backup'ları temizle (son 10 tanesini sakla)
+  const backupDir = path.join(process.cwd(), 'backups', 'scheduled');
+  if (fs.existsSync(backupDir)) {
+    const files = fs.readdirSync(backupDir)
+      .filter(file => file.startsWith('grbt8-backup-'))
+      .sort()
+      .reverse();
+    if (files.length > 10) {
+      files.slice(10).forEach(file => {
+        fs.unlinkSync(path.join(backupDir, file));
+        console.log(`🗑️ Eski backup silindi: ${file}`);
+      });
+    }
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
-    // Authorization kontrolü
+    // Authorization kontrolü (manual tetikleme için)
     const authHeader = request.headers.get('authorization');
-    if (!authHeader || !authHeader.includes(BACKUP_SECRET)) {
+    const isVercelCron = !!request.headers.get('x-vercel-cron');
+    if (!isVercelCron && (!authHeader || !authHeader.includes(BACKUP_SECRET))) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
@@ -351,36 +381,7 @@ export async function POST(request: NextRequest) {
 
     console.log('🚀 Zamanlanmış backup başlatılıyor...');
 
-    // Full backup oluştur
-    const backupFilePath = await createFullBackup();
-    
-    // GitHub'a yükle
-    const uploaded = await pushToGitHub(backupFilePath);
-    
-    // GitHub'da eski backup'ları temizle (10 günden eski)
-    await cleanupOldGitHubBackups();
-    
-    // Yerel dosyayı sil (opsiyonel)
-    if (uploaded) {
-      fs.unlinkSync(backupFilePath);
-      console.log('🗑️ Yerel backup dosyası silindi');
-    }
-
-    // Eski backup'ları temizle (son 10 tanesini sakla)
-    const backupDir = path.join(process.cwd(), 'backups', 'scheduled');
-    if (fs.existsSync(backupDir)) {
-      const files = fs.readdirSync(backupDir)
-        .filter(file => file.startsWith('grbt8-backup-'))
-        .sort()
-        .reverse();
-      
-      if (files.length > 10) {
-        files.slice(10).forEach(file => {
-          fs.unlinkSync(path.join(backupDir, file));
-          console.log(`🗑️ Eski backup silindi: ${file}`);
-        });
-      }
-    }
+    await runScheduledBackupFlow();
 
     return NextResponse.json({
       success: true,
@@ -408,6 +409,32 @@ export async function POST(request: NextRequest) {
 // GET endpoint - backup durumunu kontrol et
 export async function GET(request: NextRequest) {
   try {
+    const url = new URL(request.url);
+    const providedSecret = url.searchParams.get('secret');
+    const isVercelCron = !!request.headers.get('x-vercel-cron');
+
+    // Eğer Vercel Cron tetiklediyse veya doğru secret verildiyse backup'ı çalıştır
+    if (isVercelCron || (providedSecret && providedSecret === BACKUP_SECRET)) {
+      console.log('🚀 GET ile zamanlanmış backup tetiklendi');
+      // Son backup 6 saat kuralını koru
+      const lastBackup = await getLastBackupTime();
+      const now = new Date();
+      if (lastBackup) {
+        const hoursDiff = (now.getTime() - lastBackup.getTime()) / (1000 * 60 * 60);
+        if (hoursDiff < 6) {
+          return NextResponse.json({
+            success: true,
+            message: 'Backup atlandı - henüz 6 saat geçmedi',
+            lastBackup: lastBackup.toISOString(),
+            nextBackup: new Date(lastBackup.getTime() + (6 * 60 * 60 * 1000)).toISOString(),
+            hoursSinceLastBackup: hoursDiff
+          });
+        }
+      }
+      await runScheduledBackupFlow();
+      return NextResponse.json({ success: true, message: 'Backup GET ile başarıyla oluşturuldu' });
+    }
+
     const lastBackup = await getLastBackupTime();
     const now = new Date();
     
@@ -432,7 +459,8 @@ export async function GET(request: NextRequest) {
         githubUpload: !!GITHUB_TOKEN,
         autoCleanup: true,
         retentionDays: 10,
-        localCleanup: true
+        localCleanup: true,
+        cronHeaderAllowed: true
       }
     });
 
