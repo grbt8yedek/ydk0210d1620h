@@ -72,8 +72,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Veritabanından gerçek veri çek
-    const { PrismaClient } = await import('../../../../lib/prisma');
-    const prisma = new PrismaClient();
+    const { prisma } = await import('../../../../lib/prisma');
 
     const [totalUsers, newUsers, activeUsers, totalReservations] = await Promise.all([
       prisma.user.count(),
