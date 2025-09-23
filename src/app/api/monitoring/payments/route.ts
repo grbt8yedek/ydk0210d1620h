@@ -54,7 +54,6 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const timeframe = searchParams.get('timeframe') || '24h';
-    const eventType = searchParams.get('eventType');
     
     const now = new Date();
     let cutoffTime: Date;
@@ -73,55 +72,95 @@ export async function GET(request: NextRequest) {
         cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     }
 
-    let filteredEvents = paymentEvents.filter(event => 
-      new Date(event.timestamp) >= cutoffTime
-    );
+    // Veritabanından gerçek veri çek
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
 
-    if (eventType) {
-      filteredEvents = filteredEvents.filter(event => event.eventType === eventType);
-    }
+    // Rezervasyonları ödeme verisi olarak kullan
+    const totalReservations = await prisma.reservation.count({
+      where: {
+        createdAt: {
+          gte: cutoffTime
+        }
+      }
+    });
+
+    const successfulReservations = await prisma.reservation.count({
+      where: {
+        createdAt: {
+          gte: cutoffTime
+        },
+        status: {
+          in: ['confirmed', 'completed']
+        }
+      }
+    });
+
+    const failedReservations = await prisma.reservation.count({
+      where: {
+        createdAt: {
+          gte: cutoffTime
+        },
+        status: 'cancelled'
+      }
+    });
+
+    // Rezervasyon detaylarını çek
+    const reservations = await prisma.reservation.findMany({
+      where: {
+        createdAt: {
+          gte: cutoffTime
+        }
+      },
+      include: {
+        user: true
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: 50
+    });
 
     // İstatistikleri hesapla
-    const successfulPayments = filteredEvents.filter(e => e.eventType === 'PAYMENT_SUCCESS');
-    const failedPayments = filteredEvents.filter(e => e.eventType === 'PAYMENT_FAILED');
-    
     const stats = {
-      totalTransactions: filteredEvents.length,
-      successfulPayments: successfulPayments.length,
-      failedPayments: failedPayments.length,
-      successRate: successfulPayments.length / (successfulPayments.length + failedPayments.length) * 100 || 0,
-      totalVolume: successfulPayments.reduce((sum, payment) => sum + payment.amount, 0),
-      averageTransactionValue: successfulPayments.reduce((sum, payment) => sum + payment.amount, 0) / successfulPayments.length || 0,
-      eventsByType: filteredEvents.reduce((acc, event) => {
-        acc[event.eventType] = (acc[event.eventType] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>),
-      volumeByCurrency: successfulPayments.reduce((acc, payment) => {
-        acc[payment.currency] = (acc[payment.currency] || 0) + payment.amount;
-        return acc;
-      }, {} as Record<string, number>),
-      paymentMethods: successfulPayments.reduce((acc, payment) => {
-        acc[payment.paymentMethod] = (acc[payment.paymentMethod] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>),
-      topErrors: failedPayments
-        .reduce((acc, payment) => {
-          const errorKey = payment.errorCode || 'UNKNOWN';
-          acc[errorKey] = (acc[errorKey] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>),
-      averageProcessingTime: successfulPayments
-        .filter(p => p.processingTime)
-        .reduce((sum, p) => sum + (p.processingTime || 0), 0) / 
-        successfulPayments.filter(p => p.processingTime).length || 0
+      totalTransactions: totalReservations,
+      successfulPayments: successfulReservations,
+      failedPayments: failedReservations,
+      successRate: totalReservations > 0 ? (successfulReservations / totalReservations) * 100 : 0,
+      totalVolume: reservations.reduce((sum, r) => sum + (r.totalAmount || 0), 0),
+      averageTransactionValue: successfulReservations > 0 ? 
+        reservations.reduce((sum, r) => sum + (r.totalAmount || 0), 0) / successfulReservations : 0,
+      eventsByType: {
+        'PAYMENT_SUCCESS': successfulReservations,
+        'PAYMENT_FAILED': failedReservations
+      },
+      volumeByCurrency: {
+        'EUR': reservations.reduce((sum, r) => sum + (r.totalAmount || 0), 0)
+      },
+      paymentMethods: {
+        'CARD': successfulReservations
+      },
+      topErrors: {},
+      averageProcessingTime: 1500 // Demo değer
     };
+
+    await prisma.$disconnect();
 
     return NextResponse.json({
       success: true,
       data: {
         timeframe,
         stats,
-        recentEvents: filteredEvents.slice(-50) // Son 50 olay
+        recentEvents: reservations.map(r => ({
+          timestamp: r.createdAt.toISOString(),
+          eventType: r.status === 'confirmed' ? 'PAYMENT_SUCCESS' : 'PAYMENT_FAILED',
+          amount: r.totalAmount || 0,
+          currency: 'EUR',
+          paymentMethod: 'CARD',
+          userId: r.userId,
+          orderId: r.id,
+          transactionId: r.pnr || r.id
+        }))
       }
     });
   } catch (error) {

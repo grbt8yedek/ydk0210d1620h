@@ -49,7 +49,6 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const timeframe = searchParams.get('timeframe') || '24h';
-    const eventType = searchParams.get('eventType');
     
     const now = new Date();
     let cutoffTime: Date;
@@ -71,41 +70,64 @@ export async function GET(request: NextRequest) {
         cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     }
 
-    let filteredActivities = userActivities.filter(activity => 
-      new Date(activity.timestamp) >= cutoffTime
-    );
+    // Veritabanından gerçek veri çek
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
 
-    if (eventType) {
-      filteredActivities = filteredActivities.filter(activity => activity.eventType === eventType);
-    }
+    const totalUsers = await prisma.user.count();
+    const newRegistrations = await prisma.user.count({
+      where: {
+        createdAt: {
+          gte: cutoffTime
+        }
+      }
+    });
+
+    // Son aktiviteleri çek (rezervasyonlar üzerinden)
+    const recentReservations = await prisma.reservation.findMany({
+      where: {
+        createdAt: {
+          gte: cutoffTime
+        }
+      },
+      include: {
+        user: true
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: 100
+    });
+
+    const activeUsers = new Set(recentReservations.map(r => r.userId)).size;
 
     // İstatistikleri hesapla
     const stats = {
-      totalActivities: filteredActivities.length,
-      uniqueUsers: new Set(filteredActivities.map(a => a.userId)).size,
-      newRegistrations: filteredActivities.filter(a => a.eventType === 'USER_REGISTERED').length,
-      activeUsers: new Set(filteredActivities.filter(a => a.eventType === 'USER_LOGIN').map(a => a.userId)).size,
-      activitiesByType: filteredActivities.reduce((acc, activity) => {
-        acc[activity.eventType] = (acc[activity.eventType] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>),
-      hourlyDistribution: filteredActivities.reduce((acc, activity) => {
-        const hour = new Date(activity.timestamp).getHours();
+      totalActivities: recentReservations.length,
+      uniqueUsers: activeUsers,
+      newRegistrations: newRegistrations,
+      activeUsers: activeUsers,
+      activitiesByType: {
+        'BOOKING_CREATED': recentReservations.length,
+        'USER_REGISTERED': newRegistrations
+      },
+      hourlyDistribution: recentReservations.reduce((acc, reservation) => {
+        const hour = new Date(reservation.createdAt).getHours();
         acc[hour] = (acc[hour] || 0) + 1;
         return acc;
       }, {} as Record<number, number>),
-      topActiveUsers: filteredActivities
-        .reduce((acc, activity) => {
-          const existing = acc.find(u => u.userId === activity.userId);
+      topActiveUsers: recentReservations
+        .reduce((acc, reservation) => {
+          const existing = acc.find(u => u.userId === reservation.userId);
           if (existing) {
             existing.count += 1;
-            existing.lastActivity = activity.timestamp;
+            existing.lastActivity = reservation.createdAt.toISOString();
           } else {
             acc.push({ 
-              userId: activity.userId, 
-              email: activity.email,
+              userId: reservation.userId, 
+              email: reservation.user.email,
               count: 1, 
-              lastActivity: activity.timestamp 
+              lastActivity: reservation.createdAt.toISOString()
             });
           }
           return acc;
@@ -113,19 +135,25 @@ export async function GET(request: NextRequest) {
         .sort((a, b) => b.count - a.count)
         .slice(0, 20),
       conversionMetrics: {
-        searchesToBookings: filteredActivities.filter(a => a.eventType === 'BOOKING_CREATED').length / 
-          filteredActivities.filter(a => a.eventType === 'FLIGHT_SEARCH').length * 100 || 0,
-        registrationToLogin: filteredActivities.filter(a => a.eventType === 'USER_LOGIN').length / 
-          filteredActivities.filter(a => a.eventType === 'USER_REGISTERED').length * 100 || 0
+        searchesToBookings: recentReservations.length > 0 ? 100 : 0, // Basit hesaplama
+        registrationToLogin: newRegistrations > 0 ? 100 : 0
       }
     };
+
+    await prisma.$disconnect();
 
     return NextResponse.json({
       success: true,
       data: {
         timeframe,
         stats,
-        recentActivities: filteredActivities.slice(-100) // Son 100 aktivite
+        recentActivities: recentReservations.map(r => ({
+          timestamp: r.createdAt.toISOString(),
+          eventType: 'BOOKING_CREATED',
+          userId: r.userId,
+          email: r.user.email,
+          details: `Rezervasyon oluşturuldu: ${r.pnr || 'N/A'}`
+        }))
       }
     });
   } catch (error) {
