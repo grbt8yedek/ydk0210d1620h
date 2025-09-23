@@ -22,7 +22,7 @@ export default function ResetPasswordPage() {
       setMessageType('error')
       setCheckingToken(false)
     }
-  }, [token, checkToken])
+  }, [token])
 
   const checkToken = async () => {
     try {
