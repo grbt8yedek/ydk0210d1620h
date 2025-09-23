@@ -320,7 +320,7 @@ async function cleanupOldGitHubBackups(): Promise<void> {
   }
 }
 
-async function runScheduledBackupFlow() {
+async function runScheduledBackupFlow(): Promise<{ uploaded: boolean }> {
   // Full backup oluştur
   const backupFilePath = await createFullBackup();
   // GitHub'a yükle
@@ -346,6 +346,7 @@ async function runScheduledBackupFlow() {
       });
     }
   }
+  return { uploaded };
 }
 
 export async function POST(request: NextRequest) {
@@ -381,13 +382,13 @@ export async function POST(request: NextRequest) {
 
     console.log('🚀 Zamanlanmış backup başlatılıyor...');
 
-    await runScheduledBackupFlow();
+    const result = await runScheduledBackupFlow();
 
     return NextResponse.json({
       success: true,
       message: 'Backup başarıyla oluşturuldu, GitHub\'a yüklendi ve eski dosyalar temizlendi',
       timestamp: now.toISOString(),
-      uploaded: uploaded,
+      uploaded: result.uploaded,
       githubCleanup: true,
       retentionDays: 10,
       nextBackup: new Date(now.getTime() + (6 * 60 * 60 * 1000)).toISOString()
