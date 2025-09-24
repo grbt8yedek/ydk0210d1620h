@@ -24,7 +24,7 @@ interface CampaignModalProps {
   isOpen: boolean
   onClose: () => void
   campaign?: Campaign | null
-  onSave: (campaign: Campaign) => void
+  onSave: (campaign: any) => void
 }
 
 const compressImage = (file: File, quality: number = 0.8, maxWidth: number = 1920): Promise<File> => {

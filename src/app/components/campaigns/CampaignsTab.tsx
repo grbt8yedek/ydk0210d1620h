@@ -1,20 +1,20 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Globe, Plus, Edit, Trash2, Monitor, Link, Calendar } from 'lucide-react'
+import { Globe, Plus, Edit, Trash2, Link, Calendar } from 'lucide-react'
 import CampaignModal from './CampaignModal'
 
-interface Campaign {
+export type Campaign = {
   id: string
   title: string
-  description: string
+  description?: string
   imageUrl?: string
   imageData?: string
   altText: string
   linkUrl?: string
   status: 'active' | 'inactive'
   position: number
-  clickCount: number
-  viewCount: number
+  clickCount?: number
+  viewCount?: number
   startDate?: string
   endDate?: string
   createdAt?: string
@@ -39,7 +39,7 @@ export default function CampaignsTab() {
       const res = await fetch('/api/campaigns')
       if (!res.ok) throw new Error('fetch failed')
       const data = await res.json()
-      setCampaigns(data.data || [])
+      setCampaigns((data.data || []) as Campaign[])
       setLastFetch(now)
     } catch (e) {
       setError('Kampanyalar yüklenemedi')
@@ -50,16 +50,14 @@ export default function CampaignsTab() {
 
   useEffect(() => { fetchCampaigns() }, [])
 
-  const handleSaveCampaign = (saved: Campaign) => {
+  const handleSaveCampaign = (saved: any) => {
+    const s = saved as Campaign
     setCampaigns(prev => {
-      const idx = prev.findIndex(c => c.id === saved.id)
-      if (idx >= 0) {
-        const next = [...prev]; next[idx] = saved; return next
-      }
-      return [...prev, saved]
+      const idx = prev.findIndex(c => c.id === s.id)
+      if (idx >= 0) { const next = [...prev]; next[idx] = s; return next }
+      return [...prev, s]
     })
-    setIsModalOpen(false)
-    setSelectedCampaign(null)
+    setIsModalOpen(false); setSelectedCampaign(null)
   }
 
   const handleDeleteCampaign = async (id: string) => {
@@ -70,8 +68,7 @@ export default function CampaignsTab() {
       const res = await fetch(`/api/campaigns/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error('delete failed')
     } catch (e) {
-      setCampaigns(original)
-      alert('Kampanya silme hatası')
+      setCampaigns(original); alert('Kampanya silme hatası')
     }
   }
 
