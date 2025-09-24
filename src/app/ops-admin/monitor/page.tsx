@@ -82,53 +82,53 @@ export default function OpsAdminMonitorPage() {
       <div className="grid gap-2 md:grid-cols-5">
         <div className={`border rounded p-2 ${slo.errorRate.ok ? 'border-green-300' : 'border-red-300'}`}>
           <div className="text-[10px] text-gray-500">Error Rate</div>
-          <div className="text-sm">{errorRate.toFixed(2)}%</div>
+          <div className="text-sm">{errorRate.toFixed(2)}% <span className="text-[10px] text-gray-500">(hedef < 1%)</span></div>
         </div>
         <div className={`border rounded p-2 ${slo.lcp.ok ? 'border-green-300' : 'border-red-300'}`}>
           <div className="text-[10px] text-gray-500">LCP P50</div>
-          <div className="text-sm">{Math.round(perf?.averageLCP || 0)} ms</div>
+          <div className="text-sm">{Math.round(perf?.averageLCP || 0)} ms <span className="text-[10px] text-gray-500">(hedef < 2500 ms)</span></div>
         </div>
         <div className={`border rounded p-2 ${slo.resp.ok ? 'border-green-300' : 'border-red-300'}`}>
           <div className="text-[10px] text-gray-500">Resp P50</div>
-          <div className="text-sm">{Math.round(sys?.averageResponseTime || 0)} ms</div>
+          <div className="text-sm">{Math.round(sys?.averageResponseTime || 0)} ms <span className="text-[10px] text-gray-500">(hedef < 2000 ms)</span></div>
         </div>
         <div className={`border rounded p-2 ${slo.cpu.ok ? 'border-green-300' : 'border-red-300'}`}>
           <div className="text-[10px] text-gray-500">CPU Avg</div>
-          <div className="text-sm">{Math.round(sys?.averageCpuUsage || 0)}%</div>
+          <div className="text-sm">{Math.round(sys?.averageCpuUsage || 0)}% <span className="text-[10px] text-gray-500">(hedef < 80%)</span></div>
         </div>
         <div className={`border rounded p-2 ${slo.mem.ok ? 'border-green-300' : 'border-red-300'}`}>
           <div className="text-[10px] text-gray-500">Memory Avg</div>
-          <div className="text-sm">{Math.round(sys?.averageMemoryUsage || 0)}%</div>
+          <div className="text-sm">{Math.round(sys?.averageMemoryUsage || 0)}% <span className="text-[10px] text-gray-500">(hedef < 85%)</span></div>
         </div>
       </div>
 
       <div className="grid gap-3 md:grid-cols-3">
-        <div className="border rounded p-3">
+        <div className={`border rounded p-3 ${slo.resp.ok ? 'border-gray-200' : 'border-red-300'}`}>
           <div className="text-xs text-gray-500">Avg Load</div>
-          <div className="text-lg">{Math.round(perf?.averageLoadTime || 0)} ms</div>
+          <div className="text-lg">{Math.round(perf?.averageLoadTime || 0)} ms <span className="text-[10px] text-gray-500">(düşük daha iyi)</span></div>
         </div>
-        <div className="border rounded p-3">
+        <div className={`border rounded p-3 ${slo.lcp.ok ? 'border-gray-200' : 'border-red-300'}`}>
           <div className="text-xs text-gray-500">Avg FCP</div>
-          <div className="text-lg">{Math.round(perf?.averageFCP || 0)} ms</div>
+          <div className="text-lg">{Math.round(perf?.averageFCP || 0)} ms <span className="text-[10px] text-gray-500">(hedef < 1800 ms)</span></div>
         </div>
-        <div className="border rounded p-3">
+        <div className={`border rounded p-3 ${slo.lcp.ok ? 'border-gray-2 00' : 'border-red-300'}`}>
           <div className="text-xs text-gray-500">Avg LCP</div>
-          <div className="text-lg">{Math.round(perf?.averageLCP || 0)} ms</div>
+          <div className="text-lg">{Math.round(perf?.averageLCP || 0)} ms <span className="text-[10px] text-gray-500">(hedef < 2500 ms)</span></div>
         </div>
       </div>
 
       <div className="grid gap-3 md:grid-cols-3">
-        <div className="border rounded p-3">
+        <div className={`border rounded p-3 ${slo.cpu.ok ? 'border-gray-200' : 'border-red-300'}`}>
           <div className="text-xs text-gray-500">Avg CPU</div>
-          <div className="text-lg">{Math.round(sys?.averageCpuUsage || 0)}%</div>
+          <div className="text-lg">{Math.round(sys?.averageCpuUsage || 0)}% <span className="text-[10px] text-gray-500">(hedef < 80%)</span></div>
         </div>
-        <div className="border rounded p-3">
+        <div className={`border rounded p-3 ${slo.mem.ok ? 'border-gray-200' : 'border-red-300'}`}>
           <div className="text-xs text-gray-500">Avg Memory</div>
-          <div className="text-lg">{Math.round(sys?.averageMemoryUsage || 0)}%</div>
+          <div className="text-lg">{Math.round(sys?.averageMemoryUsage || 0)}% <span className="text-[10px] text-gray-500">(hedef < 85%)</span></div>
         </div>
-        <div className="border rounded p-3">
+        <div className={`border rounded p-3 ${slo.resp.ok ? 'border-gray-200' : 'border-red-300'}`}>
           <div className="text-xs text-gray-500">Avg Resp Time</div>
-          <div className="text-lg">{Math.round(sys?.averageResponseTime || 0)} ms</div>
+          <div className="text-lg">{Math.round(sys?.averageResponseTime || 0)} ms <span className="text-[10px] text-gray-500">(hedef < 2000 ms)</span></div>
         </div>
       </div>
 
