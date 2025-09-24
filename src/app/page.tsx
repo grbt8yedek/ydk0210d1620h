@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AirportInput from '@/components/AirportInput';
@@ -15,9 +14,7 @@ import { tr } from 'date-fns/locale';
 import { format } from 'date-fns';
 import Image from 'next/image';
 
-const CampaignsSection = dynamic(() => import('@/components/CampaignsSection'), {
-  ssr: false
-});
+import CampaignsSection from '@/components/CampaignsSection';
 
 // Type tanımları
 interface Airport {
