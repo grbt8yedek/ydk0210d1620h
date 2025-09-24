@@ -23,7 +23,18 @@ export default async function OpsAdminLayout({ children }: { children: React.Rea
       <head>
         <meta name="robots" content="noindex,nofollow" />
       </head>
-      <body>{children}</body>
+      <body>
+        <div className="min-h-screen flex">
+          <aside className="w-56 border-r p-4">
+            <div className="text-sm text-gray-500 mb-4">Ops Admin</div>
+            <nav className="flex flex-col gap-2">
+              <a href="/ops-admin/raporlar" className="hover:underline">Raporlar</a>
+              <a href="/ops-admin/kampanyalar" className="hover:underline">Kampanyalar</a>
+            </nav>
+          </aside>
+          <main className="flex-1">{children}</main>
+        </div>
+      </body>
     </html>
   );
 }
