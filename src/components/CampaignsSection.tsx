@@ -49,8 +49,7 @@ export default function CampaignsSection() {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        // Cache kontrolü için headers ekle
-        cache: forceRefresh ? 'no-cache' : 'default'
+        cache: 'no-store'
       })
       
       console.log('Response status:', response.status)

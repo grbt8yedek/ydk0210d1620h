@@ -1,28 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-// Basit bellek içi cache (5 dk)
-const cache = new Map<string, { data: any; timestamp: number }>()
-const CACHE_DURATION = 5 * 60 * 1000
-
-function jsonOk(body: any, cacheSeconds = 300) {
+function jsonOk(body: any, cacheSeconds = 0) {
   return NextResponse.json(body, {
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Cache-Control': `public, max-age=${cacheSeconds}`,
+      // Kampanya yönetiminde anında yansısın
+      'Cache-Control': cacheSeconds > 0 ? `public, max-age=${cacheSeconds}` : 'no-store',
     },
   })
 }
 
 export async function GET(request: NextRequest) {
-  const cacheKey = 'campaigns'
-  const cached = cache.get(cacheKey)
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    return jsonOk(cached.data)
-  }
-
   const items = await prisma.campaign.findMany({
     where: {
       status: 'active',
@@ -36,7 +27,6 @@ export async function GET(request: NextRequest) {
   })
 
   const result = { success: true, data: items }
-  cache.set(cacheKey, { data: result, timestamp: Date.now() })
   return jsonOk(result)
 }
 
@@ -56,7 +46,6 @@ export async function POST(request: NextRequest) {
       endDate: body.endDate ? new Date(body.endDate) : null,
     },
   })
-  cache.delete('campaigns')
   return jsonOk({ success: true, data: created }, 0)
 }
 
@@ -78,7 +67,6 @@ export async function PUT(request: NextRequest) {
       endDate: body.endDate ? new Date(body.endDate) : undefined,
     },
   })
-  cache.delete('campaigns')
   return jsonOk({ success: true, data: updated }, 0)
 }
 
