@@ -121,11 +121,32 @@ export default function CampaignsTab() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {campaigns.map((c) => (
+            {campaigns
+              .slice()
+              .sort((a,b) => (a.position ?? 0) - (b.position ?? 0))
+              .map((c, idx) => (
               <div key={c.id} className="relative p-4 rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                 <div className="absolute top-2 right-2 flex space-x-1">
                   <button onClick={() => handleEditCampaign(c)} className="p-1 hover:bg-white/20 rounded" title="Düzenle"><Edit className="h-3 w-3" /></button>
                   <button onClick={() => handleDeleteCampaign(c.id)} className="p-1 hover:bg-white/20 rounded" title="Sil"><Trash2 className="h-3 w-3" /></button>
+                </div>
+                <div className="absolute bottom-2 right-2 flex space-x-1">
+                  <button
+                    className="px-2 py-0.5 text-xs bg-white/20 rounded hover:bg-white/30"
+                    onClick={async () => {
+                      const newPos = Math.max(0, (c.position ?? idx) - 1)
+                      setCampaigns(prev => prev.map(x => x.id === c.id ? { ...x, position: newPos } : x))
+                      await fetch(`/api/campaigns/${c.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ position: newPos }) })
+                    }}
+                  >↑</button>
+                  <button
+                    className="px-2 py-0.5 text-xs bg-white/20 rounded hover:bg-white/30"
+                    onClick={async () => {
+                      const newPos = (c.position ?? idx) + 1
+                      setCampaigns(prev => prev.map(x => x.id === c.id ? { ...x, position: newPos } : x))
+                      await fetch(`/api/campaigns/${c.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ position: newPos }) })
+                    }}
+                  >↓</button>
                 </div>
                 <div className="mt-4">
                   <div className="text-sm font-medium mb-2">{c.title}</div>
@@ -139,10 +160,8 @@ export default function CampaignsTab() {
                       </span>
                     </div>
                   )}
-                  <div className="mt-2">
-                    <span className={`px-2 py-1 text-xs rounded-full ${c.status === 'active' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>{c.status === 'active' ? 'Aktif' : 'Pasif'}</span>
-                  </div>
-                  <div className="text-xs opacity-90 mt-1">Pozisyon: {c.position}</div>
+                  <div className="mt-2"><span className={`px-2 py-1 text-xs rounded-full ${c.status === 'active' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>{c.status === 'active' ? 'Aktif' : 'Pasif'}</span></div>
+                  <div className="text-xs opacity-90 mt-1">Pozisyon: {c.position ?? idx}</div>
                 </div>
               </div>
             ))}
