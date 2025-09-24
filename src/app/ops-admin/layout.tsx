@@ -30,6 +30,7 @@ export default async function OpsAdminLayout({ children }: { children: React.Rea
             <nav className="flex flex-col gap-2">
               <a href="/ops-admin/raporlar" className="hover:underline">Raporlar</a>
               <a href="/ops-admin/kampanyalar" className="hover:underline">Kampanyalar</a>
+              <a href="/ops-admin/monitor" className="hover:underline">Monitor</a>
             </nav>
           </aside>
           <main className="flex-1">{children}</main>
