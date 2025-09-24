@@ -8,6 +8,7 @@ interface Campaign {
   title: string
   description: string
   imageUrl: string | null
+  imageData?: string | null
   altText: string
   linkUrl: string
   status: 'active' | 'inactive'
@@ -234,9 +235,13 @@ export default function CampaignsSection() {
                 className="block"
               >
                 <div className="relative w-full h-48 cursor-pointer">
-                  {campaign.imageUrl ? (
+                  {campaign.imageUrl || campaign.imageData ? (
                     <Image
-                      src={campaign.imageUrl.startsWith('data:') ? campaign.imageUrl : `https://www.grbt8.store${campaign.imageUrl}`}
+                      src={(campaign.imageUrl && campaign.imageUrl.startsWith('data:'))
+                        ? campaign.imageUrl
+                        : (campaign.imageData && campaign.imageData.startsWith('data:'))
+                          ? campaign.imageData
+                          : `https://www.grbt8.store${campaign.imageUrl}`}
                       alt={campaign.altText}
                       fill
                       className="object-cover"
@@ -262,9 +267,13 @@ export default function CampaignsSection() {
               </Link>
             ) : (
               <div className="relative w-full h-48">
-                {campaign.imageUrl ? (
+                {campaign.imageUrl || campaign.imageData ? (
                   <Image
-                    src={campaign.imageUrl.startsWith('data:') ? campaign.imageUrl : `https://www.grbt8.store${campaign.imageUrl}`}
+                    src={(campaign.imageUrl && campaign.imageUrl.startsWith('data:'))
+                      ? campaign.imageUrl
+                      : (campaign.imageData && campaign.imageData.startsWith('data:'))
+                        ? campaign.imageData
+                        : `https://www.grbt8.store${campaign.imageUrl}`}
                     alt={campaign.altText}
                     fill
                     className="object-cover"
