@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
+    // Disable in production to avoid polluting real data
+    if (process.env.NODE_ENV === 'production' && process.env.ALLOW_TEST_MONITORING !== 'true') {
+      return NextResponse.json({ success: false, error: 'Test data disabled in production' }, { status: 403 })
+    }
     const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
     
     // Test verilerini oluştur
