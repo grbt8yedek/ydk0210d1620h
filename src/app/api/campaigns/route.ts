@@ -45,9 +45,9 @@ export async function POST(request: NextRequest) {
   const created = await prisma.campaign.create({
     data: {
       title: body.title,
-      description: body.description || null,
-      imageUrl: body.imageUrl || null,
-      imageData: body.imageData || null,
+      description: body.description ?? null,
+      imageUrl: body.imageUrl && typeof body.imageUrl === 'string' && !body.imageUrl.startsWith('data:') ? body.imageUrl : null,
+      imageData: body.imageData && typeof body.imageData === 'string' && body.imageData.startsWith('data:') ? body.imageData : null,
       altText: body.altText || body.title || 'Kampanya',
       linkUrl: body.linkUrl || null,
       status: body.status || 'active',

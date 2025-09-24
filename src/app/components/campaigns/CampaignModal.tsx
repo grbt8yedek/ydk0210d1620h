@@ -65,7 +65,8 @@ export default function CampaignModal({ isOpen, onClose, campaign, onSave }: Cam
       const res = await fetch('/api/upload', { method: 'POST', body: fd })
       if (!res.ok) throw new Error('upload failed')
       const data = await res.json()
-      setFormData(prev => ({ ...prev, imageUrl: data.url, imageData: data.url }))
+      // Yalnızca imageData olarak tut, imageUrl boş kalsın (payload'u ikiye katlama)
+      setFormData(prev => ({ ...prev, imageUrl: '', imageData: data.url }))
       setImagePreview(data.url); setUploadSuccess(true); setTimeout(() => setUploadSuccess(false), 2500)
     } catch (err) { console.error(err); alert('Yükleme hatası') } finally { setIsLoading(false) }
   }
@@ -74,7 +75,12 @@ export default function CampaignModal({ isOpen, onClose, campaign, onSave }: Cam
     e.preventDefault(); if (!formData.title) { alert('Başlık gerekli'); return }
     setIsLoading(true)
     try {
-      const res = await fetch('/api/campaigns', { method: campaign ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) })
+      const payload = { ...formData }
+      if (payload.imageUrl && payload.imageUrl.startsWith('data:')) {
+        payload.imageData = payload.imageUrl
+        payload.imageUrl = ''
+      }
+      const res = await fetch('/api/campaigns', { method: campaign ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
       const data = await res.json()
       if (!res.ok || !data.success) throw new Error(data.error || 'Kayıt hatası')
       onSave(data.data)

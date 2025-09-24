@@ -24,8 +24,8 @@ export async function PUT(
       data: {
         title: body.title,
         description: body.description,
-        imageUrl: body.imageUrl,
-        imageData: body.imageData,
+        imageUrl: body.imageUrl && typeof body.imageUrl === 'string' && !body.imageUrl.startsWith('data:') ? body.imageUrl : undefined,
+        imageData: body.imageData && typeof body.imageData === 'string' && body.imageData.startsWith('data:') ? body.imageData : undefined,
         altText: body.altText,
         linkUrl: body.linkUrl,
         status: body.status,
