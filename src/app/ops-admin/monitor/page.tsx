@@ -10,6 +10,7 @@ export default function OpsAdminMonitorPage() {
   const [perfRaw, setPerfRaw] = useState<any[]>([]);
   const [errsRaw, setErrsRaw] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAlerts, setShowAlerts] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -67,16 +68,57 @@ export default function OpsAdminMonitorPage() {
 
   if (loading) return <div className="p-4">Monitoring verileri yükleniyor...</div>;
 
+  const riskItems = [
+    !slo.errorRate.ok && 'Error Rate (>1%)',
+    !slo.lcp.ok && 'LCP (>=2500 ms)',
+    !slo.resp.ok && 'Response Time (>=2000 ms)',
+    !slo.cpu.ok && 'CPU (>=80%)',
+    !slo.mem.ok && 'Memory (>=85%)',
+  ].filter(Boolean) as string[];
+  const riskCount = riskItems.length;
+
   return (
     <div className="p-4 space-y-3 text-sm">
       <div className="flex items-center justify-between">
-        <h1 className="text-base font-semibold">Monitor</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-base font-semibold">Monitor</h1>
+          {riskCount > 0 && (
+            <button
+              onClick={() => setShowAlerts(true)}
+              className="text-xs px-2 py-0.5 rounded border border-red-400 text-red-700 hover:bg-red-50"
+              aria-label={`Uyarı: ${riskCount}`}
+            >
+              Uyarı: {riskCount}
+            </button>
+          )}
+        </div>
         <select className="border rounded px-2 py-1 text-xs" value={timeframe} onChange={e => setTimeframe(e.target.value as any)}>
           <option value="1h">1 saat</option>
           <option value="24h">24 saat</option>
           <option value="7d">7 gün</option>
         </select>
       </div>
+
+      {showAlerts && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setShowAlerts(false)} />
+          <div className="relative bg-white rounded shadow border w-full max-w-sm p-3 text-sm">
+            <div className="flex items-center justify-between mb-2">
+              <div className="font-semibold">Riskli Birimler</div>
+              <button className="text-xs text-gray-600 hover:underline" onClick={() => setShowAlerts(false)}>Kapat</button>
+            </div>
+            {riskItems.length === 0 ? (
+              <div className="text-gray-600">Risk bulunamadı.</div>
+            ) : (
+              <ul className="list-disc pl-4 space-y-1">
+                {riskItems.map((item) => (
+                  <li key={item} className="text-red-700">{item}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* SLO / Sağlık Rozetleri */}
       <div className="grid gap-2 md:grid-cols-5">
