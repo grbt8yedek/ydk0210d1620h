@@ -1,57 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const timeframe = searchParams.get('timeframe') || '24h';
     
-    // Basit simülasyon verisi
+    // Zaman aralığını hesapla
+    const now = new Date();
+    const hours = timeframe === '1h' ? 1 : timeframe === '7d' ? 168 : 24;
+    const startTime = new Date(now.getTime() - (hours * 60 * 60 * 1000));
+
+    // Güvenlik verilerini topla
+    const [
+      totalUsers,
+      recentLogins,
+      failedLogins,
+      suspiciousActivities
+    ] = await Promise.all([
+      prisma.user.count(),
+      prisma.user.count({
+        where: { 
+          lastLoginAt: { gte: startTime }
+        }
+      }),
+      prisma.systemLog.count({
+        where: { 
+          timestamp: { gte: startTime },
+          level: 'error',
+          source: 'auth'
+        }
+      }),
+      prisma.systemLog.count({
+        where: { 
+          timestamp: { gte: startTime },
+          level: 'warn',
+          message: { contains: 'suspicious' }
+        }
+      })
+    ]);
+
+    // Güvenlik skorlarını hesapla (0-100)
+    const loginSuccessRate = recentLogins > 0 ? Math.max(0, 100 - (failedLogins / recentLogins * 100)) : 100;
+    const threatLevel = suspiciousActivities > 10 ? 'HIGH' : suspiciousActivities > 5 ? 'MEDIUM' : 'LOW';
+    const securityScore = Math.round((loginSuccessRate * 0.6) + (threatLevel === 'LOW' ? 40 : threatLevel === 'MEDIUM' ? 20 : 0));
+
     const stats = {
-      totalSecurityEvents: Math.floor(Math.random() * 100) + 50,
-      loginAttempts: Math.floor(Math.random() * 200) + 100,
-      successfulLogins: Math.floor(Math.random() * 150) + 80,
-      failedLogins: Math.floor(Math.random() * 50) + 20,
-      passwordResetRequests: Math.floor(Math.random() * 30) + 10,
-      suspiciousActivities: Math.floor(Math.random() * 10) + 5,
-      bruteForceAttempts: Math.floor(Math.random() * 5) + 2,
-      securityScore: Math.max(100 - (Math.random() * 30), 70),
-      eventsByType: {
-        'LOGIN_SUCCESS': Math.floor(Math.random() * 150) + 80,
-        'LOGIN_FAILURE': Math.floor(Math.random() * 50) + 20,
-        'PASSWORD_RESET': Math.floor(Math.random() * 30) + 10,
-        'SUSPICIOUS_ACTIVITY': Math.floor(Math.random() * 10) + 5,
-        'BRUTE_FORCE': Math.floor(Math.random() * 5) + 2
-      },
-      hourlyDistribution: (() => {
-        const distribution: Record<number, number> = {};
-        for (let i = 0; i < 24; i++) {
-          distribution[i] = Math.floor(Math.random() * 10) + 1;
-        }
-        return distribution;
-      })(),
-      topThreats: [
-        { type: 'Failed Login Attempts', count: Math.floor(Math.random() * 50) + 20, severity: 'MEDIUM' },
-        { type: 'Password Reset Requests', count: Math.floor(Math.random() * 30) + 10, severity: 'LOW' },
-        { type: 'Suspicious IP Activity', count: Math.floor(Math.random() * 10) + 5, severity: 'HIGH' }
-      ],
-      recentEvents: [
-        {
-          timestamp: new Date().toISOString(),
-          eventType: 'LOGIN_SUCCESS',
-          ip: '192.168.1.100',
-          userId: 'user_' + Math.floor(Math.random() * 100),
-          severity: 'LOW',
-          details: 'Successful login'
-        },
-        {
-          timestamp: new Date().toISOString(),
-          eventType: 'LOGIN_FAILURE',
-          ip: '192.168.1.101',
-          userId: null,
-          severity: 'MEDIUM',
-          details: 'Failed login attempt'
-        }
-      ]
+      securityScore,
+      threatLevel,
+      loginSuccessRate: Math.round(loginSuccessRate),
+      failedLogins,
+      suspiciousActivities,
+      recentLogins,
+      isRisky: securityScore < 70 || threatLevel === 'HIGH',
+      metrics: {
+        authSecurity: loginSuccessRate > 90 ? 'GOOD' : loginSuccessRate > 70 ? 'WARNING' : 'CRITICAL',
+        threatDetection: threatLevel === 'LOW' ? 'GOOD' : threatLevel === 'MEDIUM' ? 'WARNING' : 'CRITICAL',
+        userActivity: recentLogins > totalUsers * 0.1 ? 'GOOD' : 'LOW'
+      }
     };
 
     return NextResponse.json({
@@ -62,7 +68,7 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('Security monitoring okuma hatası:', error);
+    console.error('Security metrics okuma hatası:', error);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }

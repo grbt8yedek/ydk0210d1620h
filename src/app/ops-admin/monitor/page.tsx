@@ -7,6 +7,7 @@ export default function OpsAdminMonitorPage() {
   const [perf, setPerf] = useState<any>(null);
   const [sys, setSys] = useState<any>(null);
   const [errs, setErrs] = useState<any>(null);
+  const [security, setSecurity] = useState<any>(null);
   const [perfRaw, setPerfRaw] = useState<any[]>([]);
   const [errsRaw, setErrsRaw] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,12 +19,14 @@ export default function OpsAdminMonitorPage() {
       fetch(`/api/monitoring/performance?timeframe=${timeframe}`).then(r => r.json()).catch(() => null),
       fetch(`/api/monitoring/system?timeframe=${timeframe}`).then(r => r.json()).catch(() => null),
       fetch(`/api/monitoring/errors?timeframe=${timeframe}`).then(r => r.json()).catch(() => null),
-    ]).then(([p, s, e]) => {
+      fetch(`/api/monitoring/security?timeframe=${timeframe}`).then(r => r.json()).catch(() => null),
+    ]).then(([p, s, e, sec]) => {
       setPerf(p?.data?.stats || null);
       setPerfRaw(p?.data?.recentMetrics || []);
       setSys(s?.data?.stats || null);
       setErrs(e?.data?.stats || null);
       setErrsRaw(e?.data?.recentErrors || []);
+      setSecurity(sec?.data?.stats || null);
       setLoading(false);
     });
   }, [timeframe]);
@@ -45,14 +48,16 @@ export default function OpsAdminMonitorPage() {
     const resp = Math.round(sys?.averageResponseTime || 0);
     const cpu = Math.round(sys?.averageCpuUsage || 0);
     const mem = Math.round(sys?.averageMemoryUsage || 0);
+    const secScore = security?.securityScore || 100;
     return {
       errorRate: { value: errorRate, ok: errorRate < 1 },
       lcp: { value: lcp, ok: lcp < 2500 },
       resp: { value: resp, ok: resp < 2000 },
       cpu: { value: cpu, ok: cpu < 80 },
       mem: { value: mem, ok: mem < 85 },
+      security: { value: secScore, ok: secScore >= 70 },
     };
-  }, [errorRate, perf, sys]);
+  }, [errorRate, perf, sys, security]);
 
   const errTypes = useMemo(() => {
     const map = errs?.errorsByType || {};
@@ -74,11 +79,12 @@ export default function OpsAdminMonitorPage() {
     !slo.resp.ok && 'Response Time (>=2000 ms)',
     !slo.cpu.ok && 'CPU (>=80%)',
     !slo.mem.ok && 'Memory (>=85%)',
+    !slo.security.ok && 'Security Score (<70)',
   ].filter(Boolean) as string[];
   const riskCount = riskItems.length;
 
   return (
-    <div className="p-4 space-y-3 text-sm">
+    <div className={`p-4 space-y-3 text-sm ${security?.isRisky ? 'border-2 border-red-500 bg-red-50' : ''}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h1 className="text-base font-semibold">Monitor</h1>
@@ -121,7 +127,7 @@ export default function OpsAdminMonitorPage() {
       )}
 
       {/* SLO / Sağlık Rozetleri */}
-      <div className="grid gap-2 md:grid-cols-5">
+      <div className="grid gap-2 md:grid-cols-6">
         <div className={`border rounded p-2 ${slo.errorRate.ok ? 'border-green-300' : 'border-red-300'}`}>
           <div className="text-[10px] text-gray-500">Error Rate</div>
           <div className="text-sm">{errorRate.toFixed(2)}% <span className="text-[10px] text-gray-500">(hedef &lt; 1%)</span></div>
@@ -141,6 +147,10 @@ export default function OpsAdminMonitorPage() {
         <div className={`border rounded p-2 ${slo.mem.ok ? 'border-green-300' : 'border-red-300'}`}>
           <div className="text-[10px] text-gray-500">Memory Avg</div>
           <div className="text-sm">{Math.round(sys?.averageMemoryUsage || 0)}% <span className="text-[10px] text-gray-500">(hedef &lt; 85%)</span></div>
+        </div>
+        <div className={`border rounded p-2 ${slo.security.ok ? 'border-green-300' : 'border-red-300'}`}>
+          <div className="text-[10px] text-gray-500">Security Score</div>
+          <div className="text-sm">{security?.securityScore || 100} <span className="text-[10px] text-gray-500">(hedef ≥ 70)</span></div>
         </div>
       </div>
 
@@ -282,6 +292,40 @@ export default function OpsAdminMonitorPage() {
           </table>
         </section>
       </div>
+
+      {/* Güvenlik Paneli - Kompakt */}
+      {security && (
+        <section className="border rounded p-3">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="font-medium">Güvenlik Durumu</h2>
+            <span className={`text-xs px-2 py-0.5 rounded ${
+              security.threatLevel === 'LOW' ? 'bg-green-100 text-green-700' :
+              security.threatLevel === 'MEDIUM' ? 'bg-yellow-100 text-yellow-700' :
+              'bg-red-100 text-red-700'
+            }`}>
+              {security.threatLevel}
+            </span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+            <div>
+              <div className="text-gray-500">Login Success</div>
+              <div className="font-medium">{security.loginSuccessRate}%</div>
+            </div>
+            <div>
+              <div className="text-gray-500">Failed Logins</div>
+              <div className="font-medium">{security.failedLogins}</div>
+            </div>
+            <div>
+              <div className="text-gray-500">Suspicious</div>
+              <div className="font-medium">{security.suspiciousActivities}</div>
+            </div>
+            <div>
+              <div className="text-gray-500">Recent Logins</div>
+              <div className="font-medium">{security.recentLogins}</div>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }
