@@ -21,11 +21,11 @@ export async function GET(request: NextRequest) {
       prisma.user.count(),
       prisma.session.count(),
       prisma.systemLog.count({
-        where: { createdAt: { gte: startTime } }
+        where: { timestamp: { gte: startTime } }
       }),
       prisma.systemLog.findMany({
         where: { 
-          createdAt: { gte: startTime },
+          timestamp: { gte: startTime },
           level: { in: ['error', 'warn'] }
         },
         take: 50

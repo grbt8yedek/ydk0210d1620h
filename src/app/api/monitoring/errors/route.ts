@@ -19,18 +19,18 @@ export async function GET(request: NextRequest) {
     ] = await Promise.all([
       prisma.systemLog.findMany({
         where: { 
-          createdAt: { gte: startTime },
+          timestamp: { gte: startTime },
           level: { in: ['error', 'warn', 'fatal'] }
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { timestamp: 'desc' },
         take: 200
       }),
       prisma.systemLog.findMany({
         where: { 
-          createdAt: { gte: startTime },
+          timestamp: { gte: startTime },
           level: 'fatal'
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { timestamp: 'desc' },
         take: 50
       }),
       prisma.user.findMany({
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
         const distribution: Record<number, number> = {};
         for (let i = 0; i < 24; i++) {
           const hourErrors = errorLogs.filter(log => 
-            new Date(log.createdAt).getHours() === i
+            new Date(log.timestamp).getHours() === i
           ).length;
           distribution[i] = hourErrors;
         }
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
       })(),
       uniqueUsers: allUsers.length,
       recentCriticalErrors: criticalLogs.map(log => ({
-        timestamp: log.createdAt.toISOString(),
+        timestamp: log.timestamp.toISOString(),
         errorType: log.source || 'Unknown',
         message: log.message.substring(0, 100),
         severity: 'CRITICAL',

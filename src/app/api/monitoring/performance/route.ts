@@ -26,8 +26,8 @@ export async function GET(request: NextRequest) {
         where: { createdAt: { gte: startTime } }
       }),
       prisma.systemLog.findMany({
-        where: { createdAt: { gte: startTime } },
-        orderBy: { createdAt: 'desc' },
+        where: { timestamp: { gte: startTime } },
+        orderBy: { timestamp: 'desc' },
         take: 100
       })
     ]);
