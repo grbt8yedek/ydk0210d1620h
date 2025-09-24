@@ -57,7 +57,7 @@ export default function CampaignModal({ isOpen, onClose, campaign, onSave }: Cam
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]; if (!file) return
     if (!file.type.startsWith('image/')) { alert('Lütfen resim dosyası seçin'); return }
-    if (file.size > 2 * 1024 * 1024) { alert('Maksimum 2MB'); return }
+    if (file.size > 5 * 1024 * 1024) { alert('Maksimum 5MB'); return }
     setIsLoading(true); setUploadSuccess(false)
     try {
       const compressed = await compressImage(file, 0.8, 1920)
@@ -124,7 +124,7 @@ export default function CampaignModal({ isOpen, onClose, campaign, onSave }: Cam
                 <label htmlFor="image-upload" className="cursor-pointer flex flex-col items-center space-y-2">
                   <Upload className="h-8 w-8 text-gray-400" />
                   <span className="text-sm text-gray-600">{isLoading ? 'Yükleniyor...' : 'Resim seç veya sürükle'}</span>
-                  <span className="text-xs text-gray-500">PNG, JPG, WEBP, GIF (Max: 2MB)</span>
+                  <span className="text-xs text-gray-500">PNG, JPG, WEBP, GIF (Max: 5MB)</span>
                 </label>
               </div>
               {isLoading && <p className="text-sm text-blue-600 text-center">Resim yükleniyor...</p>}

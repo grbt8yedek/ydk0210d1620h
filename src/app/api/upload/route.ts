@@ -17,8 +17,8 @@ export async function POST(request: NextRequest) {
     const file: File | null = data.get('file') as unknown as File
     if (!file) return cors(NextResponse.json({ success: false, error: 'Dosya bulunamadı' }, { status: 400 }))
 
-    const maxSize = 2 * 1024 * 1024
-    if (file.size > maxSize) return cors(NextResponse.json({ success: false, error: 'Maksimum 2MB' }, { status: 413 }))
+    const maxSize = 5 * 1024 * 1024
+    if (file.size > maxSize) return cors(NextResponse.json({ success: false, error: 'Maksimum 5MB' }, { status: 413 }))
 
     if (!file.type.startsWith('image/')) return cors(NextResponse.json({ success: false, error: 'Sadece resim' }, { status: 400 }))
 
