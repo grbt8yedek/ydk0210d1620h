@@ -8,6 +8,10 @@
     {
       "path": "/api/monitoring/cron-sample",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/backup/scheduled",
+      "schedule": "0 */6 * * *"
     }
   ]
 }
