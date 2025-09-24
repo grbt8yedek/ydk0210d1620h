@@ -6,10 +6,13 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    await prisma.campaign.delete({ where: { id: params.id } })
+    const result = await prisma.campaign.deleteMany({ where: { id: params.id } })
+    if (result.count === 0) {
+      return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 })
+    }
     return NextResponse.json({ success: true })
   } catch (error) {
-    return NextResponse.json({ success: false, error: 'Delete failed' }, { status: 500 })
+    return NextResponse.json({ success: false, error: 'Delete failed', details: (error as any)?.message }, { status: 500 })
   }
 }
 
