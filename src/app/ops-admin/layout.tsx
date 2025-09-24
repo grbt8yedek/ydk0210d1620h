@@ -2,6 +2,7 @@ import React from 'react';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import AlertBadge from './AlertBadge';
 
 export const metadata = {
   robots: 'noindex, nofollow',
@@ -27,7 +28,8 @@ export default async function OpsAdminLayout({ children }: { children: React.Rea
       <body>
         <div className="min-h-screen flex">
           <aside className="w-56 border-r p-4">
-            <div className="text-sm text-gray-500 mb-4">Ops Admin</div>
+            <div className="text-sm text-gray-500 mb-1">Ops Admin</div>
+            <AlertBadge />
             <nav className="flex flex-col gap-2">
               <a href="/ops-admin/raporlar" className="hover:underline">Raporlar</a>
               <a href="/ops-admin/kampanyalar" className="hover:underline">Kampanyalar</a>
