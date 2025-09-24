@@ -11,6 +11,7 @@ Allow: /kullanim-kosullari
 
 # Admin paneli - arama motorlarından gizle
 Disallow: /admin
+Disallow: /ops-admin
 Disallow: /api/
 Disallow: /_next/
 Disallow: /node_modules/

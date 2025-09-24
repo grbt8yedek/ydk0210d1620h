@@ -101,6 +101,14 @@ export async function middleware(request: NextRequest) {
     // }
   }
 
+  // /admin ve /ops-admin: arama motoru engelleme ve ek sertleştirme
+  if (request.nextUrl.pathname.startsWith('/admin') || request.nextUrl.pathname.startsWith('/ops-admin')) {
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    if (process.env.NODE_ENV === 'production' && request.nextUrl.protocol !== 'https:') {
+      return NextResponse.redirect(new URL('https://' + request.nextUrl.host + request.nextUrl.pathname));
+    }
+  }
+
   return response;
 }
 
