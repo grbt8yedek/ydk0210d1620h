@@ -134,15 +134,25 @@ export const authOptions: NextAuthOptions = {
                     return null;
                 }
 
-                const user = await prisma.user.findUnique({ where: { email: credentials.email } });
+                // Admin email kontrolü
+                const adminEmails = (process.env.ADMIN_EMAILS || '')
+                    .split(',')
+                    .map(email => email.trim().toLowerCase())
+                    .filter(Boolean);
 
-                if (user && user.password) {
-                    const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
-                    if (isPasswordValid) {
-                        const name = (user.firstName && user.lastName) ? `${user.firstName} ${user.lastName}` : user.email;
-                        return { ...user, name };
+                // Admin paneli için sadece admin email'ler
+                if (credentials.email.includes('grbt8') || adminEmails.includes(credentials.email.toLowerCase())) {
+                    const user = await prisma.user.findUnique({ where: { email: credentials.email } });
+
+                    if (user && user.password) {
+                        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+                        if (isPasswordValid) {
+                            const name = (user.firstName && user.lastName) ? `${user.firstName} ${user.lastName}` : user.email;
+                            return { ...user, name };
+                        }
                     }
                 }
+
                 return null;
             }
         })

@@ -18,7 +18,7 @@ export default function AdminGiris() {
 
     try {
       // Sasirtmaca: password aslında ID, id aslında şifre
-      const result = await signIn('AdminCredentials', {
+      const result = await signIn('credentials', {
         email: password, // Gerçek ID
         password: id,    // Gerçek şifre
         redirect: false,
