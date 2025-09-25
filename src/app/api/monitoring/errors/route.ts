@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
       { page: '/flights/search', count: Math.floor(errorLogs.length * 0.3), criticalCount: Math.floor(criticalLogs.length * 0.4) },
       { page: '/payment', count: Math.floor(errorLogs.length * 0.2), criticalCount: Math.floor(criticalLogs.length * 0.3) },
       { page: '/hesabim', count: Math.floor(errorLogs.length * 0.15), criticalCount: Math.floor(criticalLogs.length * 0.2) },
-      { page: '/ops-admin', count: Math.floor(errorLogs.length * 0.1), criticalCount: Math.floor(criticalLogs.length * 0.1) }
+      { page: '/grbt-8', count: Math.floor(errorLogs.length * 0.1), criticalCount: Math.floor(criticalLogs.length * 0.1) }
     ];
 
     const stats = {

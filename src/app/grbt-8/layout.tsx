@@ -28,12 +28,12 @@ export default async function OpsAdminLayout({ children }: { children: React.Rea
       <body>
         <div className="min-h-screen flex">
           <aside className="w-56 border-r p-4">
-            <div className="text-sm text-gray-500 mb-1">Ops Admin</div>
+            <div className="text-sm text-gray-500 mb-1">GRBT-8</div>
             <AlertBadge />
             <nav className="flex flex-col gap-2">
-              <a href="/ops-admin/raporlar" className="hover:underline">Raporlar</a>
-              <a href="/ops-admin/kampanyalar" className="hover:underline">Kampanyalar</a>
-              <a href="/ops-admin/monitor" className="hover:underline">Monitor</a>
+              <a href="/grbt-8/raporlar" className="hover:underline">Raporlar</a>
+              <a href="/grbt-8/kampanyalar" className="hover:underline">Kampanyalar</a>
+              <a href="/grbt-8/monitor" className="hover:underline">Monitor</a>
             </nav>
           </aside>
           <main className="flex-1">{children}</main>

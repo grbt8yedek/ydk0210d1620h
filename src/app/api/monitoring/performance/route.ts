@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
           avgTime: Math.round(280 + (Math.random() * 120)) 
         },
         { 
-          page: '/ops-admin', 
+          page: '/grbt-8', 
           totalTime: Math.round(900 + (Math.random() * 400)), 
           count: Math.max(2, systemLogs.length), 
           avgTime: Math.round(220 + (Math.random() * 100)) 
