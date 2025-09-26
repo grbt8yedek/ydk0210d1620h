@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminGiris() {
@@ -16,25 +17,18 @@ export default function AdminGiris() {
     setError('');
 
     try {
-      // Basit admin kontrolü
-      const adminEmail = 'admin@grbt8.store';
-      const adminPassword = 'GRBT8Admin2025!';
-      
-      if (email === adminEmail && password === adminPassword) {
-        // Session oluştur
-        const response = await fetch('/api/auth/session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: adminEmail, password: adminPassword })
-        });
-        
-        if (response.ok) {
-          router.push('/grbt-8');
-        } else {
-          setError('Giriş başarısız.');
-        }
-      } else {
+      // NextAuth ile giriş yap
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
         setError('Giriş başarısız. Bilgileri kontrol edin.');
+      } else {
+        // Başarılı giriş - raporlar sayfasına yönlendir
+        router.push('/grbt-8/raporlar');
       }
     } catch (error) {
       setError('Bir hata oluştu.');
@@ -45,7 +39,7 @@ export default function AdminGiris() {
 
   return (
     <div className="min-h-screen bg-white relative">
-      {/* Sol alt köşede sahte giriş formu */}
+      {/* Sol alt köşede giriş formu */}
       <div className="absolute bottom-8 left-8 w-80 bg-gray-50 border border-gray-200 rounded-lg p-6 shadow-lg">
         <h2 className="text-lg font-semibold text-gray-800 mb-4">
           Admin Giriş
@@ -62,7 +56,7 @@ export default function AdminGiris() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Admin email adresinizi girin"
+              placeholder="admin@grbt8.store"
               required
             />
           </div>
@@ -77,7 +71,7 @@ export default function AdminGiris() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Şifrenizi girin"
+              placeholder="GRBT8Admin2025!"
               required
             />
           </div>
@@ -97,13 +91,13 @@ export default function AdminGiris() {
           </button>
         </form>
 
-        {/* Sahte bilgi */}
+        {/* Bilgi */}
         <div className="mt-4 text-xs text-gray-500">
-          Güvenlik için iki faktörlü doğrulama gerekebilir
+          Admin paneli erişimi için giriş yapın
         </div>
       </div>
 
-      {/* Sayfa ortasında sahte içerik */}
+      {/* Sayfa ortasında içerik */}
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-300 mb-4">

@@ -10,10 +10,9 @@ export const metadata = {
 };
 
 export default async function OpsAdminLayout({ children }: { children: React.ReactNode }) {
-  // Geçici bypass - giriş sayfası için
-  const bypass = true; // Geçici olarak bypass aktif
+  const bypass = (process.env.ADMIN_BYPASS || '').toLowerCase() === 'true';
   const session = await getServerSession(authOptions);
-  const allow = (process.env.ADMIN_EMAILS || '')
+  const allow = (process.env.ADMIN_EMAILS || 'admin@grbt8.store')
     .split(',')
     .map(s => s.trim().toLowerCase())
     .filter(Boolean);
