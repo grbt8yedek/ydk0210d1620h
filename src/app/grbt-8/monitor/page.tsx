@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import AdminSidebar from '@/components/AdminSidebar';
 
 export default function OpsAdminMonitorPage() {
   const [timeframe, setTimeframe] = useState<'1h' | '24h' | '7d'>('24h');
@@ -84,7 +85,10 @@ export default function OpsAdminMonitorPage() {
   const riskCount = riskItems.length;
 
   return (
-    <div className={`p-4 space-y-3 text-sm ${security?.isRisky ? 'border-2 border-red-500 bg-red-50' : ''}`}>
+    <div className="min-h-screen flex">
+      <AdminSidebar />
+      <main className="flex-1">
+        <div className={`p-6 space-y-3 text-sm ${security?.isRisky ? 'border-2 border-red-500 bg-red-50' : ''}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h1 className="text-base font-semibold">Monitor</h1>
@@ -326,6 +330,8 @@ export default function OpsAdminMonitorPage() {
           </div>
         </section>
       )}
+        </div>
+      </main>
     </div>
   );
 }

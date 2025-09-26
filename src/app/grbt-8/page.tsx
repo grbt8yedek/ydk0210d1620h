@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import AdminSidebar from '@/components/AdminSidebar';
 
 export default async function GRBT8Dashboard() {
   const bypass = (process.env.ADMIN_BYPASS || '').toLowerCase() === 'true';
@@ -15,15 +16,7 @@ export default async function GRBT8Dashboard() {
   }
   return (
     <div className="min-h-screen flex">
-      <aside className="w-56 border-r p-4 bg-gray-50">
-        <div className="text-sm text-gray-500 mb-4">GRBT-8 Admin</div>
-        <nav className="flex flex-col gap-2">
-          <a href="/grbt-8" className="hover:underline text-blue-600">Dashboard</a>
-          <a href="/grbt-8/raporlar" className="hover:underline">Raporlar</a>
-          <a href="/grbt-8/kampanyalar" className="hover:underline">Kampanyalar</a>
-          <a href="/grbt-8/monitor" className="hover:underline">Monitor</a>
-        </nav>
-      </aside>
+      <AdminSidebar />
       <main className="flex-1">
         <div className="p-6">
           <h1 className="text-2xl font-bold text-gray-800 mb-6">
