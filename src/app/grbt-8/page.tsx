@@ -3,7 +3,8 @@ import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
 export default async function GRBT8Dashboard() {
-  const bypass = (process.env.ADMIN_BYPASS || '').toLowerCase() === 'true';
+  // Geçici bypass - giriş sayfası için
+  const bypass = true; // Geçici olarak bypass aktif
   const session = await getServerSession(authOptions);
   const allow = (process.env.ADMIN_EMAILS || '')
     .split(',')
