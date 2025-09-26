@@ -55,30 +55,6 @@ export default function GRBT8Dashboard() {
         </div>
       </div>
 
-      {/* Hızlı İstatistikler */}
-      <div className="mt-8 bg-gray-50 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">
-          Hızlı İstatistikler
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div>
-            <div className="text-2xl font-bold text-blue-600">--</div>
-            <div className="text-sm text-gray-600">Toplam Kullanıcı</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-green-600">--</div>
-            <div className="text-sm text-gray-600">Aktif Kampanya</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-purple-600">--</div>
-            <div className="text-sm text-gray-600">Sistem Durumu</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-orange-600">--</div>
-            <div className="text-sm text-gray-600">Güvenlik Skoru</div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

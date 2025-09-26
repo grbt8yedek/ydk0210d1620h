@@ -212,8 +212,14 @@ NEXTAUTH_URL="https://anasite.grbt8.store"
 
 ---
 
-**Son Güncelleme:** 2025-01-09  
-**Deployment Durumu:** Hazır  
-**AI Asistan:** Aktif  
+*GitHub adresi https://github.com/Depogrbt8/grbt8
+Githubtoken  [REMOVED_FOR_SECURITY]
+
+Vercel https://vercel.com/grbt8/grbt8
+Verceltoken [REMOVED_FOR_SECURITY]
+Prisme générâtes
+Prisme ,Database gibi alanlarda  Silme reset islemi yapilacaksa mutlaka veri kaybi olabilir diye uyar, illa yapilmasi gerekiyorsa yedek al mutlaka, tum icerikleR
+
+ Vercel otomatik deploy kapali, yapilan islem commit edilip gitte push edilir sonra da gitten Vercele déploy edilir.
 
 Bu dokümantasyon, GRBT8 seyahat sitesinin Vercel'e sorunsuz deployment'ı için gerekli tüm bilgileri içerir. AI asistan bu bilgileri kullanarak otomatik deployment ve hata yönetimi yapacaktır.
