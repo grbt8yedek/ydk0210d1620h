@@ -14,61 +14,73 @@ export default async function GRBT8Dashboard() {
     redirect('/grbt-8/giris');
   }
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        GRBT-8 Dashboard
-      </h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Raporlar Kartı */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">
-            📊 Satış Raporları
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Detaylı satış analizleri ve performans metrikleri
-          </p>
-          <a 
-            href="/grbt-8/raporlar" 
-            className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Raporları Görüntüle
-          </a>
-        </div>
+    <div className="min-h-screen flex">
+      <aside className="w-56 border-r p-4 bg-gray-50">
+        <div className="text-sm text-gray-500 mb-4">GRBT-8 Admin</div>
+        <nav className="flex flex-col gap-2">
+          <a href="/grbt-8" className="hover:underline text-blue-600">Dashboard</a>
+          <a href="/grbt-8/raporlar" className="hover:underline">Raporlar</a>
+          <a href="/grbt-8/kampanyalar" className="hover:underline">Kampanyalar</a>
+          <a href="/grbt-8/monitor" className="hover:underline">Monitor</a>
+        </nav>
+      </aside>
+      <main className="flex-1">
+        <div className="p-6">
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">
+            GRBT-8 Dashboard
+          </h1>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Raporlar Kartı */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                📊 Satış Raporları
+              </h2>
+              <p className="text-gray-600 mb-4">
+                Detaylı satış analizleri ve performans metrikleri
+              </p>
+              <a 
+                href="/grbt-8/raporlar" 
+                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              >
+                Raporları Görüntüle
+              </a>
+            </div>
 
-        {/* Kampanyalar Kartı */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">
-            🎯 Kampanya Yönetimi
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Banner kampanyaları ve promosyon yönetimi
-          </p>
-          <a 
-            href="/grbt-8/kampanyalar" 
-            className="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
-          >
-            Kampanyaları Yönet
-          </a>
-        </div>
+            {/* Kampanyalar Kartı */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                🎯 Kampanya Yönetimi
+              </h2>
+              <p className="text-gray-600 mb-4">
+                Banner kampanyaları ve promosyon yönetimi
+              </p>
+              <a 
+                href="/grbt-8/kampanyalar" 
+                className="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+              >
+                Kampanyaları Yönet
+              </a>
+            </div>
 
-        {/* Monitor Kartı */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">
-            🔍 Sistem İzleme
-          </h2>
-          <p className="text-gray-600 mb-4">
-            Performans metrikleri ve güvenlik durumu
-          </p>
-          <a 
-            href="/grbt-8/monitor" 
-            className="inline-block bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
-          >
-            Sistemi İzle
-          </a>
+            {/* Monitor Kartı */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                🔍 Sistem İzleme
+              </h2>
+              <p className="text-gray-600 mb-4">
+                Performans metrikleri ve güvenlik durumu
+              </p>
+              <a 
+                href="/grbt-8/monitor" 
+                className="inline-block bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
+              >
+                Sistemi İzle
+              </a>
+            </div>
+          </div>
         </div>
-      </div>
-
+      </main>
     </div>
   );
 }
