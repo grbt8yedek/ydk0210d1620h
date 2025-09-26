@@ -1,4 +1,18 @@
-export default function GRBT8Dashboard() {
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+
+export default async function GRBT8Dashboard() {
+  const bypass = (process.env.ADMIN_BYPASS || '').toLowerCase() === 'true';
+  const session = await getServerSession(authOptions);
+  const allow = (process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map(s => s.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (!bypass && (!session || !session.user?.email || (allow.length && !allow.includes(session.user.email.toLowerCase())))) {
+    redirect('/grbt-8/giris');
+  }
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">
