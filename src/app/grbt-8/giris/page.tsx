@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminGiris() {
@@ -17,17 +16,25 @@ export default function AdminGiris() {
     setError('');
 
     try {
-      // Normal giriş: email ve şifre
-      const result = await signIn('credentials', {
-        email: email,    // Email
-        password: password, // Şifre
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError('Giriş başarısız. Bilgileri kontrol edin.');
+      // Basit admin kontrolü
+      const adminEmail = 'admin@grbt8.store';
+      const adminPassword = 'GRBT8Admin2025!';
+      
+      if (email === adminEmail && password === adminPassword) {
+        // Session oluştur
+        const response = await fetch('/api/auth/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: adminEmail, password: adminPassword })
+        });
+        
+        if (response.ok) {
+          router.push('/grbt-8');
+        } else {
+          setError('Giriş başarısız.');
+        }
       } else {
-        router.push('/grbt-8/monitor');
+        setError('Giriş başarısız. Bilgileri kontrol edin.');
       }
     } catch (error) {
       setError('Bir hata oluştu.');
