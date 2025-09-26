@@ -18,13 +18,13 @@ export default function AdminGiris() {
     setError('');
 
     try {
-      // PIN kontrolü (geçici olarak devre dışı)
-      // const correctPin = process.env.NEXT_PUBLIC_ADMIN_PIN || '7000';
-      // if (pin !== correctPin) {
-      //   setError('Geçersiz PIN');
-      //   setLoading(false);
-      //   return;
-      // }
+      // PIN kontrolü
+      const correctPin = process.env.NEXT_PUBLIC_ADMIN_PIN || '7000';
+      if (pin !== correctPin) {
+        setError('Geçersiz PIN');
+        setLoading(false);
+        return;
+      }
 
       // NextAuth ile giriş yap
       const result = await signIn('credentials', {
@@ -59,6 +59,7 @@ export default function AdminGiris() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="PIN"
               maxLength={6}
+              required
             />
           </div>
 
