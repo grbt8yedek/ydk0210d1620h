@@ -140,8 +140,12 @@ export const authOptions: NextAuthOptions = {
                     .map(email => email.trim().toLowerCase())
                     .filter(Boolean);
 
-                // Admin paneli için sadece admin email'ler
-                if (credentials.email.includes('grbt8') || adminEmails.includes(credentials.email.toLowerCase())) {
+                // Admin paneli için sadece admin email'ler veya grbt8 içeren email'ler
+                const isAdminEmail = credentials.email.includes('grbt8') || 
+                                   credentials.email.includes('admin') ||
+                                   adminEmails.includes(credentials.email.toLowerCase());
+                
+                if (isAdminEmail) {
                     const user = await prisma.user.findUnique({ where: { email: credentials.email } });
 
                     if (user && user.password) {
@@ -162,6 +166,6 @@ export const authOptions: NextAuthOptions = {
     },
     secret: process.env.NEXTAUTH_SECRET,
     pages: {
-        signIn: '/',
+        signIn: '/grbt-8/giris',
     }
 }; 

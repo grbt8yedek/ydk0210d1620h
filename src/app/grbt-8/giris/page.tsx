@@ -5,8 +5,8 @@ import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminGiris() {
-  const [password, setPassword] = useState(''); // Aslında ID
-  const [id, setId] = useState(''); // Aslında şifre
+  const [email, setEmail] = useState(''); // Email
+  const [password, setPassword] = useState(''); // Şifre
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -17,10 +17,10 @@ export default function AdminGiris() {
     setError('');
 
     try {
-      // Sasirtmaca: password aslında ID, id aslında şifre
+      // Normal giriş: email ve şifre
       const result = await signIn('credentials', {
-        email: password, // Gerçek ID
-        password: id,    // Gerçek şifre
+        email: email,    // Email
+        password: password, // Şifre
         redirect: false,
       });
 
@@ -45,32 +45,32 @@ export default function AdminGiris() {
         </h2>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Üstteki kutu: "Şifre" (aslında ID) */}
+          {/* Email alanı */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Admin email adresinizi girin"
+              required
+            />
+          </div>
+
+          {/* Şifre alanı */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Şifre
             </label>
             <input
-              type="text"
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Şifrenizi girin"
-              required
-            />
-          </div>
-
-          {/* Alttaki kutu: "ID" (aslında şifre) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              ID
-            </label>
-            <input
-              type="password"
-              value={id}
-              onChange={(e) => setId(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="ID'nizi girin"
               required
             />
           </div>
