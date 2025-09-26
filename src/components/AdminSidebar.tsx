@@ -1,12 +1,14 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useMonitoringAlert } from '@/hooks/useMonitoringAlert';
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const { riskCount, loading } = useMonitoringAlert('24h');
 
   const menuItems = [
-    { href: '/grbt-8', label: 'Dashboard', icon: '🏠' },
+    { href: '/grbt-8', label: 'Çıkış', icon: '🚪' },
     { href: '/grbt-8/raporlar', label: 'Raporlar', icon: '📊' },
     { href: '/grbt-8/kampanyalar', label: 'Kampanyalar', icon: '🎯' },
     { href: '/grbt-8/monitor', label: 'Monitor', icon: '🔍' },
@@ -14,7 +16,15 @@ export default function AdminSidebar() {
 
   return (
     <aside className="w-56 border-r p-4 bg-gray-50 min-h-screen">
-      <div className="text-sm text-gray-500 mb-4 font-semibold">GRBT-8 Admin</div>
+      <div className="text-sm text-gray-500 mb-2 font-semibold">GRBT-8 Admin</div>
+      
+      {/* Uyarı Bilgisi */}
+      {!loading && riskCount > 0 && (
+        <div className="mb-4 px-2 py-1 bg-red-50 border border-red-200 rounded text-xs">
+          <span className="text-red-600 font-medium">⚠️ Uyarı: {riskCount}</span>
+          <div className="text-red-500 text-[10px] mt-1">Sistem riskleri tespit edildi</div>
+        </div>
+      )}
       
       <nav className="flex flex-col gap-2">
         {menuItems.map((item) => (
