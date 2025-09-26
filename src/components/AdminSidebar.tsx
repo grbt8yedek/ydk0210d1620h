@@ -2,10 +2,12 @@
 
 import { usePathname } from 'next/navigation';
 import { useMonitoringAlert } from '@/hooks/useMonitoringAlert';
+import { useState } from 'react';
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const { riskCount, loading } = useMonitoringAlert('24h');
+  const { riskCount, riskItems, loading } = useMonitoringAlert('24h');
+  const [showAlerts, setShowAlerts] = useState(false);
 
   const menuItems = [
     { href: '/grbt-8', label: 'Çıkış', icon: '🚪' },
@@ -20,9 +22,14 @@ export default function AdminSidebar() {
       
       {/* Uyarı Bilgisi */}
       {!loading && riskCount > 0 && (
-        <div className="mb-4 px-2 py-1 bg-red-50 border border-red-200 rounded text-xs">
-          <span className="text-red-600 font-medium">⚠️ Uyarı: {riskCount}</span>
-          <div className="text-red-500 text-[10px] mt-1">Sistem riskleri tespit edildi</div>
+        <div className="mb-4">
+          <button
+            onClick={() => setShowAlerts(true)}
+            className="w-full text-xs px-2 py-1 rounded border border-red-400 text-red-700 hover:bg-red-50 text-left"
+            aria-label={`Uyarı: ${riskCount}`}
+          >
+            ⚠️ Uyarı: {riskCount}
+          </button>
         </div>
       )}
       
@@ -48,6 +55,28 @@ export default function AdminSidebar() {
           Sistem Durumu: ✅ Aktif
         </div>
       </div>
+
+      {/* Popup Modal */}
+      {showAlerts && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setShowAlerts(false)} />
+          <div className="relative bg-white rounded shadow border w-full max-w-sm p-3 text-sm">
+            <div className="flex items-center justify-between mb-2">
+              <div className="font-semibold">Riskli Birimler</div>
+              <button className="text-xs text-gray-600 hover:underline" onClick={() => setShowAlerts(false)}>Kapat</button>
+            </div>
+            {riskItems.length === 0 ? (
+              <div className="text-gray-600">Risk bulunamadı.</div>
+            ) : (
+              <ul className="list-disc pl-4 space-y-1">
+                {riskItems.map((item) => (
+                  <li key={item} className="text-red-700">{item}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
     </aside>
   );
 }
