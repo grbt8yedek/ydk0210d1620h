@@ -125,13 +125,13 @@ const DateInput: React.FC<DateInputProps> = ({ value, onChange, disabled, classN
     <div className={`relative ${className || ''}`} ref={inputRef}>
             <button
         type="button"
-        className="w-full h-full text-center focus:outline-none focus:border-none focus:ring-0 disabled:opacity-50 flex items-center justify-center text-[14px] font-normal text-black flight-search-input transition-all duration-200"
+        className="w-full h-full text-center focus:outline-none focus:border-none focus:ring-0 disabled:opacity-50 flex items-center justify-center text-[14px] font-semibold text-gray-700 flight-search-input transition-all duration-200"
         onClick={() => setShow(!show)}
         disabled={disabled}
         style={{ 
           textAlign: 'center', 
           outline: 'none !important',
-          color: selected ? 'rgb(0 0 0)' : (isMobile ? 'rgb(0 0 0)' : 'rgb(0 0 0)')
+          color: selected ? 'rgb(55 65 81)' : (isMobile ? 'rgb(55 65 81)' : 'rgb(144 149 157)')
         }}
       >
         {selected ? selected.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }) : (placeholder || label || 'Tarih seçin')}
