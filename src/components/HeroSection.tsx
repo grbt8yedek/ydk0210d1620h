@@ -11,7 +11,7 @@ export default function HeroSection() {
         <h2 className="hidden sm:block text-xs sm:text-xl font-light">Gurbetten Memlekete, Yol Arkadaşınız!</h2>
       </div>
       {/* Service Icons - overlap border */}
-      <div className="absolute left-1/2 bottom-0 -translate-x-1/2 translate-y-[80%] sm:translate-y-[80%] z-20 flex justify-center w-full pointer-events-none">
+      <div className="absolute left-1/2 bottom-0 -translate-x-1/2 translate-y-[60%] sm:translate-y-[65%] z-20 flex justify-center w-full pointer-events-none">
         <div className="flex gap-8 bg-transparent scale-75 sm:scale-100">
           <div className="flex flex-col items-center">
             <div className="bg-gradient-to-br from-green-400 to-green-600 rounded-full w-20 h-20 flex items-center justify-center shadow-2xl hover:shadow-3xl mb-2 border-4 border-white transition-all duration-500 hover:scale-110 hover:rotate-3 cursor-pointer">
