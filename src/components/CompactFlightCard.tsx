@@ -68,7 +68,7 @@ export default function CompactFlightCard({
       <div className="flex items-center justify-between">
         {/* Sol: Rota */}
         <div className="text-xs text-gray-600">
-          {flight.origin} > {flight.destination}
+          {flight.origin} &gt; {flight.destination}
         </div>
         
         {/* Orta: Direkt etiketi */}
