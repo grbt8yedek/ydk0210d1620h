@@ -68,7 +68,7 @@ export default function ModalManager({
   
   // Mobil ikon barı
   const renderMobileIconBar = () => (
-    <div className="block md:hidden sticky top-[56px] z-20 bg-white border-b border-gray-100">
+    <div className="block md:hidden sticky top-[56px] z-20 bg-white border-b border-gray-100 hidden">
       <div className="flex items-center justify-between px-1 py-1 gap-2">
         {/* Fiyat Alarmı */}
         <button 

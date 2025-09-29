@@ -26,6 +26,11 @@ interface PriceDateSelectorProps {
   onStepChange?: (step: "departure" | "return") => void;
   // Başlık/rota metinlerini gizlemek için opsiyonel bayrak (yalnızca belirli sayfalarda)
   hideTitles?: boolean;
+  // Mobil buton satırı için tetikleyiciler (opsiyonel)
+  onOpenPriceAlert?: () => void;
+  onOpenFavorite?: () => void;
+  onOpenMobileFilter?: () => void;
+  onOpenSort?: () => void;
 }
 
 export default function PriceDateSelector({
@@ -40,7 +45,11 @@ export default function PriceDateSelector({
   onMobilePriceBarStartDateChange,
   tripType = 'oneWay',
   onStepChange,
-  hideTitles = false
+  hideTitles = false,
+  onOpenPriceAlert,
+  onOpenFavorite,
+  onOpenMobileFilter,
+  onOpenSort
 }: PriceDateSelectorProps) {
   
   // Desktop için merkez tarih state'i
@@ -232,6 +241,36 @@ export default function PriceDateSelector({
             </div>
             <div className="flex-1 border-t border-gray-200"></div>
           </div>
+
+        {/* Mobil: Ay etiketinin altında Alarm/Favori/Filtre/Sırala butonları */}
+        {(onOpenPriceAlert || onOpenFavorite || onOpenMobileFilter || onOpenSort) && (
+          <div className="flex items-center justify-between w-full gap-2 mt-1 mb-2">
+            <button
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200 shadow-sm flex-1 min-w-0 active:bg-green-100"
+              onClick={onOpenPriceAlert}
+            >
+              <span className="text-[15px] font-semibold text-gray-800 whitespace-nowrap">Alarm</span>
+            </button>
+            <button
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200 shadow-sm flex-1 min-w-0 active:bg-green-100"
+              onClick={onOpenFavorite}
+            >
+              <span className="text-[15px] font-semibold text-gray-800 whitespace-nowrap">Favori</span>
+            </button>
+            <button
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200 shadow-sm flex-1 min-w-0 active:bg-green-100"
+              onClick={onOpenMobileFilter}
+            >
+              <span className="text-[15px] font-semibold text-gray-800 whitespace-nowrap">Filtreler</span>
+            </button>
+            <button
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200 shadow-sm flex-1 min-w-0 active:bg-green-100"
+              onClick={onOpenSort}
+            >
+              <span className="text-[15px] font-semibold text-gray-800 whitespace-nowrap">Sırala</span>
+            </button>
+          </div>
+        )}
         </div>
         
         {!hideTitles && (

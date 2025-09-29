@@ -762,6 +762,10 @@ export default function FlightSearchPage() {
             tripType={tripType}
             onStepChange={setStep}
             hideTitles={true}
+            onOpenPriceAlert={openPriceAlert}
+            onOpenFavorite={openFavorite}
+            onOpenMobileFilter={openMobileFilter}
+            onOpenSort={openSort}
           />
           {/* --- Fiyat-tarih barının altındaki başlık ve rota: gizlendi --- */}
           <div className="hidden md:hidden"></div>
