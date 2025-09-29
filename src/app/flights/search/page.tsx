@@ -611,20 +611,61 @@ export default function FlightSearchPage() {
     />
   );
 
+  const [sortOption, setSortOption] = useState('price');
+
   const renderSortOptions = () => (
     <div className="space-y-4 text-sm text-gray-600">
       <h4 className="font-semibold mb-2">Sıralama</h4>
       <div className="space-y-2">
-        <label className="flex items-center gap-2">
-          <input type="radio" name="sort" value="price" checked={true} onChange={() => {}} />
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input 
+            type="radio" 
+            name="sort" 
+            value="price" 
+            checked={sortOption === 'price'} 
+            onChange={() => {
+              setSortOption('price');
+              // Fiyata göre sırala
+              // Burada gerçek sıralama mantığı eklenecek
+              closeSort();
+            }}
+            className="w-4 h-4 text-green-500 border-green-500 focus:ring-green-500 focus:ring-2"
+            style={{ accentColor: '#10b981' }}
+          />
           Fiyata göre sırala (En düşük fiyat)
         </label>
-        <label className="flex items-center gap-2">
-          <input type="radio" name="sort" value="duration" onChange={() => {}} />
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input 
+            type="radio" 
+            name="sort" 
+            value="duration" 
+            checked={sortOption === 'duration'} 
+            onChange={() => {
+              setSortOption('duration');
+              // Süreye göre sırala
+              // Burada gerçek sıralama mantığı eklenecek
+              closeSort();
+            }}
+            className="w-4 h-4 text-green-500 border-green-500 focus:ring-green-500 focus:ring-2"
+            style={{ accentColor: '#10b981' }}
+          />
           Uçuş süresine göre sırala (En kısa süre)
         </label>
-        <label className="flex items-center gap-2">
-          <input type="radio" name="sort" value="departureTime" onChange={() => {}} />
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input 
+            type="radio" 
+            name="sort" 
+            value="departureTime" 
+            checked={sortOption === 'departureTime'} 
+            onChange={() => {
+              setSortOption('departureTime');
+              // Kalkış saatine göre sırala
+              // Burada gerçek sıralama mantığı eklenecek
+              closeSort();
+            }}
+            className="w-4 h-4 text-green-500 border-green-500 focus:ring-green-500 focus:ring-2"
+            style={{ accentColor: '#10b981' }}
+          />
           Kalkış saatine göre sırala (En erken kalkış)
         </label>
       </div>

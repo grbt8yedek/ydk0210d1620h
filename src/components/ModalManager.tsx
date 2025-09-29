@@ -153,8 +153,8 @@ export default function ModalManager({
       
       {/* Mobil Sıralama Modalı */}
       {showSort && (
-        <div className="fixed inset-0 z-50 bg-black/30 flex items-end justify-center">
-          <div className="bg-white rounded-t-xl shadow-lg p-4 w-full max-w-sm">
+        <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-lg p-4 w-full max-w-sm mx-4">
             <div className="flex justify-between items-center mb-4">
               <span className="font-bold text-lg">Sırala</span>
               <button onClick={onSortClose} className="text-gray-500 text-xl">×</button>
