@@ -762,14 +762,11 @@ export default function FlightSearchPage() {
             tripType={tripType}
             onStepChange={setStep}
           />
-          {/* --- Fiyat-tarih barının altındaki başlık ve BRU-IST: sadece desktopta --- */}
-          <div className="hidden md:flex flex-col items-center w-full mt-2 mb-2">
-            <span className="text-lg font-bold text-gray-800">Gidiş Uçuşları</span>
-            <span className="text-gray-500 text-sm mt-0 mb-1">{origin} → {destination}</span>
-          </div>
+          {/* --- Fiyat-tarih barının altındaki başlık ve rota: gizlendi --- */}
+          <div className="hidden md:hidden"></div>
           {/* MOBİL: Tek kolon - Sadece Gidiş */}
           <div className="md:hidden">
-            <h3 className="text-lg font-semibold mb-3 text-gray-800">Gidiş Uçuşları</h3>
+            <h3 className="hidden">Gidiş Uçuşları</h3>
             <div className="space-y-3 pb-20">
               {loadingDeparture ? (
                 <div className="flex flex-col items-center py-8 text-gray-400"><Loader2 className="w-8 h-8 animate-spin mb-2" /> Yükleniyor...</div>
