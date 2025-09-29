@@ -138,7 +138,7 @@ const DateInput: React.FC<DateInputProps> = ({ value, onChange, disabled, classN
       </button>
       {/* Masaüstü popup */}
       {show && !isMobile && (
-        <div className="absolute z-[9999] mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 min-w-[500px] right-0">
+        <div className="absolute z-[9999] mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 min-w-[500px] left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-0">
           <DayPicker
             mode="single"
             selected={selected}
@@ -164,7 +164,7 @@ const DateInput: React.FC<DateInputProps> = ({ value, onChange, disabled, classN
       {/* Mobil tam ekran scrollable modal */}
       {show && isMobile && (
         <div className="fixed inset-0 z-[9999] bg-black bg-opacity-40 flex items-end">
-          <div className="w-full bg-white rounded-t-2xl p-4 pb-8 shadow-2xl animate-slide-up max-h-[90vh] flex flex-col">
+          <div className="w-full bg-white rounded-t-2xl p-4 pb-8 shadow-2xl animate-slide-up max-h-[85vh] flex flex-col">
             <div className="flex items-center justify-between mb-2">
               <span className="font-semibold text-lg text-gray-800">{label || placeholder || 'Tarih Seç'}</span>
               <button onClick={handleCancel} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
