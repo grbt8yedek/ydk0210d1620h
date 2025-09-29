@@ -45,9 +45,9 @@ export default function CustomSlider({
   
   // Ortak slider stilleri - tekrar eden kodları önlemek için
   const sliderStyles = {
-    track: { backgroundColor: '#2563eb', height: 6 },
+    track: { backgroundColor: '#10b981', height: 6 },
     handle: {
-      borderColor: '#2563eb',
+      borderColor: '#10b981',
       backgroundColor: '#ffffff',
       opacity: 1,
       borderWidth: 2,
