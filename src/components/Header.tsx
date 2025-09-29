@@ -60,8 +60,7 @@ export default function Header() {
                     <div className="sm:hidden w-full">
                         <div className="flex flex-row justify-end items-center pt-3.5 w-full gap-2">
                             {/* Döviz alanı - Sadece mobilde görünür */}
-                            <span className="flex items-center flex-nowrap whitespace-nowrap text-xs mr-auto">
-                                <Image src="/eu.svg" alt="EU" width={16} height={16} className="inline-block align-middle mr-1" />
+                            <span className="flex items-center flex-nowrap whitespace-nowrap text-sm mr-auto">
                                 <span className="font-medium">€ = {euroRate?.toFixed(2) || 'Yükleniyor...'} TL</span>
                             </span>
                             <LanguageDropdown />
@@ -81,8 +80,7 @@ export default function Header() {
                         <div className="flex items-center gap-2">
                             <Link href="/" className="text-sm font-normal text-white leading-tight underline hover:text-gray-100 transition-colors">gurbetbiz.com</Link>
                             {/* Döviz alanı - Sadece masaüstünde görünür */}
-                            <span className="sm:ml-6 ml-2 items-center flex-nowrap whitespace-nowrap text-xs sm:text-sm flex">
-                                <Image src="/eu.svg" alt="EU" width={18} height={18} className="inline-block align-middle mr-1" />
+                            <span className="sm:ml-6 ml-2 items-center flex-nowrap whitespace-nowrap text-sm sm:text-base flex">
                                 <span className="font-medium">€ = {euroRate?.toFixed(2) || 'Yükleniyor...'} TL</span>
                             </span>
                         </div>
