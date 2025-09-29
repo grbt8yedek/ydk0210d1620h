@@ -558,6 +558,7 @@ export default function FlightSearchPage() {
   ];
   const [baggageSelections, setBaggageSelections] = useState<string[]>(passengers.map(() => '0 kg'));
   const [selectedDepartureFlight, setSelectedDepartureFlight] = useState<any>(null);
+  const [showMobileBrandModal, setShowMobileBrandModal] = useState(false);
 
   const handleBrandSelect = (flight: any, brand: any) => {
     // Seçilen brand ile rezervasyon akışına devam et
@@ -783,7 +784,7 @@ export default function FlightSearchPage() {
                     flight={flight}
                     airlinesList={airlinesList}
                     isSelected={selectedDepartureFlight?.id === flight.id}
-                    onSelect={() => setSelectedDepartureFlight(flight)}
+                    onSelect={() => { setSelectedDepartureFlight(flight); setShowMobileBrandModal(true); }}
                   />
                 ))
               )}
@@ -853,6 +854,23 @@ export default function FlightSearchPage() {
         </div>
       </div>
       
+      {/* MOBİL: Paket seçenekleri bottom sheet */}
+      {isClient && isMobile && showMobileBrandModal && selectedDepartureFlight && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowMobileBrandModal(false)} />
+          <div className="absolute left-0 right-0 bottom-0 bg-white rounded-t-2xl shadow-2xl max-h-[75vh] overflow-y-auto p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="font-semibold text-gray-800">Paket Seçenekleri</div>
+              <button className="text-gray-500 text-xl" onClick={() => setShowMobileBrandModal(false)}>×</button>
+            </div>
+            <FlightBrandOptions
+              flight={selectedDepartureFlight}
+              onSelectBrand={(brand) => handleBrandSelect(selectedDepartureFlight, brand)}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Modal yönetimi */}
       <ModalManager
         showPriceAlert={showPriceAlert}
