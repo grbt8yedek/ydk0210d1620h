@@ -138,15 +138,20 @@ export default function ModalManager({
         </div>
       )}
       
-      {/* Mobil Filtre Modalı */}
+      {/* Mobil Filtre Modalı - scrollable ve alt 'Tamam' */}
       {showMobileFilter && (
-        <div className="fixed inset-0 z-50 bg-black/30 flex items-start justify-end">
-          <div className="bg-white rounded-l-xl shadow-lg p-4 w-4/5 max-w-xs h-full overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
+        <div className="fixed inset-0 z-50 bg-black/30 flex items-end justify-center">
+          <div className="bg-white rounded-t-2xl shadow-lg w-full max-w-md max-h-[80vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white z-10 flex justify-between items-center px-4 pt-4 pb-2 border-b">
               <span className="font-bold text-lg">Filtreler</span>
               <button onClick={onMobileFilterClose} className="text-gray-500 text-xl">×</button>
             </div>
-            {mobileFilterContent}
+            <div className="p-4">
+              {mobileFilterContent}
+            </div>
+            <div className="sticky bottom-0 bg-white z-10 px-4 pt-2 pb-4 border-t">
+              <button className="w-full py-3 rounded-lg bg-green-600 text-white font-semibold" onClick={onMobileFilterClose}>Tamam</button>
+            </div>
           </div>
         </div>
       )}

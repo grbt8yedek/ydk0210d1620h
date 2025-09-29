@@ -71,7 +71,7 @@ export default function FlightFilters({
                 <label key={airlineName} className="flex items-center gap-2">
                   <input
                     type="checkbox"
-                    className="rounded"
+                    className="rounded w-4 h-4 text-green-600 border-green-500 focus:ring-green-500 focus:ring-2"
                     checked={selectedAirlines.includes(airlineName)}
                     onChange={() => onAirlineChange(airlineName)}
                   />
@@ -159,7 +159,7 @@ export default function FlightFilters({
               value="0"
               checked={maxStops === 0}
               onChange={(e) => onMaxStopsChange(Number(e.target.value))}
-              className="rounded"
+              className="rounded w-4 h-4 text-green-600 border-green-500 focus:ring-green-500 focus:ring-2"
             />
             Direkt uçuşlar (0 aktarma)
           </label>
@@ -170,7 +170,7 @@ export default function FlightFilters({
               value="1"
               checked={maxStops === 1}
               onChange={(e) => onMaxStopsChange(Number(e.target.value))}
-              className="rounded"
+              className="rounded w-4 h-4 text-green-600 border-green-500 focus:ring-green-500 focus:ring-2"
             />
             En fazla 1 aktarma
           </label>
@@ -181,7 +181,7 @@ export default function FlightFilters({
               value="2"
               checked={maxStops === 2}
               onChange={(e) => onMaxStopsChange(Number(e.target.value))}
-              className="rounded"
+              className="rounded w-4 h-4 text-green-600 border-green-500 focus:ring-green-500 focus:ring-2"
             />
             En fazla 2 aktarma
           </label>
@@ -199,7 +199,7 @@ export default function FlightFilters({
               value="economy"
               checked={selectedCabinClass === 'economy'}
               onChange={(e) => onCabinClassChange(e.target.value)}
-              className="rounded"
+              className="rounded w-4 h-4 text-green-600 border-green-500 focus:ring-green-500 focus:ring-2"
             />
             Ekonomi
           </label>
@@ -210,7 +210,7 @@ export default function FlightFilters({
               value="business"
               checked={selectedCabinClass === 'business'}
               onChange={(e) => onCabinClassChange(e.target.value)}
-              className="rounded"
+              className="rounded w-4 h-4 text-green-600 border-green-500 focus:ring-green-500 focus:ring-2"
             />
             Business
           </label>
@@ -221,7 +221,7 @@ export default function FlightFilters({
               value="first"
               checked={selectedCabinClass === 'first'}
               onChange={(e) => onCabinClassChange(e.target.value)}
-              className="rounded"
+              className="rounded w-4 h-4 text-green-600 border-green-500 focus:ring-green-500 focus:ring-2"
             />
             First Class
           </label>
