@@ -761,6 +761,7 @@ export default function FlightSearchPage() {
             onMobilePriceBarStartDateChange={setMobilePriceBarStartDate}
             tripType={tripType}
             onStepChange={setStep}
+            hideTitles={true}
           />
           {/* --- Fiyat-tarih barının altındaki başlık ve rota: gizlendi --- */}
           <div className="hidden md:hidden"></div>

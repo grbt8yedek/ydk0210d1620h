@@ -24,6 +24,8 @@ interface PriceDateSelectorProps {
   // Trip type (round trip için)
   tripType?: string;
   onStepChange?: (step: "departure" | "return") => void;
+  // Başlık/rota metinlerini gizlemek için opsiyonel bayrak (yalnızca belirli sayfalarda)
+  hideTitles?: boolean;
 }
 
 export default function PriceDateSelector({
@@ -37,7 +39,8 @@ export default function PriceDateSelector({
   mobilePriceBarStartDate,
   onMobilePriceBarStartDateChange,
   tripType = 'oneWay',
-  onStepChange
+  onStepChange,
+  hideTitles = false
 }: PriceDateSelectorProps) {
   
   // Desktop için merkez tarih state'i
@@ -231,10 +234,14 @@ export default function PriceDateSelector({
           </div>
         </div>
         
-        <div className="flex items-center gap-2 mt-0.5">
-          <span className="text-lg font-bold text-gray-800">Gidiş Uçuşları</span>
-        </div>
-        <div className="text-gray-500 text-sm mt-0 mb-1">{origin} → {destination}</div>
+        {!hideTitles && (
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="text-lg font-bold text-gray-800">Gidiş Uçuşları</span>
+          </div>
+        )}
+        {!hideTitles && (
+          <div className="text-gray-500 text-sm mt-0 mb-1">{origin} → {destination}</div>
+        )}
       </div>
       
       {/* Desktop modern kart tasarımı */}
