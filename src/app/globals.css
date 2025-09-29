@@ -44,6 +44,18 @@ html, body {
     display: none;            /* Chrome/Safari/Opera/iOS WebKit */
     background: transparent;
   }
+  
+  /* Tüm elementlerde scrollbar gizle */
+  * {
+    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none;    /* Firefox */
+  }
+  *::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+    background: transparent;
+  }
 }
 /* --- Sonu --- */
 
