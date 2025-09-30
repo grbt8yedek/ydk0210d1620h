@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { randomBytes } from 'crypto'
+import { csrfToken as redisCSRFToken } from './redis'
 
-// CSRF token store (production'da Redis kullanılmalı)
+// CSRF token store - ARTIK REDIS KULLANILIYOR!
+// Memory Map sadece fallback için (Redis erişilemezse)
 interface TokenData {
   token: string;
   expires: number;
@@ -49,7 +51,7 @@ export function createCSRFProtection(config: Partial<CSRFConfig> = {}) {
     const token = tokenFromHeader || tokenFromCookie
 
     // Token'ı doğrula
-    if (!token || !isValidCSRFToken(token)) {
+    if (!token || !(await isValidCSRFToken(token))) {
       return NextResponse.json(
         { error: 'Invalid CSRF token' },
         { status: 403 }
@@ -65,9 +67,14 @@ export function generateCSRFToken(): string {
   return randomBytes(32).toString('hex')
 }
 
-// CSRF token'ı kaydet
-export function storeCSRFToken(sessionId: string, token: string): void {
+// CSRF token'ı kaydet (Redis'e)
+export async function storeCSRFToken(sessionId: string, token: string): Promise<void> {
   const expires = Date.now() + defaultConfig.tokenExpiry;
+  
+  // Redis'e kaydet (1 saat TTL)
+  await redisCSRFToken.set(token, Math.floor(defaultConfig.tokenExpiry / 1000));
+  
+  // Fallback: Memory'e de kaydet
   csrfTokens.set(sessionId, { token, expires });
   
   // Eski token'ları temizle (basit yaklaşım)
@@ -76,20 +83,27 @@ export function storeCSRFToken(sessionId: string, token: string): void {
   }
 }
 
-// CSRF token'ı doğrula
-export function isValidCSRFToken(token: string): boolean {
+// CSRF token'ı doğrula (Redis'ten)
+export async function isValidCSRFToken(token: string): Promise<boolean> {
   // Token formatını kontrol et
   if (!token || typeof token !== 'string' || token.length !== 64) {
     console.log('CSRF Token format hatası:', token?.length)
     return false
   }
 
-  // Token'ın geçerli olup olmadığını kontrol et
-  const isValid = csrfTokens.has(token)
-  console.log('CSRF Token kontrolü:', token.substring(0, 8) + '...', isValid ? 'GEÇERLİ' : 'GEÇERSİZ')
-  console.log('Mevcut token sayısı:', csrfTokens.size)
+  // Önce Redis'ten kontrol et
+  const isValidInRedis = await redisCSRFToken.verify(token);
   
-  return isValid
+  if (isValidInRedis) {
+    console.log('CSRF Token kontrolü (Redis):', token.substring(0, 8) + '...', 'GEÇERLİ')
+    return true
+  }
+
+  // Fallback: Memory'den kontrol et
+  const isValidInMemory = csrfTokens.has(token)
+  console.log('CSRF Token kontrolü (Memory fallback):', token.substring(0, 8) + '...', isValidInMemory ? 'GEÇERLİ' : 'GEÇERSİZ')
+  
+  return isValidInMemory
 }
 
 // Eski token'ları temizle

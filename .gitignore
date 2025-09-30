@@ -64,4 +64,4 @@ dev.log
 .vscode/
 .idea/
 *.swp
-*.swo
+*.swo.env.development

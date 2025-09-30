@@ -10,6 +10,7 @@
     "@auth/prisma-adapter": "1.0.12",
     "@headlessui/react": "2.2.4",
     "@prisma/client": "5.13.0",
+    "@upstash/redis": "1.35.4",
     "@vercel/analytics": "1.5.0",
     "@vercel/speed-insights": "1.2.0",
     "bcryptjs": "2.4.3",

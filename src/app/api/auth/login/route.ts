@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     
     // CSRF Token kontrolü
     const csrfToken = request.headers.get('x-csrf-token');
-    if (!csrfToken || !isValidCSRFToken(csrfToken)) {
+    if (!csrfToken || !(await isValidCSRFToken(csrfToken))) {
       return NextResponse.json({
         success: false,
         message: 'CSRF token gerekli'

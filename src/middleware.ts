@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createCSRFProtection } from './lib/csrfProtection';
+import { rateLimit } from './lib/redis';
 
-// Rate limiting için basit bir Map
-const rateLimit = new Map<string, number[]>();
+// Rate limiting ayarları
 const RATE_LIMIT_DURATION = 60 * 1000; // 1 dakika
 const MAX_REQUESTS = 100; // 1 dakikada maksimum istek sayısı
 
@@ -69,13 +69,11 @@ export async function middleware(request: NextRequest) {
   // API Rate Limiting ve CSRF Protection
   if (request.nextUrl.pathname.startsWith('/api')) {
     const ip = request.ip || 'unknown';
-    const now = Date.now();
-    const windowStart = now - RATE_LIMIT_DURATION;
     
-    const requestHistory = rateLimit.get(ip) || [];
-    const recentRequests = requestHistory.filter((time: number) => time > windowStart);
+    // Redis ile rate limiting kontrolü
+    const rateLimitResult = await rateLimit.check(ip, MAX_REQUESTS, RATE_LIMIT_DURATION);
     
-    if (recentRequests.length >= MAX_REQUESTS) {
+    if (!rateLimitResult.allowed) {
       return new NextResponse(JSON.stringify({
         error: 'Too many requests',
         message: 'Please try again later'
@@ -83,13 +81,16 @@ export async function middleware(request: NextRequest) {
         status: 429,
         headers: {
           'Content-Type': 'application/json',
-          'Retry-After': '60'
+          'Retry-After': '60',
+          'X-RateLimit-Limit': MAX_REQUESTS.toString(),
+          'X-RateLimit-Remaining': '0'
         }
       });
     }
-    
-    recentRequests.push(now);
-    rateLimit.set(ip, recentRequests);
+
+    // Rate limit headers ekle
+    response.headers.set('X-RateLimit-Limit', MAX_REQUESTS.toString());
+    response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
 
     // CSRF Protection for POST, PUT, DELETE requests
     if (['POST', 'PUT', 'DELETE'].includes(request.method)) {
