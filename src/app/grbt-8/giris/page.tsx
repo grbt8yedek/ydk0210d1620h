@@ -18,10 +18,19 @@ export default function AdminGiris() {
     setError('');
 
     try {
-      // PIN kontrolü
-      const correctPin = process.env.NEXT_PUBLIC_ADMIN_PIN || '7000';
-      if (pin !== correctPin) {
-        setError('Geçersiz PIN');
+      // PIN kontrolü - SERVER-SIDE (güvenli)
+      const pinResponse = await fetch('/api/admin/verify-pin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ pin }),
+      });
+
+      const pinData = await pinResponse.json();
+
+      if (!pinData.success) {
+        setError(pinData.message || 'Geçersiz PIN');
         setLoading(false);
         return;
       }
