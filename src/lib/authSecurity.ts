@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { randomBytes, createHash } from 'crypto'
+import { randomBytes } from 'crypto'
 
 // Brute force koruması için store
 const loginAttempts = new Map<string, { count: number; lastAttempt: number; blockedUntil?: number }>()
@@ -113,20 +113,6 @@ export function validatePasswordStrength(password: string): {
     isValid: errors.length === 0,
     errors
   }
-}
-
-// Password hash'le
-export function hashPassword(password: string): string {
-  const salt = randomBytes(16).toString('hex')
-  const hash = createHash('sha256').update(password + salt).digest('hex')
-  return `${salt}:${hash}`
-}
-
-// Password doğrula
-export function verifyPassword(password: string, hashedPassword: string): boolean {
-  const [salt, hash] = hashedPassword.split(':')
-  const testHash = createHash('sha256').update(password + salt).digest('hex')
-  return hash === testHash
 }
 
 // Session güvenliği
