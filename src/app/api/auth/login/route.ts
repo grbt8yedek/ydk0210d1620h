@@ -12,14 +12,14 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     
-    // CSRF Token kontrolü (şimdilik devre dışı)
-    // const csrfToken = request.headers.get('x-csrf-token');
-    // if (!csrfToken || !isValidCSRFToken(csrfToken)) {
-    //   return NextResponse.json({
-    //     success: false,
-    //     message: 'CSRF token gerekli'
-    //   }, { status: 403 });
-    // }
+    // CSRF Token kontrolü
+    const csrfToken = request.headers.get('x-csrf-token');
+    if (!csrfToken || !isValidCSRFToken(csrfToken)) {
+      return NextResponse.json({
+        success: false,
+        message: 'CSRF token gerekli'
+      }, { status: 403 });
+    }
     
     // Input validation
     await validate(userSchema.login, body);

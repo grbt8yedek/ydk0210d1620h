@@ -9,6 +9,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import { setupErrorTracking } from '@/lib/errorTracking'
+import { setupCSRFProtection } from '@/hooks/useCSRFToken'
 import '@/lib/monitoringClient'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -50,6 +51,7 @@ export default function RootLayout({
             __html: `
               if (typeof window !== 'undefined') {
                 ${setupErrorTracking.toString()}();
+                ${setupCSRFProtection.toString()}();
               }
             `
           }}

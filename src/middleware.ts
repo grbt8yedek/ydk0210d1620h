@@ -91,14 +91,14 @@ export async function middleware(request: NextRequest) {
     recentRequests.push(now);
     rateLimit.set(ip, recentRequests);
 
-    // CSRF Protection for POST, PUT, DELETE requests (şimdilik devre dışı)
-    // if (['POST', 'PUT', 'DELETE'].includes(request.method)) {
-    //   const csrfMiddleware = createCSRFProtection();
-    //   const csrfResponse = await csrfMiddleware(request);
-    //   if (csrfResponse.status === 403) {
-    //     return csrfResponse;
-    //   }
-    // }
+    // CSRF Protection for POST, PUT, DELETE requests
+    if (['POST', 'PUT', 'DELETE'].includes(request.method)) {
+      const csrfMiddleware = createCSRFProtection();
+      const csrfResponse = await csrfMiddleware(request);
+      if (csrfResponse.status === 403) {
+        return csrfResponse;
+      }
+    }
   }
 
   // /admin ve /grbt-8: arama motoru engelleme ve ek sertleştirme
