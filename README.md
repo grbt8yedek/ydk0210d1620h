@@ -1,4 +1,4 @@
-,ade9# GRBT - Gurbet.biz Web Uygulaması
+# GRBT - Gurbet.biz Web Uygulaması
 
 Modern Next.js tabanlı web uygulaması.
 
