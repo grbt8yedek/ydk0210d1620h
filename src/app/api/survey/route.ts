@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { logger } from '@/utils/error';
 
 const prisma = new PrismaClient();
 
@@ -27,27 +28,10 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      // Admin paneline anket cevabını sync et
-      try {
-        const adminApiUrl = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'https://www.grbt8.store'
-        await fetch(`${adminApiUrl}/api/surveys/user/${userId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userId: userId,
-            answers: answers,
-            completedAt: completedAt,
-            userAgent: request.headers.get('user-agent') || '',
-            ipAddress: request.headers.get('x-forwarded-for') || request.ip || '',
-          })
-        });
-        console.log('Anket cevabı admin paneline başarıyla sync edildi');
-      } catch (error) {
-        console.error('Admin paneline anket sync hatası:', error);
-        // Admin paneline sync başarısız olsa bile ana site kaydı devam etsin
-      }
+      // NOT: Admin panel ve ana site aynı Neon PostgreSQL database'ini kullanıyor
+      // Bu yüzden ayrıca HTTP sync'e gerek yok - anket cevapları zaten her iki panelde de görünüyor
+
+      logger.info('Anket kaydedildi:', { userId, surveyId: surveyResponse.id });
 
       return NextResponse.json({ 
         success: true, 
@@ -56,7 +40,7 @@ export async function POST(request: NextRequest) {
       });
     } catch (dbError) {
       // Veritabanı tablosu yoksa demo response döndür
-      console.warn('SurveyResponse tablosu bulunamadı - Demo response döndürülüyor');
+      logger.warn('SurveyResponse tablosu bulunamadı - Demo response döndürülüyor');
       return NextResponse.json({ 
         success: true, 
         message: 'Anket başarıyla kaydedildi (demo)',
@@ -65,7 +49,11 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Anket kaydedilirken hata:', error);
+    logger.error('Anket kaydedilirken hata:', {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    
     return NextResponse.json(
       { success: false, message: 'Anket kaydedilirken bir hata oluştu' },
       { status: 500 }
@@ -96,7 +84,7 @@ export async function GET(request: NextRequest) {
         });
       } catch (dbError) {
         // Veritabanı tablosu yoksa demo veri döndür
-        console.warn('SurveyResponse tablosu bulunamadı - Demo veri döndürülüyor');
+        logger.warn('SurveyResponse tablosu bulunamadı - Demo veri döndürülüyor');
         return NextResponse.json({ 
           success: true, 
           data: [] // Boş array - kullanıcı anketi doldurmamış
@@ -128,7 +116,7 @@ export async function GET(request: NextRequest) {
         });
       } catch (dbError) {
         // Veritabanı tablosu yoksa demo veri döndür
-        console.warn('SurveyResponse tablosu bulunamadı - Demo veri döndürülüyor');
+        logger.warn('SurveyResponse tablosu bulunamadı - Demo veri döndürülüyor');
         return NextResponse.json({ 
           success: true, 
           data: [] // Boş array
@@ -137,7 +125,11 @@ export async function GET(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Anket sonuçları getirilirken hata:', error);
+    logger.error('Anket sonuçları getirilirken hata:', {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    
     return NextResponse.json(
       { success: false, message: 'Anket sonuçları getirilirken bir hata oluştu' },
       { status: 500 }

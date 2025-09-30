@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
+import { logger } from '@/utils/error';
 
 export async function POST(request: Request) {
   try {
@@ -70,45 +71,10 @@ export async function POST(request: Request) {
       }
     });
 
-    // Admin paneline kullanıcıyı otomatik kaydet
-    try {
-      const adminApiUrl = process.env.NEXT_PUBLIC_ADMIN_API_URL || 'https://www.grbt8.store'
-      await fetch(`${adminApiUrl}/api/users/sync-single`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user: {
-            id: user.id,
-            email: user.email,
-            password: hashedPassword,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            countryCode: user.countryCode,
-            phone: user.phone,
-            birthDay: user.birthDay,
-            birthMonth: user.birthMonth,
-            birthYear: user.birthYear,
-            gender: user.gender,
-            identityNumber: user.identityNumber,
-            isForeigner: user.isForeigner,
-            emailVerified: user.emailVerified,
-            image: user.image,
-            lastLoginAt: user.lastLoginAt,
-            status: user.status,
-            role: user.role,
-            canDelete: user.canDelete,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt
-          }
-        })
-      });
-      console.log('Kullanıcı admin paneline başarıyla kaydedildi');
-    } catch (error) {
-      console.error('Admin paneline kayıt hatası:', error);
-      // Admin paneline kayıt başarısız olsa bile ana site kaydı devam etsin
-    }
+    // NOT: Admin panel ve ana site aynı Neon PostgreSQL database'ini kullanıyor
+    // Bu yüzden ayrıca HTTP sync'e gerek yok - kullanıcı zaten her iki panelde de görünüyor
+
+    logger.info('Yeni kullanıcı kaydedildi:', { email: user.email, id: user.id });
 
     return NextResponse.json({
       message: 'Kullanıcı başarıyla oluşturuldu',
@@ -120,10 +86,14 @@ export async function POST(request: Request) {
       }
     });
   } catch (error) {
-    console.error('Kullanıcı kayıt hatası:', error);
+    logger.error('Kullanıcı kayıt hatası:', {
+      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    
     return NextResponse.json(
       { error: 'Kullanıcı oluşturulurken bir hata oluştu' },
       { status: 500 }
     );
   }
-} 
+}
