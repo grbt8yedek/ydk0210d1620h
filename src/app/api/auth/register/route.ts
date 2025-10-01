@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
 import { logger } from '@/utils/error';
+import { ApiError, successResponse, ErrorCode } from '@/utils/errorResponse';
 
 export async function POST(request: Request) {
   try {
@@ -20,21 +20,15 @@ export async function POST(request: Request) {
       isForeigner 
     } = await request.json();
 
-    // Basit validasyon
+    // Validation
     if (!email || !password || !firstName || !lastName) {
-      return NextResponse.json(
-        { error: 'Tüm alanlar zorunludur' },
-        { status: 400 }
-      );
+      return ApiError.missingField('Tüm zorunlu alanlar');
     }
 
     // Email formatı kontrolü
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Geçerli bir email adresi giriniz' },
-        { status: 400 }
-      );
+      return ApiError.invalidInput('Geçersiz email adresi');
     }
 
     // Email kullanımda mı kontrolü
@@ -43,10 +37,7 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: 'Bu email adresi zaten kullanımda' },
-        { status: 400 }
-      );
+      return ApiError.alreadyExists('Email adresi');
     }
 
     // Şifreyi hashle
@@ -76,24 +67,16 @@ export async function POST(request: Request) {
 
     logger.info('Yeni kullanıcı kaydedildi:', { email: user.email, id: user.id });
 
-    return NextResponse.json({
-      message: 'Kullanıcı başarıyla oluşturuldu',
+    return successResponse({
       user: {
         id: user.id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName
       }
-    });
-  } catch (error) {
-    logger.error('Kullanıcı kayıt hatası:', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-      stack: error instanceof Error ? error.stack : undefined
-    });
+    }, 'Kullanıcı başarıyla oluşturuldu');
     
-    return NextResponse.json(
-      { error: 'Kullanıcı oluşturulurken bir hata oluştu' },
-      { status: 500 }
-    );
+  } catch (error) {
+    return ApiError.databaseError(error as Error);
   }
 }

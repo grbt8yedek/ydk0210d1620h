@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import { logger } from '@/utils/error';
+import { ApiError, successResponse } from '@/utils/errorResponse';
 
 // Airport arama için server-side proxy
 // API key'i client-side'da expose etmeden kullan
@@ -10,10 +10,7 @@ export async function GET(request: Request) {
     const query = searchParams.get('q');
 
     if (!query || query.length < 2) {
-      return NextResponse.json({
-        success: false,
-        data: []
-      });
+      return successResponse([]);
     }
 
     // Server-side API key kullanımı (güvenli)
@@ -21,10 +18,7 @@ export async function GET(request: Request) {
 
     if (!API_KEY) {
       logger.error('FLIGHT_API_KEY tanımlı değil');
-      return NextResponse.json({
-        success: false,
-        error: 'API key yapılandırılmamış'
-      }, { status: 500 });
+      return ApiError.internalError(new Error('API key yapılandırılmamış'));
     }
 
     // Bilet Dükkanı airport API'sine istek at
@@ -39,33 +33,14 @@ export async function GET(request: Request) {
     );
 
     if (!response.ok) {
-      logger.error('Airport API hatası:', {
-        status: response.status,
-        statusText: response.statusText
-      });
-      
-      return NextResponse.json({
-        success: false,
-        data: []
-      });
+      return ApiError.externalApiError('Havalimanı servisi');
     }
 
     const data = await response.json();
 
-    return NextResponse.json({
-      success: true,
-      data: data.airports || []
-    });
+    return successResponse(data.airports || []);
 
   } catch (error) {
-    logger.error('Airport search hatası:', {
-      error: error instanceof Error ? error.message : 'Bilinmeyen hata',
-      stack: error instanceof Error ? error.stack : undefined
-    });
-
-    return NextResponse.json({
-      success: false,
-      data: []
-    });
+    return ApiError.externalApiError('Havalimanı servisi', error as Error);
   }
 }
