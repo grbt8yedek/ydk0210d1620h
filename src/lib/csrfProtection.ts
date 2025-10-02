@@ -74,12 +74,17 @@ export async function storeCSRFToken(sessionId: string, token: string): Promise<
   // Redis'e kaydet (1 saat TTL)
   await redisCSRFToken.set(token, Math.floor(defaultConfig.tokenExpiry / 1000));
   
-  // Fallback: Memory'e de kaydet
-  csrfTokens.set(sessionId, { token, expires });
+  // Fallback: Memory'e de kaydet - TOKEN'I KEY OLARAK KULLAN!
+  csrfTokens.set(token, { token, expires });
   
   // Eski token'ları temizle (basit yaklaşım)
   if (csrfTokens.size > 1000) {
-    csrfTokens.clear()
+    const now = Date.now();
+    for (const [key, data] of csrfTokens.entries()) {
+      if (data.expires <= now) {
+        csrfTokens.delete(key);
+      }
+    }
   }
 }
 
@@ -100,10 +105,14 @@ export async function isValidCSRFToken(token: string): Promise<boolean> {
   }
 
   // Fallback: Memory'den kontrol et
-  const isValidInMemory = csrfTokens.has(token)
-  console.log('CSRF Token kontrolü (Memory fallback):', token.substring(0, 8) + '...', isValidInMemory ? 'GEÇERLİ' : 'GEÇERSİZ')
+  const tokenData = csrfTokens.get(token);
+  if (tokenData && tokenData.expires > Date.now()) {
+    console.log('CSRF Token kontrolü (Memory fallback):', token.substring(0, 8) + '...', 'GEÇERLİ')
+    return true;
+  }
   
-  return isValidInMemory
+  console.log('CSRF Token kontrolü:', token.substring(0, 8) + '...', 'GEÇERSİZ')
+  return false
 }
 
 // Eski token'ları temizle
