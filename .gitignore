@@ -65,3 +65,4 @@ dev.log
 .idea/
 *.swp
 *.swo.env.development
+.env.development
