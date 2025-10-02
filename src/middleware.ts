@@ -93,7 +93,10 @@ export async function middleware(request: NextRequest) {
     response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString());
 
     // CSRF Protection for POST, PUT, DELETE requests
-    if (['POST', 'PUT', 'DELETE'].includes(request.method)) {
+    // NextAuth endpoint'lerini CSRF kontrolünden muaf tut
+    const isNextAuthEndpoint = request.nextUrl.pathname.startsWith('/api/auth/');
+    
+    if (['POST', 'PUT', 'DELETE'].includes(request.method) && !isNextAuthEndpoint) {
       const csrfMiddleware = createCSRFProtection();
       const csrfResponse = await csrfMiddleware(request);
       if (csrfResponse.status === 403) {
