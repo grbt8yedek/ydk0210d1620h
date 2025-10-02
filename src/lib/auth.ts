@@ -134,28 +134,38 @@ export const authOptions: NextAuthOptions = {
                     return null;
                 }
 
-                // Admin email kontrolü
-                const adminEmails = (process.env.ADMIN_EMAILS || '')
-                    .split(',')
-                    .map(email => email.trim().toLowerCase())
-                    .filter(Boolean);
+                // Kullanıcıyı veritabanında ara
+                const user = await prisma.user.findUnique({ 
+                    where: { email: credentials.email } 
+                });
 
-                // Admin paneli için sadece ADMIN_EMAILS listesindeki emailler
-                const isAdminEmail = adminEmails.includes(credentials.email.toLowerCase());
-                
-                if (isAdminEmail) {
-                    const user = await prisma.user.findUnique({ where: { email: credentials.email } });
-
-                    if (user && user.password) {
-                        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
-                        if (isPasswordValid) {
-                            const name = (user.firstName && user.lastName) ? `${user.firstName} ${user.lastName}` : user.email;
-                            return { ...user, name };
-                        }
-                    }
+                // Kullanıcı yoksa veya şifresi yoksa
+                if (!user || !user.password) {
+                    return null;
                 }
 
-                return null;
+                // Şifreyi doğrula
+                const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
+                
+                if (!isPasswordValid) {
+                    return null;
+                }
+
+                // Kullanıcı aktif değilse
+                if (user.status !== 'active') {
+                    return null;
+                }
+
+                // Başarılı giriş
+                const name = (user.firstName && user.lastName) 
+                    ? `${user.firstName} ${user.lastName}` 
+                    : user.email;
+                
+                return { 
+                    ...user, 
+                    name,
+                    email: user.email 
+                };
             }
         })
     ],
