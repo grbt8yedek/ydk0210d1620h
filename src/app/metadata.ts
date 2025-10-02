@@ -53,19 +53,25 @@ export const metadata: Metadata = {
     description: 'Yurt dışı seyahatleriniz için en uygun fiyatlı uçak bileti, otel ve araç kiralama hizmetleri.',
     images: ['/images/og-image.jpg'],
   },
+  // ⚠️ TÜM ARAMA MOTORLARI - INDEXLEME KAPALI
+  // Site geçici domain'de (anasite.grbt8.store)
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
+    noarchive: true,
+    nosnippet: true,
+    noimageindex: true,
+    nocache: true,
     googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      index: false,
+      follow: false,
+      noarchive: true,
+      nosnippet: true,
+      noimageindex: true,
+      'max-video-preview': 0,
+      'max-image-preview': 'none',
+      'max-snippet': 0,
     },
   },
-  verification: {
-    google: 'google-site-verification-code-here',
-    yandex: 'yandex-verification-code-here',
-  },
+  // Verification kodlarını kaldır (geçici site)
 }

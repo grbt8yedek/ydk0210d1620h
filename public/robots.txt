@@ -1,20 +1,23 @@
+# TÜM ARAMA MOTORLARI - TÜM SİTE KAPALI
+# Site geçici domain'de, indexlenmemeli!
+
 User-agent: *
-Allow: /
+Disallow: /
 
-# Ana sayfalar
-Allow: /hesabim
-Allow: /flights/search
-Allow: /flights/booking
-Allow: /check-in
-Allow: /gizlilik-politikasi
-Allow: /kullanim-kosullari
+# Google
+User-agent: Googlebot
+Disallow: /
 
-# Admin paneli - arama motorlarından gizle
-Disallow: /admin
-Disallow: /ops-admin
-Disallow: /api/
-Disallow: /_next/
-Disallow: /node_modules/
+# Yandex
+User-agent: Yandex
+Disallow: /
 
-# Sitemap
-Sitemap: https://gurbet.biz/sitemap.xml
+# Bing
+User-agent: Bingbot
+Disallow: /
+
+# Diğer tüm botlar
+User-agent: *
+Disallow: /
+
+# Sitemap yok (geçici site)

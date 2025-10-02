@@ -23,6 +23,12 @@ export default function RootLayout({
   return (
     <html lang="tr">
       <head>
+        {/* ARAMA MOTORLARI - TÜM SİTE KAPALI */}
+        <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache" />
+        <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+        <meta name="bingbot" content="noindex, nofollow" />
+        <meta name="yandex" content="noindex, nofollow" />
+        
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
