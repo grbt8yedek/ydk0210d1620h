@@ -57,9 +57,14 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
         toast.success('Başarıyla giriş yapıldı!');
         // Monitoring: Başarılı giriş
         monitoringClient.trackLoginAttempt(true);
+        
+        // Modal'ı kapat ve yönlendir
         onClose();
-        router.push('/hesabim');
-        router.refresh(); // Session'ı yenile
+        
+        // Kısa bir gecikme ile yönlendir (modal kapanma animasyonu için)
+        setTimeout(() => {
+          window.location.href = '/hesabim';
+        }, 500);
       }
     } catch (err) {
       toast.error('Giriş yapılırken bir hata oluştu');
