@@ -38,7 +38,6 @@ const nextConfig = {
   
   // Experimental features (Next.js 13.5.6 için güvenli)
   experimental: {
-    optimizeCss: true, // CSS optimization
     optimizePackageImports: ['lucide-react', 'react-hot-toast'], // Tree shaking
   },
   
