@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { startOfDay } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 // Demo fiyat verisi fonksiyonu (API'ye hazır)
 function getDemoPrices(baseDate: Date, currency: string = "EUR") {
@@ -27,7 +28,7 @@ async function fetchPricesFromAPI(origin: string, destination: string, baseDate:
     if (!demo || demo.length === 0) throw new Error('Demo veri boş');
     return demo;
   } catch (error) {
-    console.error('Fiyat çekme hatası:', error);
+    logger.error('Fiyat çekme hatası', { error });
     // Hata durumunda demo veri döndür
     return getDemoPrices(baseDate, currency);
   }
@@ -85,7 +86,7 @@ export function usePriceState({
           setReturnPrices([]);
         }
       } catch (error) {
-        console.error('Fiyat çekme hatası:', error);
+        logger.error('Fiyat çekme hatası', { error });
         setErrorPrices('Fiyatlar yüklenirken hata oluştu');
         setDeparturePrices(getDemoPrices(departureDate, "EUR"));
         if (tripType === "roundTrip" && returnDate) {

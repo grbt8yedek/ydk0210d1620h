@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -69,7 +70,7 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('Active users error:', error);
+    logger.error('Active users error:', error);
     return NextResponse.json(
       { 
         success: false, 

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { logger } from '@/lib/logger';
 
 export default function YolcularimError({
   error,
@@ -12,7 +13,7 @@ export default function YolcularimError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Yolcularım sayfası hatası:', error);
+    logger.error('Yolcularım sayfası hatası', { error });
   }, [error]);
 
   return (

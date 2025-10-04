@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import nodemailer from 'nodemailer';
+import { logger } from '@/lib/logger';
 
 async function sendPriceAlertMail(to: string, alert: any) {
   const transporter = nodemailer.createTransport({
@@ -47,12 +48,12 @@ export async function POST(req: NextRequest) {
       try {
         await sendPriceAlertMail(session.user.email, alert);
       } catch (e) {
-        console.error('E-posta gönderilemedi:', e);
+        logger.error('E-posta gönderilemedi', { error: e });
       }
     }
     return NextResponse.json({ success: true, alert });
   } catch (error: any) {
-    console.error('API error:', error);
+    logger.error('API error', { error });
     return NextResponse.json({ error: error?.message || 'Bilinmeyen hata' }, { status: 500 });
   }
 }
@@ -69,7 +70,7 @@ export async function GET(req: NextRequest) {
     });
     return NextResponse.json({ alerts });
   } catch (error: any) {
-    console.error('API error:', error);
+    logger.error('API error', { error });
     return NextResponse.json({ error: error?.message || 'Bilinmeyen hata' }, { status: 500 });
   }
 } 

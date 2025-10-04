@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from 'crypto';
+import { logger } from '@/lib/logger';
 
 // PCI DSS Compliance için güvenlik önlemleri
 
@@ -24,7 +25,7 @@ export function logSecureCardInfo(message: string, cardInfo: {
     }
   };
   
-  console.log('[PCI-SECURE]', JSON.stringify(secureLog));
+  logger.payment('[PCI-SECURE]', JSON.stringify(secureLog));
 }
 
 /**
@@ -234,7 +235,7 @@ export function auditLog(action: string, details: Record<string, any>): void {
     ip: details.ip || 'unknown'
   };
   
-  console.log('[PCI-AUDIT]', JSON.stringify(auditEntry));
+  logger.payment('[PCI-AUDIT]', JSON.stringify(auditEntry));
 }
 
 /**

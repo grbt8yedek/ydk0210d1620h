@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { tokenizeCard, getCardFromToken, invalidateToken, getSecureCardInfo } from '@/lib/cardTokenization';
 import { getCardBinInfo } from '@/services/paymentApi';
+import { logger } from '@/lib/logger';
 
 // Güvenli kart işleme şeması
 const processPaymentSchema = z.object({
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
     const secureCardInfo = getSecureCardInfo(cardToken);
     
     // Payment processing log (güvenli)
-    console.log(`Ödeme işlemi başlatıldı:`, {
+    logger.payment('Ödeme işlemi başlatıldı', {
       amount: `${amount} ${currency}`,
       card: `${secureCardInfo?.brand} ****${secureCardInfo?.lastFour}`,
       bin: cardData.number.substring(0, 6) + '****',
@@ -72,7 +73,11 @@ export async function POST(request: NextRequest) {
     if (paymentResult.success) {
       invalidateToken(cardToken);
       
-      console.log(`Ödeme başarılı: ${amount} ${currency} - ${secureCardInfo?.brand} ****${secureCardInfo?.lastFour}`);
+      logger.payment('Ödeme başarılı', {
+        amount: `${amount} ${currency}`,
+        card: `${secureCardInfo?.brand} ****${secureCardInfo?.lastFour}`,
+        transactionId: paymentResult.transactionId
+      });
       
       return NextResponse.json({
         success: true,
@@ -95,7 +100,10 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('Ödeme işlemi hatası:', error);
+    logger.error('Ödeme işlemi hatası', { 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
     
     return NextResponse.json(
       { 

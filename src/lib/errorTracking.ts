@@ -1,5 +1,7 @@
 // Basit error tracking sistemi (Sentry alternatifi)
 
+import { logger } from '@/lib/logger';
+
 interface ErrorEvent {
   id: string;
   timestamp: string;
@@ -46,7 +48,7 @@ class ErrorTracker {
 
     // Console'a logla (development için)
     if (process.env.NODE_ENV === 'development') {
-      console.error('Error tracked:', errorEvent);
+      logger.error('Error tracked:', errorEvent);
     }
 
     // Ana site monitoring API'sine gönder
@@ -77,7 +79,7 @@ class ErrorTracker {
         });
       }
     } catch (err) {
-      console.error('Failed to send error to monitoring API:', err);
+      logger.error('Failed to send error to monitoring API:', err);
     }
   }
 

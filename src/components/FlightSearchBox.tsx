@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import { searchAirports } from '@/services/flightApi';
 import { Airport } from '@/types/flight';
 import { monitoringClient } from '@/lib/monitoringClient';
+import { logger } from '@/lib/logger';
 
 const DateInput = dynamic(() => import('./DateInput'), { ssr: false });
 
@@ -64,7 +65,7 @@ export default function FlightSearchBox({
       const results = await searchAirports(query);
       setSuggestions(results);
     } catch (error) {
-      console.error("Havalimanı arama hatası:", error);
+      logger.error("Havalimanı arama hatası", { error });
       setSuggestions([]); // Hata durumunda listeyi temizle
     }
   };

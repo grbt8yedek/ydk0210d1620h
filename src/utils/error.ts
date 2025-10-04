@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logger as mainLogger } from '@/lib/logger';
 
 export class AppError extends Error {
   constructor(
@@ -12,7 +13,7 @@ export class AppError extends Error {
 }
 
 export const errorHandler = (error: unknown) => {
-  console.error('Error:', error);
+  mainLogger.error('Error', { error });
 
   if (error instanceof AppError) {
     return NextResponse.json(
@@ -60,19 +61,5 @@ export const errorHandler = (error: unknown) => {
   );
 };
 
-export const logger = {
-  info: (message: string, data?: any) => {
-    console.log(`[INFO] ${message}`, data || '');
-  },
-  error: (message: string, error?: any) => {
-    console.error(`[ERROR] ${message}`, error || '');
-  },
-  warn: (message: string, data?: any) => {
-    console.warn(`[WARN] ${message}`, data || '');
-  },
-  debug: (message: string, data?: any) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.debug(`[DEBUG] ${message}`, data || '');
-    }
-  }
-}; 
+// Logger artık @/lib/logger'dan import edilmeli
+export const logger = mainLogger; 

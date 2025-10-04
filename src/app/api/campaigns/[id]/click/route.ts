@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 
 export async function POST(
   request: NextRequest,
@@ -15,7 +16,7 @@ export async function POST(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Campaign click API error:', error)
+    logger.error('Campaign click API error:', error)
     return NextResponse.json({ success: false }, { status: 500 })
   }
 }

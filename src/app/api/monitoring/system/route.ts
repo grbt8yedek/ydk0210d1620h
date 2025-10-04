@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -88,7 +89,7 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('System metrics okuma hatası:', error);
+    logger.error('System metrics okuma hatası:', error);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { errorTracker } from '@/lib/errorTracking';
+import { logger } from '@/lib/logger';
 
 interface Props {
   children: React.ReactNode;
@@ -33,7 +34,11 @@ export default class ErrorBoundary extends React.Component<Props, State> {
       }
     });
 
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    logger.error('ErrorBoundary yakaladı', { 
+      error: error.message, 
+      stack: error.stack,
+      componentStack: errorInfo.componentStack 
+    });
   }
 
   render() {

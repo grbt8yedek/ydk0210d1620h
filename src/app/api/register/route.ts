@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
 import { z } from 'zod';
 import { validatePasswordStrength } from '@/lib/authSecurity';
+import { logger } from '@/lib/logger';
 
 const registerUserSchema = z.object({
     email: z.string().email({ message: "Geçerli bir e-posta adresi girin." }),
@@ -74,7 +75,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: 'Kullanıcı başarıyla oluşturuldu.', userId: result.id }, { status: 201 });
 
     } catch (error) {
-        console.error('Kayıt Hatası:', error);
+        logger.error('Kayıt hatası', { error });
         return NextResponse.json({ error: 'Sunucu hatası oluştu.' }, { status: 500 });
     }
 } 

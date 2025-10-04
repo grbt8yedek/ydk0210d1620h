@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { logger } from '@/lib/logger';
 
 const BASE_URL = '/api/euro-rate';
 
@@ -14,7 +15,7 @@ export async function getEuroRate(): Promise<number> {
     const response = await axios.get(BASE_URL);
     return response.data.eurTry || response.data.rate;
   } catch (error) {
-    console.error('Döviz kuru çekilirken hata oluştu:', error);
+    logger.error('Döviz kuru çekilirken hata', { error });
     return 48.50; // Hata durumunda varsayılan değer
   }
 }
@@ -24,7 +25,7 @@ export async function getExchangeRates(): Promise<ExchangeRateResponse> {
     const response = await axios.get(BASE_URL);
     return response.data;
   } catch (error) {
-    console.error('Döviz kurları çekilirken hata oluştu:', error);
+    logger.error('Döviz kurları çekilirken hata', { error });
     return {
       eurTry: 48.50,
       eurUsd: 1.18,

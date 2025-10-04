@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
 
 let csrfToken: string | null = null;
 let tokenPromise: Promise<string> | null = null;
@@ -104,7 +105,7 @@ export function setupCSRFProtection() {
         });
       }
     } catch (err) {
-      console.error('CSRF token eklenemedi:', err);
+      logger.error('CSRF token eklenemedi', { error: err });
     }
 
     return originalFetch(input, init);

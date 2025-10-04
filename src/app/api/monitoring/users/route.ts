@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    console.error('User activities okuma hatası:', error);
+    logger.error('User activities okuma hatası:', error);
     return NextResponse.json(
       { success: false, error: 'Sunucu hatası' },
       { status: 500 }

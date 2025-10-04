@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { logger } from '@/lib/logger';
 
 // GET: Belirli bir yolcuyu getir
 export async function GET(
@@ -34,7 +35,7 @@ export async function GET(
 
     return NextResponse.json(passenger);
   } catch (error) {
-    console.error('Yolcu getirme hatası:', error);
+    logger.error('Yolcu getirme hatası', { error });
     return NextResponse.json(
       { error: 'Yolcu bilgileri alınırken bir hata oluştu' },
       { status: 500 }
@@ -117,7 +118,7 @@ export async function PUT(
 
     return NextResponse.json(updatedPassenger);
   } catch (error) {
-    console.error('Yolcu güncelleme hatası:', error);
+    logger.error('Yolcu güncelleme hatası', { error });
     return NextResponse.json(
       { error: 'Yolcu bilgileri güncellenirken bir hata oluştu' },
       { status: 500 }
@@ -175,7 +176,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Yolcu silme hatası:', error);
+    logger.error('Yolcu silme hatası', { error });
     return NextResponse.json(
       { error: 'Yolcu silinirken bir hata oluştu' },
       { status: 500 }

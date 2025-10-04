@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Test verisi ekleme hatası:', error);
+    logger.error('Test verisi ekleme hatası:', error);
     return NextResponse.json(
       { success: false, error: 'Test verisi eklenirken hata oluştu' },
       { status: 500 }

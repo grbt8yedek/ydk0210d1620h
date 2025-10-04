@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    console.log('API: Session user ID:', session?.user?.id);
+    logger.api('GET', '/api/reservations', { userId: session?.user?.id });
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Yetkisiz erişim.' }, { status: 401 });
@@ -14,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
-    console.log('API: Type filter:', type);
+    logger.debug('Type filter', { type });
 
     const reservations = await prisma.reservation.findMany({
       where: { 
@@ -24,10 +25,10 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' }
     });
 
-    console.log('API: Found reservations:', reservations.length);
+    logger.debug('Rezervasyonlar bulundu', { count: reservations.length });
     return NextResponse.json(reservations);
   } catch (error) {
-    console.error('Rezervasyon getirme hatası:', error);
+    logger.error('Rezervasyon getirme hatası', { error });
     return NextResponse.json({ error: 'Rezervasyonlar yüklenirken bir hata oluştu.' }, { status: 500 });
   }
 }
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    console.log('Rezervasyon oluşturma isteği:', body);
+    logger.api('POST', '/api/reservations', { userId: body.userId });
 
     const reservation = await prisma.reservation.create({
       data: {
@@ -65,12 +66,11 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    console.log('Rezervasyon başarıyla oluşturuldu:', reservation);
+    logger.info('Rezervasyon başarıyla oluşturuldu', { reservationId: reservation.id });
     return NextResponse.json(reservation);
   } catch (error) {
-    console.error('Rezervasyon oluşturma hatası:', error);
+    logger.error('Rezervasyon oluşturma hatası', { error });
     const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
-    console.error('Hata detayı:', errorMessage);
     return NextResponse.json({ error: 'Rezervasyon oluşturulurken bir hata oluştu.', details: errorMessage }, { status: 500 });
   }
 }

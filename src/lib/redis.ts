@@ -6,6 +6,7 @@
  */
 
 import { Redis } from '@upstash/redis';
+import { logger } from '@/lib/logger';
 
 // Redis client oluştur
 export const redis = new Redis({
@@ -52,7 +53,7 @@ export const rateLimit = {
         remaining: maxRequests - (requestCount + 1) 
       };
     } catch (error) {
-      console.error('Redis rate limit error:', error);
+      logger.error('Redis rate limit error:', error);
       // Redis hatası durumunda trafiği engelleme
       return { allowed: true, remaining: maxRequests };
     }
@@ -67,7 +68,7 @@ export const rateLimit = {
       const key = `rate_limit:${ip}`;
       await redis.del(key);
     } catch (error) {
-      console.error('Redis rate limit reset error:', error);
+      logger.error('Redis rate limit reset error:', error);
     }
   }
 };
@@ -86,7 +87,7 @@ export const csrfToken = {
       const key = `csrf_token:${token}`;
       await redis.set(key, '1', { ex: ttlSeconds });
     } catch (error) {
-      console.error('Redis CSRF token set error:', error);
+      logger.error('Redis CSRF token set error:', error);
     }
   },
 
@@ -101,7 +102,7 @@ export const csrfToken = {
       const exists = await redis.exists(key);
       return exists === 1;
     } catch (error) {
-      console.error('Redis CSRF token verify error:', error);
+      logger.error('Redis CSRF token verify error:', error);
       // Redis hatası durumunda güvenli tarafta kal
       return false;
     }
@@ -116,7 +117,7 @@ export const csrfToken = {
       const key = `csrf_token:${token}`;
       await redis.del(key);
     } catch (error) {
-      console.error('Redis CSRF token delete error:', error);
+      logger.error('Redis CSRF token delete error:', error);
     }
   }
 };
@@ -136,7 +137,7 @@ export const cache = {
     try {
       await redis.set(`cache:${key}`, JSON.stringify(value), { ex: ttlSeconds });
     } catch (error) {
-      console.error('Redis cache set error:', error);
+      logger.error('Redis cache set error:', error);
     }
   },
 
@@ -151,7 +152,7 @@ export const cache = {
       if (!data) return null;
       return typeof data === 'string' ? JSON.parse(data) : data;
     } catch (error) {
-      console.error('Redis cache get error:', error);
+      logger.error('Redis cache get error:', error);
       return null;
     }
   },
@@ -164,7 +165,7 @@ export const cache = {
     try {
       await redis.del(`cache:${key}`);
     } catch (error) {
-      console.error('Redis cache delete error:', error);
+      logger.error('Redis cache delete error:', error);
     }
   },
 
@@ -179,7 +180,7 @@ export const cache = {
         await redis.del(...keys);
       }
     } catch (error) {
-      console.error('Redis cache delete pattern error:', error);
+      logger.error('Redis cache delete pattern error:', error);
     }
   }
 };

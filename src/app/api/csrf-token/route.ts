@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateCSRFToken, storeCSRFToken, createCSRFResponse } from '@/lib/csrfProtection';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -16,7 +17,7 @@ export async function GET() {
     return response;
     
   } catch (error) {
-    console.error('CSRF token oluşturma hatası:', error);
+    logger.error('CSRF token oluşturma hatası', { error });
     return NextResponse.json(
       { error: 'CSRF token oluşturulamadı' },
       { status: 500 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import os from 'os';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -78,7 +79,7 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('Health score error:', error);
+    logger.error('Health score error:', error);
     return NextResponse.json(
       { 
         success: false, 

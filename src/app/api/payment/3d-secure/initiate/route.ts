@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { initiate3DSecure } from '@/lib/threeDSecure';
 import { getCardFromToken, getSecureCardInfo } from '@/lib/cardTokenization';
+import { logger } from '@/lib/logger';
 
 // 3D Secure başlatma şeması
 const initiate3DSchema = z.object({
@@ -49,7 +50,11 @@ export async function POST(request: NextRequest) {
     });
 
     if (result.success) {
-      console.log(`3D Secure başlatıldı: ${amount} ${currency} - ${secureCardInfo?.brand} ****${secureCardInfo?.lastFour}`);
+      logger.payment('3D Secure başlatıldı', {
+        amount: `${amount} ${currency}`,
+        card: `${secureCardInfo?.brand} ****${secureCardInfo?.lastFour}`,
+        sessionId: result.sessionId?.substring(0, 8) + '...'
+      });
       
       return NextResponse.json({
         success: true,
@@ -67,7 +72,9 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('3D Secure başlatma hatası:', error);
+    logger.error('3D Secure başlatma hatası', {
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
     
     return NextResponse.json(
       { 

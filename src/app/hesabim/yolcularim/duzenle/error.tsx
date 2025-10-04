@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { logger } from '@/lib/logger';
 
 export default function YolcuDuzenleError({
   error,
@@ -12,7 +13,7 @@ export default function YolcuDuzenleError({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Yolcu düzenleme sayfası hatası:', error);
+    logger.error('Yolcu düzenleme sayfası hatası', { error });
   }, [error]);
 
   return (

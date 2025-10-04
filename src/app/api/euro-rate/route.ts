@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
+import { logger } from '@/lib/logger';
 
 // Cache sistemi - 5 dakika boyunca sakla
 const cache = new Map();
@@ -11,7 +12,7 @@ export async function GET() {
     const cacheKey = 'euro-rate';
     const cached = cache.get(cacheKey);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log('Cache\'den döviz kuru döndürülüyor');
+      logger.debug('Cache\'den döviz kuru döndürülüyor');
       return NextResponse.json(cached.data);
     }
 
@@ -63,7 +64,7 @@ export async function GET() {
         return { success: false, apiUrl };
       } catch (apiError) {
         const errorMessage = apiError instanceof Error ? apiError.message : 'Bilinmeyen hata';
-        console.log(`API hatası (${apiUrl}):`, errorMessage);
+        logger.warn(`API hatası (${apiUrl})`, { error: errorMessage });
         return { success: false, apiUrl };
       }
     });
@@ -76,7 +77,7 @@ export async function GET() {
       if (result.status === 'fulfilled' && result.value.success) {
         const responseData = result.value.data;
         if (responseData && responseData.eurTry) {
-          console.log(`Döviz kuru başarıyla alındı: €1 = ${responseData.eurTry} TL (${result.value.apiUrl})`);
+          logger.info(`Döviz kuru başarıyla alındı`, { rate: responseData.eurTry, source: result.value.apiUrl });
           
           // Cache'e kaydet
           cache.set(cacheKey, {
@@ -90,7 +91,7 @@ export async function GET() {
     }
 
     // Tüm API'ler başarısız olursa fallback
-    console.log('Tüm API\'ler başarısız, fallback değer kullanılıyor');
+    logger.warn('Tüm API\'ler başarısız, fallback değer kullanılıyor');
     const fallbackData = { 
       eurTry: 48.50,
       eurUsd: 1.18,
@@ -107,7 +108,7 @@ export async function GET() {
     return NextResponse.json(fallbackData);
 
   } catch (error) {
-    console.error('Euro kuru çekilemedi:', error);
+    logger.error('Euro kuru çekilemedi', { error });
     const errorData = { 
       eurTry: 48.50,
       eurUsd: 1.18,

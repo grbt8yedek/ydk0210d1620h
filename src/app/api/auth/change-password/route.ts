@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: Request) {
   try {
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error('Şifre değiştirme hatası:', error);
+    logger.error('Şifre değiştirme hatası', { error });
     return NextResponse.json(
       { error: 'Şifre değiştirme başarısız' },
       { status: 500 }

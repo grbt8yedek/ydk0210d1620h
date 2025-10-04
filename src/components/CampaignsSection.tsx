@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { logger } from '@/lib/logger'
 
 interface Campaign {
   id: string
@@ -36,13 +37,13 @@ export default function CampaignsSection() {
     
     // Cache kontrolü
     if (!forceRefresh && lastFetch && (now - lastFetch) < CACHE_DURATION) {
-      console.log('Cache\'den kampanyalar kullanılıyor')
+      logger.debug('Cache\'den kampanyalar kullanılıyor')
       return
     }
 
     try {
       setError(null)
-      console.log('Fetching campaigns...')
+      logger.debug('Kampanyalar getiriliyor...')
       
       const response = await fetch('/api/campaigns', {
         method: 'GET',
@@ -53,11 +54,11 @@ export default function CampaignsSection() {
         cache: 'no-store'
       })
       
-      console.log('Response status:', response.status)
+      logger.debug('Response status', { status: response.status })
       
       if (response.ok) {
         const data = await response.json()
-        console.log('API Response:', data)
+        logger.debug('API Response', { data })
         
         if (data.success && data.data && Array.isArray(data.data)) {
           // Sadece aktif kampanyaları al ve pozisyona göre sırala
@@ -66,21 +67,21 @@ export default function CampaignsSection() {
             .sort((a: Campaign, b: Campaign) => a.position - b.position)
             .slice(0, 4) // Maksimum 4 kampanya
           
-          console.log('Active campaigns:', activeCampaigns)
+          logger.debug('Aktif kampanyalar', { count: activeCampaigns.length })
           setCampaigns(activeCampaigns)
           setLastFetch(now)
         } else {
-          console.log('No valid data received:', data)
+          logger.warn('Geçersiz veri alındı', { data })
           setError('Geçerli veri alınamadı')
         }
       } else {
-        console.error('API response not ok:', response.status, response.statusText)
+        logger.error('API response başarısız', { status: response.status, statusText: response.statusText })
         const errorText = await response.text()
-        console.error('Error response:', errorText)
+        logger.error('Error response', { errorText })
         setError(`API Hatası: ${response.status}`)
       }
     } catch (error) {
-      console.error('Kampanyalar yüklenirken hata:', error)
+      logger.error('Kampanyalar yükleme hatası', { error })
       setError('Kampanyalar yüklenirken hata oluştu')
     } finally {
       setLoading(false)
@@ -119,7 +120,7 @@ export default function CampaignsSection() {
         await fetchCampaigns(true)
       }
     } catch (error) {
-      console.error('Kampanya kaydetme hatası:', error)
+      logger.error('Kampanya kaydetme hatası', { error })
       // Hata durumunda yenile
       await fetchCampaigns(true)
     }
@@ -141,7 +142,7 @@ export default function CampaignsSection() {
       // Cache'i temizle
       setLastFetch(null)
     } catch (error) {
-      console.error('Kampanya silme hatası:', error)
+      logger.error('Kampanya silme hatası', { error })
       setCampaigns(originalCampaigns) // Geri al
     }
   }, [campaigns])
@@ -176,7 +177,7 @@ export default function CampaignsSection() {
         method: 'POST'
       })
     } catch (error) {
-      console.error('Tıklama sayacı güncellenirken hata:', error)
+      logger.error('Tıklama sayacı güncelleme hatası', { error })
       // Hata durumunda geri al
       setCampaigns(prev => prev.map(c => 
         c.id === campaignId 

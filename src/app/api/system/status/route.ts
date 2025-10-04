@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import os from 'os';
 import fs from 'fs';
 import path from 'path';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -65,7 +66,7 @@ export async function GET() {
       systemInfo.database.reservationCount = reservationCount;
       systemInfo.database.paymentCount = paymentCount;
     } catch (error) {
-      console.error('Database stats error:', error);
+      logger.error('Database stats error:', error);
       systemInfo.database.status = 'error';
     }
 
@@ -77,7 +78,7 @@ export async function GET() {
         systemInfo.disk.dbSize = stats.size;
       }
     } catch (error) {
-      console.error('Disk size error:', error);
+      logger.error('Disk size error:', error);
     }
 
     return NextResponse.json({
@@ -86,7 +87,7 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('System status error:', error);
+    logger.error('System status error:', error);
     return NextResponse.json(
       { 
         success: false, 

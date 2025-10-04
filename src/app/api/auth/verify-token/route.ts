@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,10 +9,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const token = searchParams.get('token')
 
-    console.log('Token doğrulama isteği:', { token })
+    logger.debug('Token doğrulama isteği', { hasToken: !!token })
 
     if (!token) {
-      console.log('Token bulunamadı')
+      logger.warn('Token bulunamadı')
       return NextResponse.json({ 
         valid: false,
         error: 'Token bulunamadı'
@@ -34,14 +35,14 @@ export async function GET(request: NextRequest) {
     })
 
     if (!user) {
-      console.log('Geçersiz veya süresi dolmuş token:', token)
+      logger.warn('Geçersiz veya süresi dolmuş token')
       return NextResponse.json({ 
         valid: false,
         error: 'Token geçersiz veya süresi dolmuş'
       })
     }
 
-    console.log('Token geçerli:', {
+    logger.security('Token doğrulandı', {
       userId: user.id,
       email: user.email,
       expiry: user.resetTokenExpiry
@@ -53,7 +54,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Token verification error:', error)
+    logger.error('Token verification error', { error })
     return NextResponse.json({ 
       valid: false, 
       error: 'Token doğrulanırken hata oluştu'

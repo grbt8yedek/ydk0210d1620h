@@ -1,5 +1,6 @@
 // BiletDukkani Havalimanı Arama API'leri
 import { Airport } from '@/types/flight';
+import { logger } from '@/lib/logger';
 
 // Havalimanı arama fonksiyonu - SERVER-SIDE PROXY KULLAN (güvenli)
 export async function searchAirports(query: string): Promise<Airport[]> {
@@ -36,7 +37,7 @@ export async function searchAirports(query: string): Promise<Airport[]> {
       airport.code.toLowerCase().includes(query.toLowerCase())
     );
   } catch (error) {
-    console.error('Havalimanı arama hatası:', error);
+    logger.error('Havalimanı arama hatası', { error });
     // Hata durumunda demo veri döndür
     return demoAirports.filter(airport => 
       airport.name.toLowerCase().includes(query.toLowerCase()) ||

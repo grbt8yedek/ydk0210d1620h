@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { randomBytes } from 'crypto'
 import { csrfToken as redisCSRFToken } from './redis'
+import { logger } from '@/lib/logger'
 
 // CSRF token store - ARTIK REDIS KULLANILIYOR!
 // Memory Map sadece fallback için (Redis erişilemezse)
@@ -92,7 +93,7 @@ export async function storeCSRFToken(sessionId: string, token: string): Promise<
 export async function isValidCSRFToken(token: string): Promise<boolean> {
   // Token formatını kontrol et
   if (!token || typeof token !== 'string' || token.length !== 64) {
-    console.log('CSRF Token format hatası:', token?.length)
+    logger.debug('CSRF Token format hatası:', token?.length)
     return false
   }
 
@@ -100,18 +101,18 @@ export async function isValidCSRFToken(token: string): Promise<boolean> {
   const isValidInRedis = await redisCSRFToken.verify(token);
   
   if (isValidInRedis) {
-    console.log('CSRF Token kontrolü (Redis):', token.substring(0, 8) + '...', 'GEÇERLİ')
+    logger.debug('CSRF Token kontrolü (Redis):', token.substring(0, 8) + '...', 'GEÇERLİ')
     return true
   }
 
   // Fallback: Memory'den kontrol et
   const tokenData = csrfTokens.get(token);
   if (tokenData && tokenData.expires > Date.now()) {
-    console.log('CSRF Token kontrolü (Memory fallback):', token.substring(0, 8) + '...', 'GEÇERLİ')
+    logger.debug('CSRF Token kontrolü (Memory fallback):', token.substring(0, 8) + '...', 'GEÇERLİ')
     return true;
   }
   
-  console.log('CSRF Token kontrolü:', token.substring(0, 8) + '...', 'GEÇERSİZ')
+  logger.debug('CSRF Token kontrolü:', token.substring(0, 8) + '...', 'GEÇERSİZ')
   return false
 }
 

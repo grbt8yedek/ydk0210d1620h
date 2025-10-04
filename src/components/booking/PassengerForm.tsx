@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 interface PassengerFormProps {
     passengerNumber: number;
@@ -30,7 +31,7 @@ export default function PassengerForm({
 
     // passengerData değişikliklerini izle
     useEffect(() => {
-        console.log(`PassengerForm ${passengerNumber} - passengerData changed:`, {
+        logger.debug(`PassengerForm ${passengerNumber} - passengerData değişti`, {
             isForeigner: passengerData?.isForeigner,
             identityNumber: passengerData?.identityNumber
         });
@@ -55,9 +56,9 @@ export default function PassengerForm({
         // @ts-ignore
         const formValue = isCheckbox ? e.target.checked : value;
         
-        console.log('Form change:', { name, value: formValue, type }); // Debug log
-        console.log('Calling onFormChange with:', { name, formValue }); // Debug log
-        console.log('Current passengerData:', passengerData); // Debug log
+        logger.debug('Form değişikliği', { name, value: formValue, type });
+        logger.debug('onFormChange çağrılıyor', { name, formValue });
+        logger.debug('Mevcut passengerData', { passengerData });
         
         // Form değerini güncelle
         onFormChange(name, formValue);

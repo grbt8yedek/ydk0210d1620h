@@ -10,6 +10,7 @@ import {
   PCIErrorMessages,
   auditLog 
 } from '@/lib/pciCompliance';
+import { logger } from '@/lib/logger';
 
 // Güvenli kart tokenization şeması
 const tokenizeCardSchema = z.object({
@@ -119,7 +120,9 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Kart tokenization hatası:', error);
+    logger.error('Kart tokenization hatası', {
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
     
     return NextResponse.json(
       { 

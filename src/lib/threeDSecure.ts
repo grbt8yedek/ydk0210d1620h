@@ -1,4 +1,5 @@
 import { randomBytes, createHash } from 'crypto';
+import { logger } from '@/lib/logger';
 
 // 3D Secure interface'leri
 export interface ThreeDSecureSession {
@@ -75,7 +76,7 @@ export function initiate3DSecure(request: ThreeDSecureRequest): ThreeDSecureResp
     // Eski session'ları temizle
     cleanupExpiredSessions();
 
-    console.log(`3D Secure başlatıldı: Session ${sessionId.substring(0, 8)}... - ${request.amount} ${request.currency}`);
+    logger.payment(`3D Secure başlatıldı: Session ${sessionId.substring(0, 8)}... - ${request.amount} ${request.currency}`);
 
     return {
       success: true,
@@ -86,7 +87,7 @@ export function initiate3DSecure(request: ThreeDSecureRequest): ThreeDSecureResp
     };
 
   } catch (error) {
-    console.error('3D Secure başlatma hatası:', error);
+    logger.error('3D Secure başlatma hatası:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : '3D Secure başlatılamadı'
@@ -139,7 +140,7 @@ export function complete3DSecure(sessionId: string, pares: string): {
       // Transaction ID oluştur
       const transactionId = `TXN_3DS_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
       
-      console.log(`3D Secure başarılı: Session ${sessionId.substring(0, 8)}... - Transaction ${transactionId}`);
+      logger.payment(`3D Secure başarılı: Session ${sessionId.substring(0, 8)}... - Transaction ${transactionId}`);
       
       return {
         success: true,
@@ -148,7 +149,7 @@ export function complete3DSecure(sessionId: string, pares: string): {
     } else {
       session.status = 'failed';
       
-      console.log(`3D Secure başarısız: Session ${sessionId.substring(0, 8)}... - Geçersiz PARes`);
+      logger.payment(`3D Secure başarısız: Session ${sessionId.substring(0, 8)}... - Geçersiz PARes`);
       
       return {
         success: false,
@@ -157,7 +158,7 @@ export function complete3DSecure(sessionId: string, pares: string): {
     }
 
   } catch (error) {
-    console.error('3D Secure tamamlama hatası:', error);
+    logger.error('3D Secure tamamlama hatası:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : '3D Secure doğrulaması tamamlanamadı'

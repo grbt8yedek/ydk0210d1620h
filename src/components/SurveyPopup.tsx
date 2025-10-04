@@ -6,6 +6,7 @@ import { searchAirports } from '@/services/flightApi';
 import { Airport } from '@/types/flight';
 import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
+import { logger } from '@/lib/logger';
 
 interface SurveyQuestion {
   id: number;
@@ -176,7 +177,7 @@ export default function SurveyPopup() {
           const response = await fetch(`/api/survey?userId=${session.user.id}`);
           const data = await response.json();
           
-          console.log('Survey check:', {
+          logger.debug('Anket kontrolü', {
             userId: session.user.id,
             apiResponse: data,
             pathname: pathname,
@@ -189,7 +190,7 @@ export default function SurveyPopup() {
             const sessionKey = `surveyShown_${session.user.id}_${new Date().toDateString()}`;
             const hasShownToday = localStorage.getItem(sessionKey);
             
-            console.log('LocalStorage check:', {
+            logger.debug('LocalStorage kontrolü', {
               hasCompleted,
               hasShownToday,
               sessionKey
@@ -201,13 +202,13 @@ export default function SurveyPopup() {
             
             // Ana sayfa veya hesabım sayfasında ve bugün gösterilmemişse göster
             if ((isHomePage || isAccountPage) && !hasCompleted && !hasShownToday) {
-              console.log('Showing popup!');
+              logger.debug('Anket popup gösteriliyor');
               setIsOpen(true);
               localStorage.setItem(sessionKey, 'true');
             }
           }
         } catch (error) {
-          console.error('Anket durumu kontrol edilirken hata:', error);
+          logger.error('Anket durumu kontrol hatası', { error });
         }
       } else {
         // Giriş yapmamış kullanıcılar için - yeni kullanıcılar
@@ -215,7 +216,7 @@ export default function SurveyPopup() {
         const hasShownToGuest = localStorage.getItem('surveyShown_guest_today');
         
         if (isHomePage && !hasShownToGuest) {
-          console.log('Showing popup to guest user!');
+          logger.debug('Misafir kullanıcıya anket gösteriliyor');
           setIsOpen(true);
           localStorage.setItem('surveyShown_guest_today', 'true');
         }
@@ -391,7 +392,7 @@ export default function SurveyPopup() {
       const results = await searchAirports(query);
       setSuggestions(results.slice(0, 8)); // Maksimum 8 sonuç
     } catch (error) {
-      console.error('Havaalanı arama hatası:', error);
+      logger.error('Havalimanı arama hatası', { error });
       setSuggestions([]);
     }
   };
@@ -434,7 +435,7 @@ export default function SurveyPopup() {
         setIsOpen(false);
       }
     } catch (error) {
-      console.error('Anket gönderilirken hata:', error);
+      logger.error('Anket gönderilirken hata', { error });
       // Hata olsa bile popup'ı kapat
       localStorage.setItem(`surveyCompleted_${session.user.id}`, 'true');
       setIsOpen(false);

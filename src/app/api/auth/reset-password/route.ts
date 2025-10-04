@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { validatePasswordStrength } from '@/lib/authSecurity'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
     const { token, password } = await request.json()
 
-    console.log('Şifre sıfırlama isteği:', { token: token ? 'var' : 'yok' })
+    logger.debug('Şifre sıfırlama isteği', { hasToken: !!token })
 
     if (!token || !password) {
       return NextResponse.json({
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (!user) {
-      console.log('Geçersiz veya süresi dolmuş token:', token)
+      logger.warn('Geçersiz veya süresi dolmuş token')
       return NextResponse.json({
         success: false,
         error: 'Geçersiz veya süresi dolmuş token'
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    console.log('Şifre başarıyla güncellendi:', {
+    logger.security('Şifre başarıyla sıfırlandı', {
       userId: user.id,
       email: user.email
     })
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Reset password error:', error)
+    logger.error('Reset password error', { error })
     return NextResponse.json({
       success: false,
       error: 'Şifre güncellenirken hata oluştu'

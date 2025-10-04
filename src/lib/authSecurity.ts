@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { randomBytes } from 'crypto'
+import { logger } from '@/lib/logger'
 
 // Brute force koruması için store
 const loginAttempts = new Map<string, { count: number; lastAttempt: number; blockedUntil?: number }>()
@@ -146,7 +147,7 @@ function cleanupOldAttempts(now: number, windowMs: number): void {
 
 // Güvenlik olayını logla
 function logSecurityEvent(event: string, data: any): void {
-  console.log(`[SECURITY] ${event}:`, data)
+  logger.security(event, data)
   // Production'da bu bilgileri güvenlik log sistemine gönder
 }
 

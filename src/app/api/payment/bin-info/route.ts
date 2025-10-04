@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCardBinInfo } from '@/services/paymentApi';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Güvenli kart bilgisi şeması
 const binInfoSchema = z.object({
@@ -30,7 +31,10 @@ export async function POST(request: NextRequest) {
     const bin = cleanCardNumber.substring(0, 6);
 
     // Güvenlik: Sadece BIN'i logla, tam kart numarasını değil
-    console.log(`BIN bilgisi isteniyor: ${bin}**** (${cleanCardNumber.length} hane)`);
+    logger.payment('BIN bilgisi sorgulanıyor', {
+      bin: `${bin}****`,
+      cardLength: cleanCardNumber.length
+    });
 
     // BIN bilgisini al (v2 formatında)
     const binInfo = await getCardBinInfo(cardNumber, {
@@ -46,7 +50,9 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('BIN bilgisi alınırken hata:', error);
+    logger.error('BIN bilgisi alınırken hata', {
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
     
     return NextResponse.json(
       { 

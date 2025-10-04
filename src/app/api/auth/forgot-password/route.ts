@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import crypto from 'crypto'
+import { logger } from '@/lib/logger'
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
     const resetToken = crypto.randomUUID()
     const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000) // 1 saat geçerli
 
-    console.log('Şifre sıfırlama token oluşturuldu:', {
+    logger.security('Şifre sıfırlama token oluşturuldu', {
       email: user.email,
       token: resetToken,
       expiry: resetTokenExpiry
@@ -75,10 +76,10 @@ export async function POST(request: NextRequest) {
       emailSuccess = emailData.success
       
       if (!emailSuccess) {
-        console.error('Email gönderme hatası:', emailData.error)
+        logger.error('Email gönderme hatası', { error: emailData.error })
       }
     } catch (error) {
-      console.error('Email API yanıt hatası:', error)
+      logger.error('Email API yanıt hatası', { error })
     }
 
     // Email gönderilmese bile başarılı mesaj döndür (güvenlik)
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Forgot password error:', error)
+    logger.error('Forgot password error', { error })
     return NextResponse.json({
       success: false,
       error: 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.'

@@ -1,4 +1,5 @@
 import { randomBytes, createHash } from 'crypto';
+import { logger } from '@/lib/logger';
 
 // Kart tokenization için interface'ler
 export interface CardToken {
@@ -58,7 +59,7 @@ export function tokenizeCard(cardData: CardData): string {
   // Eski token'ları temizle
   cleanupExpiredTokens();
   
-  console.log(`Kart tokenize edildi: ${brand} ****${lastFour} (Token: ${token.substring(0, 8)}...)`);
+  logger.payment(`Kart tokenize edildi: ${brand} ****${lastFour} (Token: ${token.substring(0, 8)}...)`);
   
   return token;
 }
@@ -72,13 +73,13 @@ export function getCardFromToken(token: string): CardData | null {
   const cardToken = cardTokens.get(token);
   
   if (!cardToken) {
-    console.log('Geçersiz kart token:', token.substring(0, 8) + '...');
+    logger.payment('Geçersiz kart token:', token.substring(0, 8) + '...');
     return null;
   }
   
   // Token süresi dolmuş mu?
   if (Date.now() > cardToken.expiresAt) {
-    console.log('Süresi dolmuş kart token:', token.substring(0, 8) + '...');
+    logger.payment('Süresi dolmuş kart token:', token.substring(0, 8) + '...');
     cardTokens.delete(token);
     tokenToCard.delete(token);
     return null;
@@ -114,7 +115,7 @@ export function getSecureCardInfo(token: string): Omit<CardToken, 'token'> | nul
  * @param token Güvenli token
  */
 export function invalidateToken(token: string): void {
-  console.log(`Kart token geçersiz kılındı: ${token.substring(0, 8)}...`);
+  logger.payment(`Kart token geçersiz kılındı: ${token.substring(0, 8)}...`);
   cardTokens.delete(token);
   tokenToCard.delete(token);
 }

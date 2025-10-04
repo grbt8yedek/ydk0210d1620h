@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 // Form tarafında bazı alanlar number olarak gelebiliyor; string'e dönüştür.
 const numberLikeToString = z
@@ -76,7 +77,7 @@ export async function PUT(request: Request) {
     return NextResponse.json(updatedUser);
 
   } catch (error) {
-    console.error('Kullanıcı güncelleme hatası:', error);
+    logger.error('Kullanıcı güncelleme hatası', { error });
     return NextResponse.json({ error: 'Sunucu hatası oluştu.' }, { status: 500 });
   }
 } 

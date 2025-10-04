@@ -9,6 +9,7 @@ import LoginModal from './LoginModal';
 import { getEuroRate } from '@/services/exchangeRate';
 import Image from 'next/image';
 import AccountSidebar from './AccountSidebar';
+import { logger } from '@/lib/logger';
 
 export default function Header() {
     const { data: session, status } = useSession();
@@ -23,7 +24,7 @@ export default function Header() {
                 const rate = await getEuroRate();
                 setEuroRate(rate);
             } catch (error) {
-                console.error('Döviz kuru alınamadı:', error);
+                logger.error('Döviz kuru alınamadı', { error });
                 // Fallback değer kaldırıldı - sadece "Yükleniyor..." gösterilecek
             }
         };

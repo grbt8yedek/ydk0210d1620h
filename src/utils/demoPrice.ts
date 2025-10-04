@@ -1,4 +1,5 @@
 import { addDays, subDays } from 'date-fns';
+import { logger } from '@/lib/logger';
 
 export function getDemoPrices(baseDate: Date, currency: string = "EUR") {
   // baseDate geçerli değilse bugünkü tarihi kullan
@@ -21,7 +22,7 @@ export async function fetchPricesFromAPI(origin: string, destination: string, ba
     if (!demo || demo.length === 0) throw new Error('Demo veri boş');
     return demo;
   } catch (error) {
-    console.error('Fiyat çekme hatası:', error);
+    logger.error('Fiyat çekme hatası', { error });
     // Hata durumunda demo veri döndür
     return getDemoPrices(baseDate, currency);
   }

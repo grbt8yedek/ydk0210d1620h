@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cache, cacheKeys, withCache } from '@/lib/cache'
+import { logger } from '@/lib/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error: any) {
-    console.error('Flight search error:', error)
+    logger.error('Flight search error:', error)
     return NextResponse.json(
       { error: 'Flight search failed' },
       { status: 500 }

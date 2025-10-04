@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -31,7 +32,7 @@ async function getLastBackupTime(): Promise<Date | null> {
     const stats = fs.statSync(path.join(backupDir, lastFile));
     return stats.mtime;
   } catch (error) {
-    console.error('Son backup zamanı alınamadı:', error);
+    logger.error('Son backup zamanı alınamadı:', error);
     return null;
   }
 }
@@ -76,7 +77,7 @@ async function createFullBackup(): Promise<string> {
     fs.mkdirSync(backupDir, { recursive: true });
   }
 
-  console.log('🔄 Full database backup oluşturuluyor...');
+  logger.info('🔄 Full database backup oluşturuluyor...');
 
   // Tüm tabloları yedekle
   const backup = {
@@ -205,10 +206,10 @@ async function createFullBackup(): Promise<string> {
       { name: `grbt8-backup-${timestamp}.json`, content: jsonData }
     ], zipFile);
     
-    console.log(`✅ ZIP backup oluşturuldu: ${zipFile}`);
+    logger.info(`✅ ZIP backup oluşturuldu: ${zipFile}`);
     return zipFile;
   } catch (error) {
-    console.error('ZIP oluşturma hatası:', error);
+    logger.error('ZIP oluşturma hatası:', error);
     // ZIP oluşturamazsa JSON dosyasını kaydet
     const jsonFile = path.join(backupDir, `grbt8-backup-${timestamp}.json`);
     fs.writeFileSync(jsonFile, jsonData);
@@ -220,7 +221,7 @@ async function createFullBackup(): Promise<string> {
 async function pushToGitHub(filePath: string, repoOverride?: string): Promise<boolean> {
   try {
     if (!GITHUB_TOKEN) {
-      console.log('⚠️ GitHub token bulunamadı, backup yerel olarak saklanacak');
+      logger.info('⚠️ GitHub token bulunamadı, backup yerel olarak saklanacak');
       return false;
     }
 
@@ -244,15 +245,15 @@ async function pushToGitHub(filePath: string, repoOverride?: string): Promise<bo
     });
 
     if (response.ok) {
-      console.log(`✅ GitHub'a yüklendi: ${fileName}`);
+      logger.info(`✅ GitHub'a yüklendi: ${fileName}`);
       return true;
     } else {
       const errorData = await response.json();
-      console.error('❌ GitHub yükleme hatası:', errorData);
+      logger.error('❌ GitHub yükleme hatası:', errorData);
       return false;
     }
   } catch (error) {
-    console.error('❌ GitHub push hatası:', error);
+    logger.error('❌ GitHub push hatası:', error);
     return false;
   }
 }
@@ -261,11 +262,11 @@ async function pushToGitHub(filePath: string, repoOverride?: string): Promise<bo
 async function cleanupOldGitHubBackups(repoOverride?: string): Promise<void> {
   try {
     if (!GITHUB_TOKEN) {
-      console.log('⚠️ GitHub token yok, temizlik atlanıyor');
+      logger.info('⚠️ GitHub token yok, temizlik atlanıyor');
       return;
     }
 
-    console.log('🧹 GitHub temizlik başlatılıyor (10 günden eski dosyalar)...');
+    logger.info('🧹 GitHub temizlik başlatılıyor (10 günden eski dosyalar)...');
 
     // GitHub'dan dosya listesi al
     const targetRepo = repoOverride || DEFAULT_GITHUB_REPO;
@@ -277,7 +278,7 @@ async function cleanupOldGitHubBackups(repoOverride?: string): Promise<void> {
     });
 
     if (!response.ok) {
-      console.error('❌ GitHub dosya listesi alınamadı');
+      logger.error('❌ GitHub dosya listesi alınamadı');
       return;
     }
 
@@ -315,20 +316,20 @@ async function cleanupOldGitHubBackups(repoOverride?: string): Promise<void> {
           });
 
           if (deleteResponse.ok) {
-            console.log(`🗑️ GitHub'dan eski backup silindi: ${file.name} (${fileDate.toLocaleDateString('tr-TR')})`);
+            logger.info(`🗑️ GitHub'dan eski backup silindi: ${file.name} (${fileDate.toLocaleDateString('tr-TR')})`);
             deletedCount++;
           } else {
-            console.error(`❌ GitHub'dan silinemedi: ${file.name}`);
+            logger.error(`❌ GitHub'dan silinemedi: ${file.name}`);
           }
         }
       } catch (error) {
-        console.error(`❌ Dosya işleme hatası: ${file.name}`, error);
+        logger.error(`❌ Dosya işleme hatası: ${file.name}`, error);
       }
     }
 
-    console.log(`✅ GitHub temizlik tamamlandı: ${deletedCount} eski dosya silindi`);
+    logger.info(`✅ GitHub temizlik tamamlandı: ${deletedCount} eski dosya silindi`);
   } catch (error) {
-    console.error('❌ GitHub temizlik hatası:', error);
+    logger.error('❌ GitHub temizlik hatası:', error);
   }
 }
 
@@ -342,7 +343,7 @@ async function runScheduledBackupFlow(repoOverride?: string): Promise<{ uploaded
   // Yerel dosyayı sil (opsiyonel)
   if (uploaded) {
     fs.unlinkSync(backupFilePath);
-    console.log('🗑️ Yerel backup dosyası silindi');
+    logger.info('🗑️ Yerel backup dosyası silindi');
   }
   // Eski backup'ları temizle (son 10 tanesini sakla)
   const backupDir = path.join('/tmp', 'backups', 'scheduled');
@@ -354,7 +355,7 @@ async function runScheduledBackupFlow(repoOverride?: string): Promise<{ uploaded
     if (files.length > 10) {
       files.slice(10).forEach(file => {
         fs.unlinkSync(path.join(backupDir, file));
-        console.log(`🗑️ Eski backup silindi: ${file}`);
+        logger.info(`🗑️ Eski backup silindi: ${file}`);
       });
     }
   }
@@ -381,7 +382,7 @@ export async function POST(request: NextRequest) {
       const hoursDiff = (now.getTime() - lastBackup.getTime()) / (1000 * 60 * 60);
       
       if (hoursDiff < 6) {
-        console.log(`⏰ Henüz 6 saat geçmedi (${hoursDiff.toFixed(1)} saat), backup atlanıyor`);
+        logger.info(`⏰ Henüz 6 saat geçmedi (${hoursDiff.toFixed(1)} saat), backup atlanıyor`);
         return NextResponse.json({
           success: true,
           message: 'Backup atlandı - henüz 6 saat geçmedi',
@@ -392,7 +393,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    console.log('🚀 Zamanlanmış backup başlatılıyor...');
+    logger.info('🚀 Zamanlanmış backup başlatılıyor...');
 
     const url = new URL(request.url);
     const repoParam = url.searchParams.get('repo') || undefined;
@@ -409,7 +410,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('❌ Scheduled backup hatası:', error);
+    logger.error('❌ Scheduled backup hatası:', error);
     return NextResponse.json(
       { 
         success: false, 
@@ -431,7 +432,7 @@ export async function GET(request: NextRequest) {
 
     // Eğer Vercel Cron tetiklediyse veya doğru secret verildiyse backup'ı çalıştır
     if (isVercelCron || (providedSecret && providedSecret === BACKUP_SECRET)) {
-      console.log('🚀 GET ile zamanlanmış backup tetiklendi');
+      logger.info('🚀 GET ile zamanlanmış backup tetiklendi');
       // Son backup 6 saat kuralını koru
       const lastBackup = await getLastBackupTime();
       const now = new Date();

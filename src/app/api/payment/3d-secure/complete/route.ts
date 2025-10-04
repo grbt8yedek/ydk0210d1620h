@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { complete3DSecure, get3DSecureSession } from '@/lib/threeDSecure';
+import { logger } from '@/lib/logger';
 
 // 3D Secure tamamlama şeması
 const complete3DSchema = z.object({
@@ -36,7 +37,10 @@ export async function POST(request: NextRequest) {
     const result = complete3DSecure(sessionId, pares);
 
     if (result.success) {
-      console.log(`3D Secure tamamlandı: Session ${sessionId.substring(0, 8)}... - Transaction ${result.transactionId}`);
+      logger.payment('3D Secure tamamlandı', {
+        sessionId: sessionId.substring(0, 8) + '...',
+        transactionId: result.transactionId
+      });
       
       return NextResponse.json({
         success: true,
@@ -53,7 +57,9 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('3D Secure tamamlama hatası:', error);
+    logger.error('3D Secure tamamlama hatası', {
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
     
     return NextResponse.json(
       { 

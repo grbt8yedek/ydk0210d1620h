@@ -1,5 +1,7 @@
 // Client-side monitoring veri toplama sistemi
 
+import { logger } from '@/lib/logger';
+
 interface PerformanceMetrics {
   timestamp: string;
   page: string;
@@ -185,7 +187,7 @@ class MonitoringClient {
         body: JSON.stringify(metrics)
       });
     } catch (error) {
-      console.error('Performance metrics gönderilemedi:', error);
+      logger.error('Performance metrics gönderilemedi:', error);
     }
   }
 
@@ -211,7 +213,7 @@ class MonitoringClient {
         body: JSON.stringify(securityEvent)
       });
     } catch (error) {
-      console.error('Security event gönderilemedi:', error);
+      logger.error('Security event gönderilemedi:', error);
     }
   }
 
@@ -236,7 +238,7 @@ class MonitoringClient {
         body: JSON.stringify(userActivity)
       });
     } catch (error) {
-      console.error('User activity gönderilemedi:', error);
+      logger.error('User activity gönderilemedi:', error);
     }
   }
 
@@ -284,9 +286,9 @@ if (typeof window !== 'undefined') {
   // Sayfa yüklendiğinde otomatik başlat
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('Monitoring client initialized');
+      logger.debug('Monitoring client initialized');
     });
   } else {
-    console.log('Monitoring client initialized');
+    logger.debug('Monitoring client initialized');
   }
 }

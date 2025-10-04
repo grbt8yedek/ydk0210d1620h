@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { logger } from '@/lib/logger';
 
 export async function POST() {
   try {
@@ -37,7 +38,7 @@ export async function POST() {
       }
     });
   } catch (error) {
-    console.error('Admin yapma hatası:', error);
+    logger.error('Admin yapma hatası', { error });
     return NextResponse.json(
       { 
         error: 'İşlem sırasında bir hata oluştu',

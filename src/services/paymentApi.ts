@@ -1,5 +1,6 @@
 // BiletDukkani Payment API servisleri
 import { getBiletDukkaniTokenDemo } from './biletdukkaniAuth';
+import { logger } from '@/lib/logger';
 
 const BILETDUKKANI_BASE_URL = process.env.BILETDUKKANI_BASE_URL || 'https://api.biletdukkani.com';
 
@@ -99,7 +100,7 @@ export async function getBinInfo(
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('BIN bilgisi alınırken hata:', error);
+    logger.error('BIN bilgisi alınırken hata', { error });
     throw new Error('Kart bilgileri doğrulanamadı. Lütfen tekrar deneyin.');
   }
 }
@@ -234,7 +235,7 @@ export async function getCardBinInfo(cardNumber: string, options: {
     // Gerçek API'yi dene
     return await getBinInfo(bin, options);
   } catch (error) {
-    console.log('Gerçek API başarısız, demo veri kullanılıyor:', error);
+    logger.warn('Gerçek API başarısız, demo veri kullanılıyor', { error });
     // Gerçek API başarısız olursa demo veri döndür
     return getBinInfoDemo(bin);
   }

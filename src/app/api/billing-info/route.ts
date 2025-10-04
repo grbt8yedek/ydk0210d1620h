@@ -2,16 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { logger } from '@/lib/logger'
 
 // GET - Kullanıcının fatura bilgilerini getir
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
-    console.log('Session:', session); // Debug için
+    logger.debug('Session kontrolü', { hasSession: !!session });
     
     if (!session?.user?.id) {
-      console.log('No session or user ID'); // Debug için
+      logger.warn('Session veya user ID bulunamadı');
       return NextResponse.json(
         { success: false, message: 'Oturum açmanız gerekiyor' },
         { status: 401 }
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Fatura bilgileri getirme hatası:', error)
+    logger.error('Fatura bilgileri getirme hatası', { error })
     return NextResponse.json(
       { success: false, message: 'Fatura bilgileri getirilemedi' },
       { status: 500 }
@@ -48,10 +49,10 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
-    console.log('POST Session:', session); // Debug için
+    logger.debug('POST Session kontrolü', { hasSession: !!session });
     
     if (!session?.user?.id) {
-      console.log('POST No session or user ID'); // Debug için
+      logger.warn('POST Session veya user ID bulunamadı');
       return NextResponse.json(
         { success: false, message: 'Oturum açmanız gerekiyor' },
         { status: 401 }
@@ -126,7 +127,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Fatura bilgisi ekleme hatası:', error)
+    logger.error('Fatura bilgisi ekleme hatası', { error })
     return NextResponse.json(
       { success: false, message: 'Fatura bilgisi eklenemedi' },
       { status: 500 }
@@ -225,7 +226,7 @@ export async function PUT(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Fatura bilgisi güncelleme hatası:', error)
+    logger.error('Fatura bilgisi güncelleme hatası', { error })
     return NextResponse.json(
       { success: false, message: 'Fatura bilgisi güncellenemedi' },
       { status: 500 }
@@ -270,7 +271,7 @@ export async function DELETE(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Fatura bilgisi silme hatası:', error)
+    logger.error('Fatura bilgisi silme hatası', { error })
     return NextResponse.json(
       { success: false, message: 'Fatura bilgisi silinemedi' },
       { status: 500 }
