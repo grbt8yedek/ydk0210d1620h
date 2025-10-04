@@ -93,7 +93,7 @@ export async function storeCSRFToken(sessionId: string, token: string): Promise<
 export async function isValidCSRFToken(token: string): Promise<boolean> {
   // Token formatını kontrol et
   if (!token || typeof token !== 'string' || token.length !== 64) {
-    logger.debug('CSRF Token format hatası:', token?.length)
+    logger.debug('CSRF Token format hatası', { tokenLength: token?.length })
     return false
   }
 
@@ -101,18 +101,18 @@ export async function isValidCSRFToken(token: string): Promise<boolean> {
   const isValidInRedis = await redisCSRFToken.verify(token);
   
   if (isValidInRedis) {
-    logger.debug('CSRF Token kontrolü (Redis):', token.substring(0, 8) + '...', 'GEÇERLİ')
+    logger.debug('CSRF Token kontrolü (Redis)', { token: token.substring(0, 8) + '...', status: 'GEÇERLİ' })
     return true
   }
 
   // Fallback: Memory'den kontrol et
   const tokenData = csrfTokens.get(token);
   if (tokenData && tokenData.expires > Date.now()) {
-    logger.debug('CSRF Token kontrolü (Memory fallback):', token.substring(0, 8) + '...', 'GEÇERLİ')
+    logger.debug('CSRF Token kontrolü (Memory fallback)', { token: token.substring(0, 8) + '...', status: 'GEÇERLİ' })
     return true;
   }
   
-  logger.debug('CSRF Token kontrolü:', token.substring(0, 8) + '...', 'GEÇERSİZ')
+  logger.debug('CSRF Token kontrolü', { token: token.substring(0, 8) + '...', status: 'GEÇERSİZ' })
   return false
 }
 
