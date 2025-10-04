@@ -38,11 +38,18 @@ export async function POST() {
       }
     });
   } catch (error) {
-    logger.error('Admin yapma hatası', { error });
+    // Detaylı error bilgisini logger'a kaydet (güvenli)
+    logger.error('Admin yapma hatası', { 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Kullanıcıya generic mesaj döndür (güvenli)
     return NextResponse.json(
       { 
-        error: 'İşlem sırasında bir hata oluştu',
-        details: error instanceof Error ? error.message : 'Bilinmeyen hata'
+        error: 'İşlem sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+        errorCode: 'ADMIN_ERROR'
       },
       { status: 500 }
     );

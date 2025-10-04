@@ -120,14 +120,19 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
+    // Detaylı error bilgisini logger'a kaydet (güvenli)
     logger.error('Kart tokenization hatası', {
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
     });
     
+    // Kullanıcıya generic mesaj döndür (güvenli)
     return NextResponse.json(
       { 
         success: false, 
-        error: error instanceof Error ? error.message : 'Kart bilgileri işlenirken hata oluştu'
+        error: 'Kart bilgileri işlenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+        errorCode: 'TOKENIZATION_ERROR'
       },
       { status: 500 }
     );

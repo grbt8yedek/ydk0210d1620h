@@ -72,14 +72,19 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
+    // Detaylı error bilgisini logger'a kaydet (güvenli)
     logger.error('3D Secure başlatma hatası', {
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
     });
     
+    // Kullanıcıya generic mesaj döndür (güvenli)
     return NextResponse.json(
       { 
         success: false, 
-        error: error instanceof Error ? error.message : '3D Secure işlemi başlatılamadı'
+        error: '3D Secure işlemi başlatılamadı. Lütfen daha sonra tekrar deneyin.',
+        errorCode: '3DS_INITIATE_ERROR'
       },
       { status: 500 }
     );

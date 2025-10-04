@@ -69,8 +69,17 @@ export async function POST(request: NextRequest) {
     logger.info('Rezervasyon başarıyla oluşturuldu', { reservationId: reservation.id });
     return NextResponse.json(reservation);
   } catch (error) {
-    logger.error('Rezervasyon oluşturma hatası', { error });
-    const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
-    return NextResponse.json({ error: 'Rezervasyon oluşturulurken bir hata oluştu.', details: errorMessage }, { status: 500 });
+    // Detaylı error bilgisini logger'a kaydet (güvenli)
+    logger.error('Rezervasyon oluşturma hatası', { 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Kullanıcıya generic mesaj döndür (güvenli)
+    return NextResponse.json({ 
+      error: 'Rezervasyon oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+      errorCode: 'RESERVATION_ERROR'
+    }, { status: 500 });
   }
 }

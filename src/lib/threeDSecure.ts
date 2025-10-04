@@ -87,10 +87,17 @@ export function initiate3DSecure(request: ThreeDSecureRequest): ThreeDSecureResp
     };
 
   } catch (error) {
-    logger.error('3D Secure başlatma hatası:', error);
+    // Detaylı error bilgisini logger'a kaydet (güvenli)
+    logger.error('3D Secure başlatma hatası', { 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Generic error döndür (güvenli)
     return {
       success: false,
-      error: error instanceof Error ? error.message : '3D Secure başlatılamadı'
+      error: '3D Secure işlemi başlatılamadı. Lütfen daha sonra tekrar deneyin.'
     };
   }
 }
@@ -158,10 +165,17 @@ export function complete3DSecure(sessionId: string, pares: string): {
     }
 
   } catch (error) {
-    logger.error('3D Secure tamamlama hatası:', error);
+    // Detaylı error bilgisini logger'a kaydet (güvenli)
+    logger.error('3D Secure tamamlama hatası', { 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Generic error döndür (güvenli)
     return {
       success: false,
-      error: error instanceof Error ? error.message : '3D Secure doğrulaması tamamlanamadı'
+      error: '3D Secure doğrulaması tamamlanamadı. Lütfen daha sonra tekrar deneyin.'
     };
   }
 }

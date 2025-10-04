@@ -410,11 +410,19 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    logger.error('❌ Scheduled backup hatası:', error);
+    // Detaylı error bilgisini logger'a kaydet (güvenli)
+    logger.error('❌ Scheduled backup hatası', { 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Kullanıcıya generic mesaj döndür (güvenli)
     return NextResponse.json(
       { 
         success: false, 
-        error: error.message,
+        error: 'Backup işlemi sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+        errorCode: 'BACKUP_ERROR',
         timestamp: new Date().toISOString()
       },
       { status: 500 }
@@ -482,8 +490,20 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error: any) {
+    // Detaylı error bilgisini logger'a kaydet (güvenli)
+    logger.error('Backup durumu kontrol hatası', { 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Kullanıcıya generic mesaj döndür (güvenli)
     return NextResponse.json(
-      { success: false, error: error.message },
+      { 
+        success: false, 
+        error: 'Backup durumu kontrol edilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+        errorCode: 'BACKUP_STATUS_ERROR'
+      },
       { status: 500 }
     );
   }

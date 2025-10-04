@@ -50,14 +50,19 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
+    // Detaylı error bilgisini logger'a kaydet (güvenli)
     logger.error('BIN bilgisi alınırken hata', {
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
     });
     
+    // Kullanıcıya generic mesaj döndür (güvenli)
     return NextResponse.json(
       { 
         success: false, 
-        error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+        error: 'BIN bilgisi alınırken bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+        errorCode: 'BIN_INFO_ERROR'
       },
       { status: 500 }
     );

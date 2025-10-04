@@ -201,8 +201,15 @@ export default function PaymentPage() {
         }
         
       } catch (error) {
-        logger.error('Ödeme hatası', { error });
-        setErrors({ cardNumber: error instanceof Error ? error.message : 'Ödeme işlemi başarısız' });
+        // Detaylı error bilgisini logger'a kaydet (güvenli)
+        logger.error('Ödeme hatası', { 
+          error: error instanceof Error ? error.message : 'Unknown error',
+          stack: error instanceof Error ? error.stack : undefined,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Kullanıcıya generic mesaj göster (güvenli)
+        setErrors({ cardNumber: 'Ödeme işlemi sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.' });
       } finally {
         setLoading(false);
       }

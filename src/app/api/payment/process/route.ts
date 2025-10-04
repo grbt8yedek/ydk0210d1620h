@@ -100,15 +100,19 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
+    // Detaylı error bilgisini logger'a kaydet (güvenli)
     logger.error('Ödeme işlemi hatası', { 
       error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
     });
     
+    // Kullanıcıya generic mesaj döndür (güvenli)
     return NextResponse.json(
       { 
         success: false, 
-        error: error instanceof Error ? error.message : 'Ödeme işlemi sırasında hata oluştu'
+        error: 'Ödeme işlemi sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+        errorCode: 'PAYMENT_ERROR'
       },
       { status: 500 }
     );

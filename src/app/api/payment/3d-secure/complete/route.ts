@@ -57,14 +57,19 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
+    // Detaylı error bilgisini logger'a kaydet (güvenli)
     logger.error('3D Secure tamamlama hatası', {
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
     });
     
+    // Kullanıcıya generic mesaj döndür (güvenli)
     return NextResponse.json(
       { 
         success: false, 
-        error: error instanceof Error ? error.message : '3D Secure doğrulaması tamamlanamadı'
+        error: '3D Secure doğrulaması tamamlanamadı. Lütfen daha sonra tekrar deneyin.',
+        errorCode: '3DS_COMPLETE_ERROR'
       },
       { status: 500 }
     );

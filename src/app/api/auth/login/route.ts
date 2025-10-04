@@ -80,10 +80,18 @@ export async function POST(request: Request) {
     }, { status: 401 });
 
   } catch (error) {
-    logger.error('Giriş hatası:', error);
+    // Detaylı error bilgisini logger'a kaydet (güvenli)
+    logger.error('Giriş hatası', { 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Kullanıcıya generic mesaj döndür (güvenli)
     return NextResponse.json({
       success: false,
-      message: error instanceof Error ? error.message : 'Bir hata oluştu'
+      message: 'Giriş işlemi sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+      errorCode: 'LOGIN_ERROR'
     }, { status: 500 });
   }
 } 

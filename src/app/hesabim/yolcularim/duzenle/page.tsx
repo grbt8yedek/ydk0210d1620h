@@ -97,8 +97,15 @@ export default function YolcuDuzenlePage() {
       toast.success(passengerId ? 'Yolcu bilgileri güncellendi' : 'Yeni yolcu eklendi');
       router.push('/hesabim/yolcularim');
     } catch (error) {
-      logger.error('Form gönderme hatası', { error });
-      toast.error(error instanceof Error ? error.message : 'Bilgiler kaydedilirken bir hata oluştu');
+      // Detaylı error bilgisini logger'a kaydet (güvenli)
+      logger.error('Form gönderme hatası', { 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Kullanıcıya generic mesaj göster (güvenli)
+      toast.error('Bilgiler kaydedilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
     } finally {
       setIsLoading(false);
     }
