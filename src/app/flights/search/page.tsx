@@ -21,6 +21,7 @@ import Footer from '@/components/Footer';
 import React from 'react';
 import { useFlightState, useFilterState, useModalState, useUIState, usePriceState } from '@/hooks';
 import CompactFlightCard from '@/components/CompactFlightCard';
+import { logger } from '@/lib/logger';
 
 // Demo fiyat verisi fonksiyonu (API'ye hazır)
 function getDemoPrices(baseDate: Date, currency: string = "EUR") {
@@ -46,7 +47,7 @@ async function fetchPricesFromAPI(origin: string, destination: string, baseDate:
     if (!demo || demo.length === 0) throw new Error('Demo veri boş');
     return demo;
   } catch (error) {
-    console.error('Fiyat çekme hatası:', error);
+    logger.error('Fiyat çekme hatası', { error });
     // Hata durumunda demo veri döndür
     return getDemoPrices(baseDate, currency);
   }

@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 import Image from 'next/image';
 
 import CampaignsSection from '@/components/CampaignsSection';
+import { logger } from '@/lib/logger';
 
 // Type tanımları
 interface Airport {
@@ -87,7 +88,7 @@ export default function Home() {
         directOnly: directOnly
       };
 
-      console.log('Uçuş arama parametreleri:', searchParams);
+      logger.debug('Uçuş arama parametreleri', { searchParams });
 
       // Şimdilik demo - gerçek API entegrasyonu yapılacak
       // const response = await fetch('/api/flights/search', {
@@ -112,7 +113,7 @@ export default function Home() {
       window.location.href = `/flights/search?${params.toString()}`;
 
     } catch (error) {
-      console.error('Uçuş arama hatası:', error);
+      logger.error('Uçuş arama hatası', { error });
       alert('Uçuş arama sırasında bir hata oluştu');
     } finally {
       setIsLoading(false);

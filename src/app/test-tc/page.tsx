@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import PassengerForm from '@/components/booking/PassengerForm';
+import { logger } from '@/lib/logger';
 
 const testFlight = {
     id: '123',
@@ -30,7 +31,7 @@ export default function TestTCPage() {
     });
 
     const handleFormChange = (field: string, value: any) => {
-        console.log('Form change:', { field, value });
+        logger.debug('Form değişikliği', { field, value });
         setPassengerData(prev => ({ ...prev, [field]: value }));
     };
 

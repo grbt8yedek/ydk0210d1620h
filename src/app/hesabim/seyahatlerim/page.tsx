@@ -9,6 +9,7 @@ import HotelCard from '@/components/travel/HotelCard';
 import CarCard from '@/components/travel/CarCard';
 import EmptyState from '@/components/travel/EmptyState';
 import Footer from '@/components/Footer';
+import { logger } from '@/lib/logger';
 
 export default function SeyahatlerimPage() {
   const [activeTab, setActiveTab] = useState<TabType>('ucak');
@@ -107,7 +108,7 @@ export default function SeyahatlerimPage() {
         const reservationsResponse = await fetch('/api/reservations?type=flight');
         if (reservationsResponse.ok) {
           const reservations = await reservationsResponse.json();
-          console.log('Veritabanından gelen rezervasyonlar:', reservations);
+          logger.debug('Veritabanından gelen rezervasyonlar', { count: reservations.length });
           
           if (reservations.length > 0) {
             // Veritabanından gelen rezervasyonları dönüştür
@@ -209,7 +210,7 @@ export default function SeyahatlerimPage() {
           setFlightReservations(results);
         }
       } catch (error) {
-        console.error('Rezervasyonlar yüklenirken hata:', error);
+        logger.error('Rezervasyonlar yüklenirken hata', { error });
         setFlightReservations([]);
       } finally {
         setLoadingFlights(false);

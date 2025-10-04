@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { PassengerFormData } from '@/types/passenger';
 import PassengerForm from '@/components/passenger/PassengerForm';
+import { logger } from '@/lib/logger';
 
 export default function YolcuDuzenlePage() {
   const router = useRouter();
@@ -62,7 +63,7 @@ export default function YolcuDuzenlePage() {
         
         setInitialFormData(formData);
       } catch (error) {
-        console.error('Yolcu bilgileri getirme hatası:', error);
+        logger.error('Yolcu bilgileri getirme hatası', { error });
         toast.error('Yolcu bilgileri getirilemedi');
       }
     };
@@ -96,7 +97,7 @@ export default function YolcuDuzenlePage() {
       toast.success(passengerId ? 'Yolcu bilgileri güncellendi' : 'Yeni yolcu eklendi');
       router.push('/hesabim/yolcularim');
     } catch (error) {
-      console.error('Form gönderme hatası:', error);
+      logger.error('Form gönderme hatası', { error });
       toast.error(error instanceof Error ? error.message : 'Bilgiler kaydedilirken bir hata oluştu');
     } finally {
       setIsLoading(false);

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
+import { logger } from '@/lib/logger';
 
 export default function ApiDocsPage() {
   const [swaggerDoc, setSwaggerDoc] = useState<any>(null);
@@ -107,7 +108,7 @@ export default function ApiDocsPage() {
               }}
               onComplete={() => {
                 // Swagger UI yüklendiğinde çalışır
-                console.log('Swagger UI loaded successfully');
+                logger.debug('Swagger UI yüklendi');
               }}
             />
           )}

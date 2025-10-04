@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { X, Upload, Calendar, Link as LinkIcon, Check } from 'lucide-react'
+import { logger } from '@/lib/logger'
 
 interface Campaign {
   id: string
@@ -68,7 +69,7 @@ export default function CampaignModal({ isOpen, onClose, campaign, onSave }: Cam
       // Yalnızca imageData olarak tut, imageUrl boş kalsın (payload'u ikiye katlama)
       setFormData(prev => ({ ...prev, imageUrl: '', imageData: data.url }))
       setImagePreview(data.url); setUploadSuccess(true); setTimeout(() => setUploadSuccess(false), 2500)
-    } catch (err) { console.error(err); alert('Yükleme hatası') } finally { setIsLoading(false) }
+    } catch (err) { logger.error('Resim yükleme hatası', { error: err }); alert('Yükleme hatası') } finally { setIsLoading(false) }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,7 +85,7 @@ export default function CampaignModal({ isOpen, onClose, campaign, onSave }: Cam
       const data = await res.json()
       if (!res.ok || !data.success) throw new Error(data.error || 'Kayıt hatası')
       onSave(data.data)
-    } catch (err) { console.error(err); alert('Kayıt hatası') } finally { setIsLoading(false) }
+    } catch (err) { logger.error('Kampanya kaydetme hatası', { error: err }); alert('Kayıt hatası') } finally { setIsLoading(false) }
   }
 
   if (!isOpen) return null

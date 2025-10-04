@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { logger } from '@/lib/logger'
 
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams()
@@ -37,7 +38,7 @@ export default function ResetPasswordPage() {
         setMessageType('error')
       }
     } catch (error) {
-      console.error('Token verification error:', error)
+      logger.error('Token verification error', { error })
       setMessage('Token doğrulanırken hata oluştu.')
       setMessageType('error')
     } finally {
@@ -106,7 +107,7 @@ export default function ResetPasswordPage() {
         setMessageType('error')
       }
     } catch (error) {
-      console.error('Reset password error:', error)
+      logger.error('Reset password error', { error })
       setMessage('Bağlantı hatası. Lütfen daha sonra tekrar deneyin.')
       setMessageType('error')
     } finally {

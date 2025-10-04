@@ -18,6 +18,7 @@ import PriceSummary from '@/components/booking/PriceSummary';
 import ReservationModal from '@/components/booking/ReservationModal';
 import ValidationPopup from '@/components/ValidationPopup';
 import Footer from '@/components/Footer';
+import { logger } from '@/lib/logger';
 
 const initialPassengerState = {
     id: null,
@@ -77,10 +78,10 @@ export default function BookingPage() {
                     const data = await response.json();
                     setSavedPassengers(data);
                 } else {
-                    console.log('Could not fetch saved passengers, user might not be logged in.');
+                    logger.debug('Kayıtlı yolcular getirilemedi, kullanıcı giriş yapmamış olabilir');
                 }
             } catch (error) {
-                console.error('Error fetching saved passengers:', error);
+                logger.error('Yolcu listesi getirme hatası', { error });
             }
         };
 
@@ -115,8 +116,8 @@ export default function BookingPage() {
                 const parsedFlight = JSON.parse(decodedFlight);
                 setFlight(parsedFlight);
             } catch (error) {
-                console.error("Failed to parse flight data", error);
-                console.error("Raw flight data:", flightData);
+                logger.error("Uçuş verisi parse edilemedi", { error });
+                logger.debug("Ham uçuş verisi", { flightData });
             }
         }
 
@@ -131,12 +132,11 @@ export default function BookingPage() {
     }, [searchParams, session]);
     
     const handlePassengerFormChange = (passengerIndex: number, field: string, value: any) => {
-        console.log('handlePassengerFormChange:', { passengerIndex, field, value }); // Debug log
+        logger.debug('Yolcu form değişikliği', { passengerIndex, field, value });
         
         // isForeigner değişikliğini özel olarak handle et
         if (field === 'isForeigner') {
-            console.log('isForeigner changed to:', value);
-            console.log('Previous passenger state:', passengerDetails[passengerIndex]);
+            logger.debug('isForeigner değişti', { value, passengerIndex });
         }
         
         const newDetails = [...passengerDetails];
@@ -148,7 +148,7 @@ export default function BookingPage() {
                 [field]: value,
                 identityNumber: '' // TC kimlik numarasını temizle
             };
-            console.log('Cleared identityNumber for passenger', passengerIndex);
+            logger.debug('identityNumber temizlendi', { passengerIndex });
         } else {
             newDetails[passengerIndex] = { ...newDetails[passengerIndex], [field]: value };
         }
@@ -188,8 +188,7 @@ export default function BookingPage() {
                 type: newDetails[passengerIndex].type,
                 isForeigner: Boolean(passengerData.isForeigner) // Boolean'a çevir
             };
-            console.log('Selected saved passenger:', passengerData);
-            console.log('isForeigner value:', passengerData.isForeigner);
+            logger.debug('Kayıtlı yolcu seçildi', { passengerId: passengerData.id, isForeigner: passengerData.isForeigner });
         } else {
             newDetails[passengerIndex] = { ...initialPassengerState, type: newDetails[passengerIndex].type };
         }
@@ -232,7 +231,7 @@ export default function BookingPage() {
                     const newDetails = [...passengerDetails];
                     newDetails[passengerIndex] = { ...newDetails[passengerIndex], ...updatedPassenger };
                     setPassengerDetails(newDetails);
-                    console.log('Yolcu güncellendi:', updatedPassenger);
+                    logger.debug('Yolcu güncellendi', { passengerId: updatedPassenger.id });
                 }
             } else { // Create new passenger
                 const response = await fetch('/api/passengers', {
@@ -249,11 +248,11 @@ export default function BookingPage() {
                     
                     // Kayıtlı yolcular listesini güncelle
                     setSavedPassengers(prev => [newPassenger, ...prev]);
-                    console.log('Yeni yolcu eklendi:', newPassenger);
+                    logger.debug('Yeni yolcu eklendi', { passengerId: newPassenger.id });
                 }
             }
         } catch (error) {
-            console.error('Yolcu kaydetme hatası:', error);
+            logger.error('Yolcu kaydetme hatası', { error });
         }
     };
     
@@ -281,7 +280,7 @@ export default function BookingPage() {
                     }
                 ]
             });
-            console.log('DEMO Ekstra Bagaj API sonucu:', result);
+            logger.debug('DEMO Ekstra Bagaj API sonucu', { result });
         }
     };
 
@@ -300,10 +299,10 @@ export default function BookingPage() {
         
         // Yolcu bilgileri validasyonu
         passengerDetails.forEach((passenger, index) => {
-            console.log(`Passenger ${index + 1} validation:`, { 
+            logger.debug(`Yolcu ${index + 1} validasyonu`, { 
                 isForeigner: passenger.isForeigner, 
-                identityNumber: passenger.identityNumber,
-                firstName: passenger.firstName 
+                hasIdentityNumber: !!passenger.identityNumber,
+                hasFirstName: !!passenger.firstName 
             });
             
             if (!passenger.firstName.trim()) {
@@ -323,10 +322,9 @@ export default function BookingPage() {
             const hasIdentityNumber = passenger.identityNumber.trim().length > 0;
             
             if (!isForeigner && !hasIdentityNumber) {
-                console.log(`TC validation failed for passenger ${index + 1}:`, {
+                logger.warn(`Yolcu ${index + 1} TC validasyonu başarısız`, {
                     isForeigner,
-                    hasIdentityNumber,
-                    identityNumber: passenger.identityNumber
+                    hasIdentityNumber
                 });
                 errors.push(`${index + 1}. yolcu için TC kimlik numarası giriniz`);
             }
@@ -382,7 +380,7 @@ export default function BookingPage() {
 
         try {
             const results = await Promise.all(promises);
-            console.log("Save/Update results:", results);
+            logger.debug("Yolcu kaydetme/güncelleme sonuçları", { count: results.length });
             
             // BiletDukkani POST /orders demo çağrısı
             try {
@@ -447,26 +445,26 @@ export default function BookingPage() {
                         
                         if (reservationResponse.ok) {
                             const savedReservation = await reservationResponse.json();
-                            console.log('Rezervasyon veritabanına kaydedildi:', savedReservation);
+                            logger.info('Rezervasyon veritabanına kaydedildi', { reservationId: savedReservation.id, pnr: orderResult.pnr });
                             alert(`Biletleme başarıyla tamamlandı! PNR: ${orderResult.pnr}`);
                         } else {
                             const errorData = await reservationResponse.json();
-                            console.error('Rezervasyon kaydetme hatası:', errorData);
+                            logger.error('Rezervasyon kaydetme hatası', { error: errorData, pnr: orderResult.pnr });
                             alert(`Biletleme başarılı ama rezervasyon kaydedilemedi. PNR: ${orderResult.pnr}`);
                         }
                     } catch (dbError) {
-                        console.error('Veritabanı kaydetme hatası:', dbError);
+                        logger.error('Veritabanı kaydetme hatası', { error: dbError, pnr: orderResult.pnr });
                         alert(`Biletleme başarılı ama rezervasyon kaydedilemedi. PNR: ${orderResult.pnr}`);
                     }
                 }
             } catch (orderError) {
-                console.error("Sipariş oluşturma hatası:", orderError);
+                logger.error("Sipariş oluşturma hatası", { error: orderError });
                 alert('Sipariş oluşturulurken bir hata oluştu.');
             }
             
             // TODO: Navigate to the actual payment page
         } catch (error) {
-            console.error('Failed to save/update passenger details', error);
+            logger.error('Yolcu bilgilerini kaydetme hatası', { error });
             alert('Yolcu bilgilerini kaydederken bir hata oluştu.');
         }
     };

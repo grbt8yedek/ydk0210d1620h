@@ -10,6 +10,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import { setupErrorTracking } from '@/lib/errorTracking'
 import '@/lib/monitoringClient'
+import { logger } from '@/lib/logger'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -92,7 +93,10 @@ export default function RootLayout({
                       return originalFetch(input, { ...init, headers });
                     }
                   } catch (err) {
-                    console.error('CSRF token eklenemedi:', err);
+                    // Client-side inline script içinde logger kullanılamaz
+                    if (process.env.NODE_ENV === 'development') {
+                      console.error('CSRF token eklenemedi:', err);
+                    }
                   }
                   
                   return originalFetch(input, init);

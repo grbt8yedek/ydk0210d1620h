@@ -11,6 +11,7 @@ import { User, Plane, Users, Receipt, Search, Bell, Heart } from 'lucide-react';
 import { User as PrismaUser } from '@prisma/client';
 import SurveyPopup from '@/components/SurveyPopup';
 import Footer from '@/components/Footer';
+import { logger } from '@/lib/logger';
 
 interface UserData {
   firstName: string;
@@ -93,7 +94,7 @@ export default function HesabimPage() {
         });
       }
     } catch (error) {
-      console.error('Kullanıcı bilgileri çekilemedi:', error);
+      logger.error('Kullanıcı bilgileri çekilemedi', { error });
     }
   };
 

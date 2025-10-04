@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { logger } from "@/lib/logger";
 
 // BIN bilgileri için tip tanımı (v2)
 interface SchemaRule {
@@ -97,7 +98,7 @@ export default function PaymentPage() {
             throw new Error(result.error || 'BIN bilgisi alınamadı');
           }
         } catch (error) {
-          console.error('BIN bilgisi alınamadı:', error);
+          logger.error('BIN bilgisi alınamadı', { error });
           setBinError('Kart bilgileri doğrulanamadı');
           setBinInfo(null);
         } finally {
@@ -193,14 +194,14 @@ export default function PaymentPage() {
         const paymentResult = await paymentResponse.json();
         
         if (paymentResult.success) {
-          console.log('Ödeme başarılı:', paymentResult);
+          logger.payment('Ödeme başarılı', { transactionId: paymentResult.transactionId });
           setSuccess(true);
         } else {
           throw new Error(paymentResult.error || 'Ödeme işlemi başarısız');
         }
         
       } catch (error) {
-        console.error('Ödeme hatası:', error);
+        logger.error('Ödeme hatası', { error });
         setErrors({ cardNumber: error instanceof Error ? error.message : 'Ödeme işlemi başarısız' });
       } finally {
         setLoading(false);

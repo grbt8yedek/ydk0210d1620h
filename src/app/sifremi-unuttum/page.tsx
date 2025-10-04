@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { logger } from '@/lib/logger'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -37,7 +38,7 @@ export default function ForgotPasswordPage() {
         setMessageType('error')
       }
     } catch (error) {
-      console.error('Forgot password error:', error)
+      logger.error('Forgot password error', { error })
       setMessage('Bağlantı hatası. Lütfen daha sonra tekrar deneyin.')
       setMessageType('error')
     } finally {

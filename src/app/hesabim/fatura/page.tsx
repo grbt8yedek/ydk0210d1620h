@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Building2, Home, Plus, Trash2, Edit, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { logger } from '@/lib/logger';
 
 interface BillingInfo {
   id: string;
@@ -92,7 +93,7 @@ export default function FaturaPage() {
         toast.error(result.message);
       }
     } catch (error) {
-      console.error('Fatura bilgileri getirme hatası:', error);
+      logger.error('Fatura bilgileri getirme hatası', { error });
       toast.error('Fatura bilgileri yüklenemedi');
     } finally {
       setLoading(false);
@@ -181,7 +182,7 @@ export default function FaturaPage() {
         toast.error(result.message);
       }
     } catch (error) {
-      console.error('Fatura bilgisi kaydetme hatası:', error);
+      logger.error('Fatura bilgisi kaydetme hatası', { error });
       toast.error('Fatura bilgisi kaydedilemedi');
     }
   };
@@ -207,7 +208,7 @@ export default function FaturaPage() {
         toast.error(result.message);
       }
     } catch (error) {
-      console.error('Fatura bilgisi silme hatası:', error);
+      logger.error('Fatura bilgisi silme hatası', { error });
       toast.error('Fatura bilgisi silinemedi');
     }
   };
@@ -261,7 +262,7 @@ export default function FaturaPage() {
         toast.error(result.message);
       }
     } catch (error) {
-      console.error('Varsayılan adres ayarlama hatası:', error);
+      logger.error('Varsayılan adres ayarlama hatası', { error });
       toast.error('Varsayılan adres ayarlanamadı');
     }
   };

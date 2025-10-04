@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { useSession, signOut } from 'next-auth/react';
 import Footer from '@/components/Footer';
+import { logger } from '@/lib/logger';
 
 interface Passenger {
   id: string;
@@ -37,7 +38,7 @@ export default function YolcularimPage() {
         const data = await response.json();
         setPassengers(data);
       } catch (error) {
-        console.error('Yolcu listesi getirme hatası:', error);
+        logger.error('Yolcu listesi getirme hatası', { error });
         toast.error('Yolcu listesi getirilemedi');
       } finally {
         setIsLoading(false);
@@ -69,7 +70,7 @@ export default function YolcularimPage() {
       setPassengers(passengers.filter(p => p.id !== passengerId));
       toast.success('Yolcu başarıyla silindi');
     } catch (error) {
-      console.error('Yolcu silme hatası:', error);
+      logger.error('Yolcu silme hatası', { error });
       toast.error('Yolcu silinirken bir hata oluştu');
     }
   };
