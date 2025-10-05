@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
   })
 
   const result = { success: true, data: items }
-  return jsonOk(result)
+  return jsonOk(result, 300)
 }
 
 export async function POST(request: NextRequest) {

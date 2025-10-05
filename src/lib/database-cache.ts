@@ -41,10 +41,6 @@ export class DatabaseCache {
     return await this.withCache(cacheKey, () =>
       prisma.reservation.findMany({
         where: { userId },
-        include: {
-          passengers: true,
-          payment: true
-        },
         orderBy: { createdAt: 'desc' },
         take: 10
       }), 180 // 3 dakika cache

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { logger } from '@/lib/logger';
+import { cache, cacheKeys } from '@/lib/cache';
 
 export async function GET() {
   try {
@@ -13,6 +14,16 @@ export async function GET() {
     }
 
     const userId = session.user.id;
+    const cacheKey = cacheKeys.userProfile(userId);
+
+    // Cache'den kontrol et
+    const cachedUser = cache.get(cacheKey);
+    if (cachedUser) {
+      logger.debug(`User profile cache hit: ${userId}`);
+      return NextResponse.json(cachedUser, {
+        headers: { 'Cache-Control': 'public, max-age=300' }
+      });
+    }
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
@@ -35,11 +46,16 @@ export async function GET() {
       return NextResponse.json({ error: 'Kullanıcı bulunamadı.' }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    // Cache'e kaydet (5 dakika)
+    cache.set(cacheKey, user, 300);
+    logger.debug(`User profile cached: ${userId}`);
+
+    return NextResponse.json(user, {
+      headers: { 'Cache-Control': 'public, max-age=300' }
+    });
 
   } catch (error) {
     logger.error('Kullanıcı profili hatası', { error });
     return NextResponse.json({ error: 'Sunucu hatası oluştu.' }, { status: 500 });
   }
 }
-

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -46,7 +47,7 @@ export async function PUT(request: Request) {
     const dataToUpdate = validation.data;
 
     // Prisma transaction kullanarak User ve ilgili ana Passenger kaydını güncelle
-    const updatedUser = await prisma.$transaction(async (tx: typeof prisma) => {
+    const updatedUser = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const user = await tx.user.update({
         where: { id: userId },
         data: dataToUpdate,

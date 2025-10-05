@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { validatePasswordStrength } from '@/lib/authSecurity';
 import { logger } from '@/lib/logger';
@@ -42,7 +43,7 @@ export async function POST(req: Request) {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const result = await prisma.$transaction(async (tx: typeof prisma) => {
+        const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
             // 1. Create the user
             const newUser = await tx.user.create({
                 data: {

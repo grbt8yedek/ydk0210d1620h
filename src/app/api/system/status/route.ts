@@ -1,101 +1,79 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import os from 'os';
-import fs from 'fs';
-import path from 'path';
 import { logger } from '@/lib/logger';
+import { cache } from '@/lib/cache';
+import { checkRateLimit } from '@/lib/rate-limiter';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Sistem bilgilerini topla
-    const systemInfo = {
-      // Sunucu bilgileri
-      serverStatus: 'active',
-      version: '1.0.0',
-      uptime: process.uptime(),
-      nodeVersion: process.version,
-      platform: os.platform(),
-      arch: os.arch(),
-      
-      // Bellek kullanımı
-      memory: {
-        total: os.totalmem(),
-        free: os.freemem(),
-        used: os.totalmem() - os.freemem(),
-        usage: ((os.totalmem() - os.freemem()) / os.totalmem()) * 100
+    // Rate limiting
+    const rateLimitResult = await checkRateLimit(request, 60, 60000); // 60 req/min
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json({ error: 'Çok fazla istek' }, { status: 429 });
+    }
+
+    const cacheKey = 'system-status';
+    const cached = cache.get(cacheKey);
+    
+    if (cached) {
+      logger.debug('System status cache hit');
+      return NextResponse.json(cached, {
+        headers: { 'Cache-Control': 'public, max-age=60' }
+      });
+    }
+
+    const now = new Date();
+    const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    const [
+      totalUsers,
+      activeUsers,
+      totalReservations,
+      recentReservations,
+      systemHealth
+    ] = await Promise.all([
+      prisma.user.count(),
+      prisma.user.count({
+        where: { lastLoginAt: { gte: last24Hours } }
+      }),
+      prisma.reservation.count(),
+      prisma.reservation.count({
+        where: { createdAt: { gte: last24Hours } }
+      }),
+      // System health check
+      prisma.$queryRaw`SELECT 1 as health`.then(() => 'healthy').catch(() => 'unhealthy')
+    ]);
+
+    const status = {
+      timestamp: now.toISOString(),
+      users: {
+        total: totalUsers,
+        active24h: activeUsers
       },
-      
-      // CPU bilgileri
-      cpu: {
-        cores: os.cpus().length,
-        model: os.cpus()[0]?.model || 'Unknown',
-        loadAverage: os.loadavg()
+      reservations: {
+        total: totalReservations,
+        recent24h: recentReservations
       },
-      
-      // Disk kullanımı (veritabanı dosyası)
-      disk: {
-        dbPath: '/Users/incesu/Desktop/grbt8/prisma/dev.db',
-        dbSize: 0
-      },
-      
-      // Ağ bilgileri
-      network: {
-        hostname: os.hostname(),
-        interfaces: os.networkInterfaces()
-      },
-      
-      // Veritabanı durumu
-      database: {
-        status: 'connected',
-        userCount: 0,
-        reservationCount: 0,
-        paymentCount: 0
-      },
-      
-      // Son güncelleme
-      lastUpdate: new Date().toISOString()
+      system: {
+        status: systemHealth,
+        uptime: process.uptime(),
+        memory: process.memoryUsage()
+      }
     };
 
-    // Veritabanı istatistikleri
-    try {
-      const userCount = await prisma.user.count();
-      const reservationCount = await prisma.reservation.count();
-      const paymentCount = await prisma.payment.count();
-      
-      systemInfo.database.userCount = userCount;
-      systemInfo.database.reservationCount = reservationCount;
-      systemInfo.database.paymentCount = paymentCount;
-    } catch (error) {
-      logger.error('Database stats error:', error);
-      systemInfo.database.status = 'error';
-    }
+    // Cache for 1 minute
+    cache.set(cacheKey, status, 60);
+    logger.debug('System status cached');
 
-    // Veritabanı dosya boyutu
-    try {
-      const dbPath = '/Users/incesu/Desktop/grbt8/prisma/dev.db';
-      if (fs.existsSync(dbPath)) {
-        const stats = fs.statSync(dbPath);
-        systemInfo.disk.dbSize = stats.size;
-      }
-    } catch (error) {
-      logger.error('Disk size error:', error);
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: systemInfo
+    return NextResponse.json(status, {
+      headers: { 'Cache-Control': 'public, max-age=60' }
     });
 
   } catch (error) {
     logger.error('System status error:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Sistem durumu alınamadı' 
-      },
+      { error: 'Sistem durumu alınamadı' },
       { status: 500 }
     );
   }
 }
-
-
