@@ -42,6 +42,17 @@ export default function RootLayout({
             __html: JSON.stringify(websiteSchema),
           }}
         />
+      
+        {process.env.NODE_ENV === 'production' ? (
+          <script dangerouslySetInnerHTML={{ __html: `
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+              });
+            }
+          `}} />
+        ) : null}
+  
       </head>
       <body className={inter.className}>
         <ErrorBoundary>

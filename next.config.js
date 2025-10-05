@@ -30,6 +30,23 @@ const nextConfig = {
     // Production'da source map boyutunu küçült
     if (!isServer && process.env.NODE_ENV === 'production') {
       config.devtool = 'source-map';
+      
+      // CSS optimization
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          ...config.optimization.splitChunks,
+          cacheGroups: {
+            ...config.optimization.splitChunks.cacheGroups,
+            styles: {
+              name: 'styles',
+              type: 'css/mini-extract',
+              chunks: 'all',
+              enforce: true,
+            },
+          },
+        },
+      };
     }
     return config;
   },
@@ -43,6 +60,13 @@ const nextConfig = {
   // Experimental features (Next.js 13.5.6 için güvenli)
   experimental: {
     optimizePackageImports: ['lucide-react', 'react-hot-toast'], // Tree shaking
+  },
+
+  // CSS optimizasyonları
+  compiler: {
+    // CSS minification
+    styledComponents: false,
+    removeConsole: process.env.NODE_ENV === 'production',
   },
   
   // HTTP headers (ekstra güvenlik)
@@ -71,6 +95,25 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()'
           },
+        ],
+
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }
+        ],
+      },
+      {
+        source: '/:all*.(png|jpg|jpeg|gif|webp|avif|svg|ico|css|js|woff|woff2)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }
+        ],
+      },
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=60, stale-while-revalidate=300' }
         ],
       },
     ];
