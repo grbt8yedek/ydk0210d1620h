@@ -5,7 +5,6 @@ import FacebookProvider from "next-auth/providers/facebook";
 import bcrypt from 'bcryptjs';
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "./prisma";
-import { User } from "@prisma/client";
 import { Adapter } from "next-auth/adapters";
 
 declare module "next-auth" {
@@ -49,16 +48,16 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 // Giriş yaparken tüm bilgileri ekle
                 token.id = user.id;
-                token.phone = (user as User).phone;
-                token.firstName = (user as User).firstName;
-                token.lastName = (user as User).lastName;
-                token.countryCode = (user as User).countryCode;
-                token.birthDay = (user as User).birthDay;
-                token.birthMonth = (user as User).birthMonth;
-                token.birthYear = (user as User).birthYear;
-                token.gender = (user as User).gender;
-                token.identityNumber = (user as User).identityNumber;
-                token.isForeigner = (user as User).isForeigner;
+                token.phone = (user as any).phone;
+                token.firstName = (user as any).firstName;
+                token.lastName = (user as any).lastName;
+                token.countryCode = (user as any).countryCode;
+                token.birthDay = (user as any).birthDay;
+                token.birthMonth = (user as any).birthMonth;
+                token.birthYear = (user as any).birthYear;
+                token.gender = (user as any).gender;
+                token.identityNumber = (user as any).identityNumber;
+                token.isForeigner = (user as any).isForeigner;
             } else if (trigger === 'update' && token.id) {
                 // Session güncellendiğinde veritabanından güncel bilgileri çek
                 const updatedUser = await prisma.user.findUnique({

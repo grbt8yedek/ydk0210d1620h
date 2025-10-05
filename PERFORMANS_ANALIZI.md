@@ -46,12 +46,8 @@
 - ❌ **Prisma 5.13.0** → 5.20.x güncellemesi gerekli
 - ❌ **next-auth 4.24.5** → 5.x güncellemesi gerekli
 - ❌ **Bundle Size** - ~800KB (hedef: <500KB)
+⚠️ **GÜVENLİK NOTU:** Bu dependency güncellemeleri sadece ayrı yedekte test edilecek, production'da asla yapılmayacak! Breaking changes riski yüksek.
 
-#### **2. Code Splitting Eksikliği**
-- ❌ **Dynamic imports** kullanılmamış
-- ❌ **Route-based splitting** eksik
-- ❌ **Component lazy loading** yok
-- ❌ **Admin panel** - Tüm kod yükleniyor
 
 #### **3. Database Performance**
 - ❌ **Query optimization** eksik

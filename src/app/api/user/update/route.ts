@@ -46,7 +46,7 @@ export async function PUT(request: Request) {
     const dataToUpdate = validation.data;
 
     // Prisma transaction kullanarak User ve ilgili ana Passenger kaydını güncelle
-    const updatedUser = await prisma.$transaction(async (tx) => {
+    const updatedUser = await prisma.$transaction(async (tx: typeof prisma) => {
       const user = await tx.user.update({
         where: { id: userId },
         data: dataToUpdate,

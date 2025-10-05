@@ -8,7 +8,6 @@ import ChangePasswordModal from '@/components/ChangePasswordModal';
 import DeleteAccountModal from '@/components/DeleteAccountModal';
 import { useSession, signOut } from 'next-auth/react';
 import { User, Plane, Users, Receipt, Search, Bell, Heart } from 'lucide-react';
-import { User as PrismaUser } from '@prisma/client';
 import SurveyPopup from '@/components/SurveyPopup';
 import Footer from '@/components/Footer';
 import { logger } from '@/lib/logger';

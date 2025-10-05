@@ -27,9 +27,9 @@ export class QueryOptimizer {
     ]);
 
     // Combine data
-    return users.map(user => ({
+    return users.map((user: any) => ({
       ...user,
-      reservations: reservations.filter(r => r.userId === user.id)
+      reservations: reservations.filter((r: any) => r.userId === user.id)
     }));
   }
 
