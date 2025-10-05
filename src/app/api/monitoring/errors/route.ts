@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     };
 
     // Log'ları analiz et
-    errorLogs.forEach(log => {
+    errorLogs.forEach((log: any) => {
       // Hata tiplerini say
       const errorType = log.source || 'Unknown';
       errorsByType[errorType] = (errorsByType[errorType] || 0) + 1;
@@ -73,16 +73,16 @@ export async function GET(request: NextRequest) {
     const stats = {
       totalErrors: errorLogs.length,
       criticalErrors: criticalLogs.length,
-      highErrors: errorLogs.filter(log => log.level === 'error').length,
-      mediumErrors: errorLogs.filter(log => log.level === 'warn').length,
-      lowErrors: errorLogs.filter(log => log.level === 'info').length,
+      highErrors: errorLogs.filter((log: any) => log.level === 'error').length,
+      mediumErrors: errorLogs.filter((log: any) => log.level === 'warn').length,
+      lowErrors: errorLogs.filter((log: any) => log.level === 'info').length,
       errorsByType,
       errorsBySeverity,
       topErrorPages: pageErrors,
       hourlyDistribution: (() => {
         const distribution: Record<number, number> = {};
         for (let i = 0; i < 24; i++) {
-          const hourErrors = errorLogs.filter(log => 
+          const hourErrors = errorLogs.filter((log: any) => 
             new Date(log.timestamp).getHours() === i
           ).length;
           distribution[i] = hourErrors;
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
         return distribution;
       })(),
       uniqueUsers: allUsers.length,
-      recentCriticalErrors: criticalLogs.map(log => ({
+      recentCriticalErrors: criticalLogs.map((log: any) => ({
         timestamp: log.timestamp.toISOString(),
         errorType: log.source || 'Unknown',
         message: log.message.substring(0, 100),

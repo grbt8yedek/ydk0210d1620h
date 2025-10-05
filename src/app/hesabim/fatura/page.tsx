@@ -128,32 +128,77 @@ export default function FaturaPage() {
   // Fatura bilgisi kaydet
   const handleSave = async () => {
     try {
-      const url = editingId ? '/api/billing-info' : '/api/billing-info';
-      const method = editingId ? 'PUT' : 'POST';
-      
       // Session'dan userId'yi al
       if (!session?.user?.id) {
         toast.error('Oturum bilgisi bulunamadı');
         return;
       }
+
+      // Form validasyonu
+      if (!form.title?.trim()) {
+        toast.error('Adres başlığı gereklidir');
+        return;
+      }
+      
+      if (!form.address?.trim()) {
+        toast.error('Adres gereklidir');
+        return;
+      }
+      
+      if (!form.city?.trim()) {
+        toast.error('İl gereklidir');
+        return;
+      }
+      
+      if (!form.country?.trim()) {
+        toast.error('Ülke seçimi gereklidir');
+        return;
+      }
+      
+      // Bireysel için ad soyad kontrolü
+      if (form.type === 'individual') {
+        if (!form.firstName?.trim()) {
+          toast.error('Ad gereklidir');
+          return;
+        }
+        if (!form.lastName?.trim()) {
+          toast.error('Soyad gereklidir');
+          return;
+        }
+      }
+      
+      // Kurumsal için şirket bilgileri kontrolü
+      if (form.type === 'corporate') {
+        if (!form.companyName?.trim()) {
+          toast.error('Şirket adı gereklidir');
+          return;
+        }
+        if (!form.taxNumber?.trim()) {
+          toast.error('Vergi numarası gereklidir');
+          return;
+        }
+      }
+
+      const url = editingId ? '/api/billing-info' : '/api/billing-info';
+      const method = editingId ? 'PUT' : 'POST';
       
       // Temiz veri hazırla
       const billingData: any = {
         userId: session.user.id,
         type: form.type,
-        title: form.title,
-        firstName: form.firstName,
-        lastName: form.lastName,
-        address: form.address,
-        city: form.city, // İl
-        country: form.country, // Ülke
+        title: form.title.trim(),
+        firstName: form.firstName?.trim(),
+        lastName: form.lastName?.trim(),
+        address: form.address.trim(),
+        city: form.city.trim(),
+        country: form.country.trim(),
         isDefault: form.isDefault || false
       };
       
       // Sadece kurumsal ise ekle
       if (form.type === 'corporate') {
-        billingData.companyName = form.companyName;
-        billingData.taxNumber = form.taxNumber;
+        billingData.companyName = form.companyName?.trim();
+        billingData.taxNumber = form.taxNumber?.trim();
       }
       
       // Eğer düzenleme ise id ekle
@@ -179,7 +224,7 @@ export default function FaturaPage() {
         setIsAdding(false);
         setForm({});
       } else {
-        toast.error(result.message);
+        toast.error(result.message || 'Bir hata oluştu');
       }
     } catch (error) {
       logger.error('Fatura bilgisi kaydetme hatası', { error });

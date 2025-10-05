@@ -344,6 +344,3 @@ model BillingInfo {
 
   @@index([userId])
 }
-
-// Performance Indexes - Eklenen tarih: 2025-01-03
-// Index'ler migration dosyasında eklenecek
